@@ -510,9 +510,11 @@ var notifications = require('../notifications') // Load Push Events
                       comment: comment
                     })
                     .then(function (html) {
+                      // DISSUE is not a typo, just try to make it special.
+                      // todo should make it configurable in Setttings
                       var mailOptions = {
                         to: emails.join(),
-                        subject: 'Updated: Ticket #' + ticket.uid + '-' + ticket.subject,
+                        subject: '[DISSUE#' + ticket.uid + ']-' + ticket.subject,
                         html: html,
                         generateTextFromHTML: true
                       }

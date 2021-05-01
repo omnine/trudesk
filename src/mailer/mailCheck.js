@@ -361,7 +361,7 @@ function handleMessages (messages, done) {
                 owner: message.owner._id
               }
               // check if the message is already in the ticket
-              const startIndex = message.subject.indexOf('[ISSUE#')
+              const startIndex = message.subject.indexOf('[DISSUE#')
               startIndex = startIndex + 7
               endIndex = message.subject.indexOf(']', startIndex)
 
