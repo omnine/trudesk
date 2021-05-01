@@ -360,6 +360,27 @@ function handleMessages (messages, done) {
                 description: 'Ticket was created.',
                 owner: message.owner._id
               }
+              // check if the message is already in the ticket
+              const startIndex = message.subject.indexOf('[ISSUE#')
+              startIndex = startIndex + 7
+              endIndex = message.subject.indexOf(']', startIndex)
+
+              var tid = message.subject.substring(startIndex, endIndex)
+              if (tid) {
+                Ticket.getTicketByUid(tid, function (err, ticket) {
+                  var comment = {
+                    owner: message.owner._id,
+                    date: new Date(),
+                    comment: message.body
+                  }
+
+                  ticket.comments.push(comment)
+                  ticket.save(function (err, ticket) {
+                    return callback()
+                  })
+                })
+                return // will not do Ticket.create
+              }
 
               Ticket.create(
                 {
