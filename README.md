@@ -69,3 +69,9 @@ Trudesk is tested with confidence using [BrowserStack](https://browserstack.com)
     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
     See the License for the specific language governing permissions and
     limitations under the License.
+
+### Knowledge
+
+The webpack bundle destination is public/js  
+How to check webpack version? `yarn list webpack`  
+

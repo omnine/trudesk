@@ -2,6 +2,7 @@ var path = require('path')
 var webpack = require('webpack')
 var MiniCssExtractPlugin = require('mini-css-extract-plugin')
 var TerserPlugin = require('terser-webpack-plugin')
+const HtmlWebpackPlugin = require('html-webpack-plugin')
 
 module.exports = {
   mode: process.env.NODE_ENV === 'production' ? 'production' : 'development',
@@ -189,6 +190,11 @@ module.exports = {
       moment: 'moment',
       'window.moment': 'moment',
       setImmediate: 'async'
+    }),
+    new HtmlWebpackPlugin({
+      filename: 'taskpane.html',
+      template: './src/public/taskpane/taskpane.html',
+      chunks: ['polyfill', 'taskpane']
     }),
     new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
     new webpack.optimize.OccurrenceOrderPlugin(),
