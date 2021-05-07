@@ -22,6 +22,7 @@ module.exports = {
       'underscore'
     ],
     'trudesk.min': path.resolve(__dirname, 'src/public/js/app.js'),
+    taskpane: './src/public/taskpane/taskpane.js',
     truRequire: 'expose-loader?truRequire!' + path.resolve(__dirname, './src/public/js/truRequire')
   },
   output: {
