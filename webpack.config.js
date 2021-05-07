@@ -192,7 +192,7 @@ module.exports = {
       setImmediate: 'async'
     }),
     new HtmlWebpackPlugin({
-      filename: 'taskpane.html',
+      filename: 'outlook/taskpane.html',
       template: './src/public/taskpane/taskpane.html',
       chunks: ['polyfill', 'taskpane']
     }),

@@ -96,7 +96,8 @@ module.exports = function (app, db, callback) {
         app.use(allowCrossDomain)
         // Mobile
         app.use('/mobile', express.static(path.join(__dirname, '../../', 'mobile')))
-
+        //serve static files for outlook addin taskpane, use a virtual folder 'outlook'
+        app.use('/outlook', express.static(path.join(__dirname, '../../public/js/outlook')))
         app.use('/assets', express.static(path.join(__dirname, '../../public/uploads/assets')))
         app.use('/uploads/users', express.static(path.join(__dirname, '../../public/uploads/users')))
         app.use('/uploads', middleware.hasAuth, express.static(path.join(__dirname, '../../public/uploads')))
