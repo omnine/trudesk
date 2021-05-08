@@ -127,6 +127,7 @@
     "babel-loader": "8.0.5",
     "chai": "*",
     "codacy-coverage": "3.0.0",
+    "copy-webpack-plugin": "4",
     "cross-env": "5.2.0",
     "css-loader": "2.1.0",
     "eslint": "5.12.1",

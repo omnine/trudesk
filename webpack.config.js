@@ -3,6 +3,7 @@ var webpack = require('webpack')
 var MiniCssExtractPlugin = require('mini-css-extract-plugin')
 var TerserPlugin = require('terser-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
+const CopyWebpackPlugin = require('copy-webpack-plugin')
 
 module.exports = {
   mode: process.env.NODE_ENV === 'production' ? 'production' : 'development',
@@ -196,6 +197,12 @@ module.exports = {
       template: './src/public/taskpane/taskpane.html',
       chunks: ['polyfill', 'taskpane']
     }),
+    new CopyWebpackPlugin([
+      {
+        to: 'outlook/taskpane.css',
+        from: './src/public/taskpane/taskpane.css'
+      }
+    ]),
     new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
     new webpack.optimize.OccurrenceOrderPlugin(),
     new MiniCssExtractPlugin({
