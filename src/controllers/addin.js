@@ -44,7 +44,7 @@ addinController.validateAgent = function (req, res) {
 
   //then render token back as json
 
-  return res.render({ token: '123456' })
+  return res.json({ token: '123456' })
 }
 
 //Post

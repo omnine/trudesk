@@ -58,6 +58,10 @@ function mainRoutes (router, middleware, controllers) {
     res.send(captcha.data)
   })
 
+  // Addin
+  router.get('/validateagent', controllers.addin.validateAgent)
+  router.post('/updateemailsubject', controllers.addin.updateSubject)
+
   // Public
   router.get('/newissue', controllers.tickets.pubNewIssue)
   router.get('/register', controllers.accounts.signup)
