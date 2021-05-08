@@ -65,7 +65,7 @@ function doSomething (item) {
     while (ticket[0] == '0') {
       ticket = ticket.substring(1)
     }
-    window.location.href = 'https://helpdesk.deepnetsecurity.com/#ticket/zoom/' + ticket
+    window.location.href = 'https://helpdesk.deepnetsecurity.com/tickets/' + ticket
   }
 }
 
@@ -100,7 +100,7 @@ export async function email2Case () {
     }
 
     let bodyHtml = result.value
-
+    //ticket and comment may need to create seperately.
     var item = Office.context.mailbox.item
     let data = {
       title: item.subject,
@@ -118,7 +118,7 @@ export async function email2Case () {
     }
 
     $.ajax({
-      url: 'https://helpdesk.deepnetsecurity.com/api/v1/tickets',
+      url: 'https://helpdesk.deepnetsecurity.com/api/v1/tickets/create',
       method: 'POST',
       dataType: 'json',
       crossDomain: true,
@@ -130,19 +130,13 @@ export async function email2Case () {
         xhr.setRequestHeader('Authorization', 'Token token=' + userAPIToken)
       },
       success: function (result) {
-        window.location.href = 'https://helpdesk.deepnetsecurity.com/#ticket/zoom/' + result.id
+        window.location.href = 'https://helpdesk.deepnetsecurity.com/tickets/' + result.ticket.uid
 
         // modify the subject by adding ticket number after the ticket is successfully created.
         // unfortunately, in read form, we can't do that. item.subject is a string, not object.
 
         let subject = item.subject
-        if (result.id < 1000) {
-          let tn = 62000 + result.id
-          subject += ' [Ticket#' + tn + ']'
-        } else {
-          subject += ' [Ticket#62' + result.id + ']'
-        }
-
+        subject = '[DISSUE#' + result.ticket.uid + ']-' + subject  
         updateSubject(item.itemId, subject)
       },
       error: function (xhr, status, error) {
@@ -215,6 +209,7 @@ function keySave () {
   document.getElementById('convert').disabled = false
 }
 
+// We have to ask the server to do the job
 function updateSubject (itemId, subject) {
   let data = {
     itemId: itemId,

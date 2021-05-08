@@ -74,4 +74,4 @@ Trudesk is tested with confidence using [BrowserStack](https://browserstack.com)
 
 The webpack bundle destination is public/js  
 How to check webpack version? `yarn list webpack`  
-
+EWS in node,  the best one https://github.com/gautamsi/ews-javascript-api   
