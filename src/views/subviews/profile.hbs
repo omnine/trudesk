@@ -102,6 +102,10 @@
                                             <label for="aEmail">Email</label>
                                             <input id="aEmail" class="md-input" name="aEmail" type="email" value="{{data.account.email}}"/>
                                         </div>
+                                        <div class="uk-margin-medium-bottom">
+                                            <label for="aExchUID">Exchange UID</label>
+                                            <input id="aExchUID" class="md-input" name="aExchUID" type="text" value="{{data.account.msexchuid}}"/>
+                                        </div>                                        
                                         <div class="uk-clearfix">
                                             <button type="submit" class="uk-float-right md-btn md-btn-small md-btn-success md-btn-wave-light" ng-click="updateUser($event)">Save</button>
                                         </div>

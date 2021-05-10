@@ -44,6 +44,7 @@ var COLLECTION = 'accounts'
  * @property {String} tOTPKey One Time Password Secret Key
  * @property {Number} tOTPPeriod One Time Password Key Length (Time) - Default 30 Seconds
  * @property {String} accessToken API Access Token
+ * @property {String} msexchuid an user UUID assigned by Exchange server
  * @property {Array} iOSDeviceTokens Array of String based device Ids for Apple iOS devices. *push notifications*
  * @property {Object} preferences Object to hold user preferences
  * @property {Boolean} preferences.autoRefreshTicketGrid Enable the auto refresh of the ticket grid.
@@ -67,6 +68,7 @@ var userSchema = mongoose.Schema({
   resetL2AuthExpire: { type: Date, select: false },
   hasL2Auth: { type: Boolean, required: true, default: false },
   accessToken: { type: String, sparse: true, select: false },
+  msexchuid: { type: String, sparse: true, select: false },
 
   preferences: {
     tourCompleted: { type: Boolean, default: false },
