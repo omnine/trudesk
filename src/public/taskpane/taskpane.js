@@ -136,7 +136,7 @@ export async function email2Case () {
         // unfortunately, in read form, we can't do that. item.subject is a string, not object.
 
         let subject = item.subject
-        subject = '[DISSUE#' + result.ticket.uid + ']-' + subject  
+        subject = '[DISSUE#' + result.ticket.uid + ']-' + subject
         updateSubject(item.itemId, subject)
       },
       error: function (xhr, status, error) {
@@ -181,8 +181,8 @@ function getExchangeToken () {
     //  console.log(data.value);
     let exToken = data.value
 
-    //use exchange token to get zammad API token
-    $.post('https://helpdesk.deepnetsecurity.com/outlook/validate', {
+    //use exchange token to get trudesk API token
+    $.post('https://helpdesk.deepnetsecurity.com/validateAgent', {
       token: exToken
     })
       .done(function (result, status, xhr) {

@@ -15,36 +15,24 @@
 var _ = require('lodash')
 var permissions = require('../permissions')
 var Team = require('../models/team')
+var userSchema = require('../models/user')
 
 var addinController = {}
-
-addinController.get = function (req, res) {
-  var user = req.user
-  if (_.isUndefined(user) || !permissions.canThis(user.role, 'teams:view')) {
-    return res.redirect('/')
-  }
-
-  var content = {}
-  content.title = 'Teams'
-  content.nav = 'teams'
-
-  content.data = {}
-  content.data.user = req.user
-  content.data.common = req.viewdata
-  content.data.teams = {}
-
-  return res.render('team', content)
-}
 
 // get an API token after validation
 addinController.validateAgent = function (req, res) {
   //Outlook will get a JWT token from exchange server, we get msexchuid
 
+  //We should validate the exchange identity token first
+  //https://docs.microsoft.com/en-us/office/dev/add-ins/outlook/authenticate-a-user-with-an-identity-token
+
   //then check database to get API token
+  userSchema.findOne({ msexchuid: req.appctx.msexchuid }, function (err, user) {
+    if (err || !user) return apiUtils.sendApiError(res, 400, 'Invalid User')
+    //then return api token
 
-  //then render token back as json
-
-  return res.json({ token: '123456' })
+    return res.json({ token: user.accessToken })
+  })
 }
 
 //Post
