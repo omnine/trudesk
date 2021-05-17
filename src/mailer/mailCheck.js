@@ -392,7 +392,8 @@ function handleMessages (messages, done) {
                   priority: results.handlePriority,
                   subject: message.subject,
                   issue: message.body,
-                  history: [HistoryItem]
+                  history: [HistoryItem],
+                  subscribers: [message.owner._id] //the originator should be the first subscriber
                 },
                 function (err, ticket) {
                   if (err) {
