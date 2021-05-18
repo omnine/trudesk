@@ -521,7 +521,8 @@ var notifications = require('../notifications') // Load Push Events
 
                       mailer.sendMail(mailOptions, function (err) {
                         if (err) winston.warn('[trudesk:events:sendSubscriberEmail] - ' + err)
-
+                        // todo Upload (save) the email to the "Sent" mailbox.
+                        // mailer.AppendMail("Sent",email);
                         winston.debug('Sent [' + emails.length + '] emails.')
                       })
 

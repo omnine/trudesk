@@ -371,7 +371,8 @@ function handleMessages (messages, done) {
                     var comment = {
                       owner: message.owner._id,
                       date: new Date(),
-                      comment: message.body
+                      // https://stackoverflow.com/questions/7978987/get-the-actual-email-message-that-the-person-just-wrote-excluding-any-quoted-te/12611562#12611562
+                      comment: message.body // todo sounds like it is very hard, we can focus on MS Exchange perhaps.
                     }
 
                     ticket.comments.push(comment)
@@ -426,4 +427,43 @@ function handleMessages (messages, done) {
 function openInbox (cb) {
   mailCheck.Imap.openBox('INBOX', cb)
 }
+
+// todo  'Sent Items'  # Exchange (probably outlook) default sent folder, other email server may have a different name
+function openSentFolder (cb) {
+  mailCheck.Imap.openBox('Sent Items', cb)
+}
+
+// https://stackoverflow.com/questions/49807855/node-imap-sending-emails-but-not-saving-it-to-sent
+//
+/*
+function appendIntoSentFolder (mailOptions, cb) {
+  mailCheck.Imap.openBox('Sent Items', cb, function (err) {
+    if (err) throw err;
+
+    let msg, htmlEntity, plainEntity;
+    msg = mimemessage.factory({
+      contentType: 'multipart/alternate',
+      body: []
+    });
+    htmlEntity = mimemessage.factory({
+      contentType: 'text/html;charset=utf-8',
+      body: mailOptions.html
+    });
+    plainEntity = mimemessage.factory({
+      body: mailOptions.text
+    });
+    msg.header('Message-ID', '<1234qwerty>');
+    msg.header('From', mailOptions.from);
+    msg.header('To', mailOptions.to);
+    msg.header('Subject', mailOptions.subject);
+    msg.header('Date', new Date()));
+    //msg.body.push(htmlEntity);
+    msg.body.push(plainEntity);
+
+    imap.append(msg.toString());
+
+  })
+}
+*/
+
 module.exports = mailCheck
