@@ -133,6 +133,28 @@ function bindImapReady () {
     })
 
     mailCheck.Imap.on('ready', function () {
+      openSentFolder(function (err) {
+        if (err) {
+          mailCheck.Imap.end()
+          winston.debug(err)
+        } else {
+          async.waterfall([
+            function (next) {
+              // alternatively mailCheck.Imap.sort(['DATE'], [searchCriteria], next), for 2 days
+              mailCheck.Imap.search(['UNSEEN', ['SINCE', 'May 20, 2021'], ['BEFORE', 'May 22, 2021']], next)
+            },
+            function (results, next) {
+              if (_.size(results) < 1) {
+                winston.debug('MailCheck: Nothing to Fetch.')
+                return next()
+              }
+
+              winston.debug('Processing %s Mail', _.size(results))
+              // copy other code?
+            }
+          ])
+        }
+      })
       openInbox(function (err) {
         if (err) {
           mailCheck.Imap.end()
@@ -434,36 +456,37 @@ function openSentFolder (cb) {
 }
 
 // https://stackoverflow.com/questions/49807855/node-imap-sending-emails-but-not-saving-it-to-sent
-//
-/*
-function appendIntoSentFolder (mailOptions, cb) {
-  mailCheck.Imap.openBox('Sent Items', cb, function (err) {
-    if (err) throw err;
+// https://github.com/nodemailer/nodemailer/issues/1032
 
-    let msg, htmlEntity, plainEntity;
-    msg = mimemessage.factory({
-      contentType: 'multipart/alternate',
-      body: []
-    });
-    htmlEntity = mimemessage.factory({
-      contentType: 'text/html;charset=utf-8',
-      body: mailOptions.html
-    });
-    plainEntity = mimemessage.factory({
-      body: mailOptions.text
-    });
-    msg.header('Message-ID', '<1234qwerty>');
-    msg.header('From', mailOptions.from);
-    msg.header('To', mailOptions.to);
-    msg.header('Subject', mailOptions.subject);
-    msg.header('Date', new Date()));
-    //msg.body.push(htmlEntity);
-    msg.body.push(plainEntity);
+function appendIntoSentFolder (mailOptions) {
+  let msg, htmlEntity, plainEntity
+  msg = mimemessage.factory({
+    contentType: 'multipart/alternate',
+    body: []
+  })
+  htmlEntity = mimemessage.factory({
+    contentType: 'text/html;charset=utf-8',
+    body: mailOptions.html
+  })
+  plainEntity = mimemessage.factory({
+    body: mailOptions.text
+  })
+  msg.header('Message-ID', '<1234qwerty>')
+  msg.header('From', mailOptions.from)
+  msg.header('To', mailOptions.to)
+  msg.header('Subject', mailOptions.subject)
+  msg.header('Date', new Date())
+  //msg.body.push(htmlEntity);
+  msg.body.push(plainEntity)
 
-    imap.append(msg.toString());
-
+  imap.append(msg.toString())
+  //mailOptions.html
+  mailCheck.Imap.append(mailOptions, { mailbox: 'Sent Items', flags: ['Seen'], date: new Date(Date.now()) }, function (
+    err
+  ) {
+    if (err) throw err
+    imap.end()
   })
 }
-*/
 
 module.exports = mailCheck
