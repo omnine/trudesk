@@ -19,6 +19,7 @@ var winston = require('winston')
 // var marked      = require('marked');
 var simpleParser = require('mailparser').simpleParser
 var cheerio = require('cheerio')
+var mimemessage = require('mimemessage')
 
 var emitter = require('../emitter')
 var userSchema = require('../models/user')
@@ -517,6 +518,7 @@ function openSentFolder (cb) {
 
 function appendIntoSentFolder (mailOptions) {
   let msg, htmlEntity, plainEntity
+  //https://github.com/eface2face/mimemessage.js
   msg = mimemessage.factory({
     contentType: 'multipart/alternate',
     body: []
@@ -536,14 +538,16 @@ function appendIntoSentFolder (mailOptions) {
   //msg.body.push(htmlEntity);
   msg.body.push(plainEntity)
 
-  imap.append(msg.toString())
+  //  imap.append(msg.toString())
   //mailOptions.html
-  mailCheck.Imap.append(mailOptions, { mailbox: 'Sent Items', flags: ['Seen'], date: new Date(Date.now()) }, function (
-    err
-  ) {
-    if (err) throw err
-    imap.end()
-  })
+  mailCheck.Imap.append(
+    msg.toString(),
+    { mailbox: 'Sent Items', flags: ['Seen'], date: new Date(Date.now()) },
+    function (err) {
+      if (err) throw err
+      imap.end()
+    }
+  )
 }
 
 module.exports = mailCheck

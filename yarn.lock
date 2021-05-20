@@ -8494,6 +8494,14 @@ mime@^2.0.3, mime@^2.4.0:
   resolved "https://registry.yarnpkg.com/mime/-/mime-2.4.0.tgz#e051fd881358585f3279df333fe694da0bcffdd6"
   integrity sha512-ikBcWwyqXQSHKtciCcctu9YfPbFYZ4+gbHEmE0Q8jzcTYQg5dHCr3g2wwAZjPoJfQVXZq6KXAjpXOTf5/cjT7w==
 
+mimemessage@1.0.5:
+  version "1.0.5"
+  resolved "https://registry.yarnpkg.com/mimemessage/-/mimemessage-1.0.5.tgz#ad7555a6cd854de699286636505762d8771df9f8"
+  integrity sha512-SCLRPGzMRssW7mKF8gg3ZbpDZ+6HTfXGK78LQ/CAHJcJZr5jQmmCKGbG3y5ut8UP5unxBF/9KkED0xmk3vt8NA==
+  dependencies:
+    debug "^3.1.0"
+    random-string "^0.2.0"
+
 mimer@^0.3.2:
   version "0.3.2"
   resolved "https://registry.yarnpkg.com/mimer/-/mimer-0.3.2.tgz#0b83aabdf48eaacfd2e093ed4c0ed3d38eda8073"
@@ -10705,6 +10713,11 @@ random-bytes@~1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/random-bytes/-/random-bytes-1.0.0.tgz#4f68a1dc0ae58bd3fb95848c30324db75d64360b"
   integrity sha1-T2ih3Arli9P7lYSMMDJNt11kNgs=
+
+random-string@^0.2.0:
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/random-string/-/random-string-0.2.0.tgz#a46e4375352beda9a0d7b0d19ed6d321ecd1d82d"
+  integrity sha1-pG5DdTUr7amg17DRntbTIezR2C0=
 
 randombytes@^2.0.0, randombytes@^2.0.1, randombytes@^2.0.5:
   version "2.0.6"
