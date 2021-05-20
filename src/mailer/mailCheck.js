@@ -140,16 +140,16 @@ function bindImapReady () {
         } else {
           async.waterfall([
             function (next) {
-              // alternatively mailCheck.Imap.sort(['DATE'], [searchCriteria], next), for 2 days
-              mailCheck.Imap.search(['UNSEEN', ['SINCE', 'May 20, 2021'], ['BEFORE', 'May 22, 2021']], next)
+              // alternatively mailCheck.Imap.sort(['DATE'], [searchCriteria], next), where to save the lastcheck?
+              mailCheck.Imap.search([['SINCE', 'May 20, 2019'], ['BEFORE', Date.now()]], next)
             },
             function (results, next) {
               if (_.size(results) < 1) {
-                winston.debug('MailCheck: Nothing to Fetch.')
+                winston.debug('MailCheck: Nothing to Fetch in SENT Folder.')
                 return next()
               }
 
-              winston.debug('Processing %s Mail', _.size(results))
+              winston.debug('Processing %s Mail in SENT Folder', _.size(results))
               // copy other code?
             }
           ])
@@ -212,7 +212,7 @@ function bindImapReady () {
                         } else {
                           message.body = mail.textAsHtml
                         }
-
+                        message.folder = 'INBOX'
                         mailCheck.messages.push(message)
                       })
                     })
@@ -405,6 +405,8 @@ function handleMessages (messages, done) {
                   return // will not do Ticket.create
                 }
               }
+
+              if (message.folder === 'SENT') return
 
               Ticket.create(
                 {
