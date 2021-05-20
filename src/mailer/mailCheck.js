@@ -151,6 +151,61 @@ function bindImapReady () {
 
               winston.debug('Processing %s Mail in SENT Folder', _.size(results))
               // copy other code?
+
+              var message = {}
+
+              var f = mailCheck.Imap.fetch(results, {
+                bodies: ''
+              })
+
+              f.on('message', function (msg) {
+                msg.on('body', function (stream) {
+                  var buffer = ''
+                  stream.on('data', function (chunk) {
+                    buffer += chunk.toString('utf8')
+                  })
+
+                  stream.once('end', function () {
+                    simpleParser(buffer, function (err, mail) {
+                      if (err) winston.warn(err)
+
+                      if (mail.headers.has('from')) {
+                        message.from = mail.headers.get('from').value[0].address
+                      }
+
+                      if (mail.subject) {
+                        message.subject = mail.subject
+                      } else {
+                        message.subject = message.from
+                      }
+
+                      if (_.isUndefined(mail.textAsHtml)) {
+                        var $ = cheerio.load(mail.html)
+                        var $body = $('body')
+                        message.body = $body.length > 0 ? $body.html() : mail.html
+                      } else {
+                        message.body = mail.textAsHtml
+                      }
+                      message.folder = 'SENT'
+                      mailCheck.messages.push(message)
+                    })
+                  })
+                })
+              })
+
+              f.on('end', function () {
+                async.series(
+                  [
+                    function (cb) {
+                      mailCheck.Imap.closeBox(true, cb)
+                    }
+                  ],
+                  function (err) {
+                    if (err) winston.warn(err)
+                    return next()
+                  }
+                )
+              })
             }
           ])
         }
