@@ -458,7 +458,19 @@ function openSentFolder (callback) {
         [
           function (next) {
             // alternatively mailCheck.Imap.sort(['DATE'], [searchCriteria], next), where to save the lastcheck?
-            mailCheck.Imap.search([['SINCE', 'May 20, 2019'], ['BEFORE', Date.now()]], next)
+            var settingUtil = require('../settings/settingsUtil')
+            var curTime = Date.now()
+            settingUtil.setSetting('mailer:check:last_fetch', curTime, function (err) {})
+
+            var settingSchema = require('../models/setting')
+            settingSchema.getSetting('mailer:check:last_fetch', function (err, last_fetch) {
+              if (err || !last_fetch) {
+                last_fetch = new Date()
+                last_fetch.setDate(curTime.getDate() - 2)
+              }
+            })
+
+            mailCheck.Imap.search([['SINCE', last_fetch], ['BEFORE', curTime]], next)
           },
           function (results, next) {
             if (_.size(results) < 1) {
