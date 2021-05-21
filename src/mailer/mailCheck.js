@@ -134,171 +134,9 @@ function bindImapReady () {
     })
 
     mailCheck.Imap.on('ready', function () {
-      openSentFolder(function (err) {
-        if (err) {
-          mailCheck.Imap.end()
-          winston.debug(err)
-        } else {
-          async.waterfall([
-            function (next) {
-              // alternatively mailCheck.Imap.sort(['DATE'], [searchCriteria], next), where to save the lastcheck?
-              mailCheck.Imap.search([['SINCE', 'May 20, 2019'], ['BEFORE', Date.now()]], next)
-            },
-            function (results, next) {
-              if (_.size(results) < 1) {
-                winston.debug('MailCheck: Nothing to Fetch in SENT Folder.')
-                return next()
-              }
-
-              winston.debug('Processing %s Mail in SENT Folder', _.size(results))
-              // copy other code?
-
-              var message = {}
-
-              var f = mailCheck.Imap.fetch(results, {
-                bodies: ''
-              })
-
-              f.on('message', function (msg) {
-                msg.on('body', function (stream) {
-                  var buffer = ''
-                  stream.on('data', function (chunk) {
-                    buffer += chunk.toString('utf8')
-                  })
-
-                  stream.once('end', function () {
-                    simpleParser(buffer, function (err, mail) {
-                      if (err) winston.warn(err)
-
-                      if (mail.headers.has('from')) {
-                        message.from = mail.headers.get('from').value[0].address
-                      }
-
-                      if (mail.subject) {
-                        message.subject = mail.subject
-                      } else {
-                        message.subject = message.from
-                      }
-
-                      if (_.isUndefined(mail.textAsHtml)) {
-                        var $ = cheerio.load(mail.html)
-                        var $body = $('body')
-                        message.body = $body.length > 0 ? $body.html() : mail.html
-                      } else {
-                        message.body = mail.textAsHtml
-                      }
-                      message.folder = 'SENT'
-                      mailCheck.messages.push(message)
-                    })
-                  })
-                })
-              })
-
-              f.on('end', function () {
-                async.series(
-                  [
-                    function (cb) {
-                      mailCheck.Imap.closeBox(true, cb)
-                    }
-                  ],
-                  function (err) {
-                    if (err) winston.warn(err)
-                    return next()
-                  }
-                )
-              })
-            }
-          ])
-        }
-      })
-      openInbox(function (err) {
-        if (err) {
-          mailCheck.Imap.end()
-          winston.debug(err)
-        } else {
-          async.waterfall(
-            [
-              function (next) {
-                mailCheck.Imap.search(['UNSEEN'], next)
-              },
-              function (results, next) {
-                if (_.size(results) < 1) {
-                  winston.debug('MailCheck: Nothing to Fetch.')
-                  return next()
-                }
-
-                winston.debug('Processing %s Mail', _.size(results))
-
-                var flag = '\\Seen'
-                if (mailCheck.fetchMailOptions.deleteMessage) {
-                  flag = '\\Deleted'
-                }
-
-                var message = {}
-
-                var f = mailCheck.Imap.fetch(results, {
-                  bodies: ''
-                })
-
-                f.on('message', function (msg) {
-                  msg.on('body', function (stream) {
-                    var buffer = ''
-                    stream.on('data', function (chunk) {
-                      buffer += chunk.toString('utf8')
-                    })
-
-                    stream.once('end', function () {
-                      simpleParser(buffer, function (err, mail) {
-                        if (err) winston.warn(err)
-
-                        if (mail.headers.has('from')) {
-                          message.from = mail.headers.get('from').value[0].address
-                        }
-
-                        if (mail.subject) {
-                          message.subject = mail.subject
-                        } else {
-                          message.subject = message.from
-                        }
-
-                        if (_.isUndefined(mail.textAsHtml)) {
-                          var $ = cheerio.load(mail.html)
-                          var $body = $('body')
-                          message.body = $body.length > 0 ? $body.html() : mail.html
-                        } else {
-                          message.body = mail.textAsHtml
-                        }
-                        message.folder = 'INBOX'
-                        mailCheck.messages.push(message)
-                      })
-                    })
-                  })
-                })
-
-                f.on('end', function () {
-                  async.series(
-                    [
-                      function (cb) {
-                        mailCheck.Imap.addFlags(results, flag, cb)
-                      },
-                      function (cb) {
-                        mailCheck.Imap.closeBox(true, cb)
-                      }
-                    ],
-                    function (err) {
-                      if (err) winston.warn(err)
-                      return next()
-                    }
-                  )
-                })
-              }
-            ],
-            function (err) {
-              if (err) winston.warn(err)
-              mailCheck.Imap.end()
-            }
-          )
-        }
+      // Runs the tasks array of functions in series
+      async.waterfall([openSentFolder, openInboxFolder], function (err, result) {
+        // result now equals 'done'
       })
     })
   } catch (error) {
@@ -452,7 +290,8 @@ function handleMessages (messages, done) {
                       // https://stackoverflow.com/questions/7978987/get-the-actual-email-message-that-the-person-just-wrote-excluding-any-quoted-te/12611562#12611562
                       comment: message.body // todo sounds like it is very hard, we can focus on MS Exchange perhaps.
                     }
-
+                    winston.debug('Creating a comment on ticket %s from mail %s', tid, message.folder)
+                    return
                     ticket.comments.push(comment)
                     ticket.save(function (err, ticket) {
                       return callback()
@@ -504,13 +343,198 @@ function handleMessages (messages, done) {
   })
 }
 
-function openInbox (cb) {
-  mailCheck.Imap.openBox('INBOX', cb)
+function openInboxFolder (callback) {
+  mailCheck.Imap.openBox('INBOX', function (err) {
+    if (err) {
+      mailCheck.Imap.end()
+      winston.debug(err)
+    } else {
+      async.waterfall(
+        [
+          function (next) {
+            mailCheck.Imap.search(['UNSEEN'], next)
+          },
+          function (results, next) {
+            if (_.size(results) < 1) {
+              winston.debug('MailCheck: Nothing to Fetch.')
+              return next()
+            }
+
+            winston.debug('Processing %s Mail', _.size(results))
+
+            var flag = '\\Seen'
+            if (mailCheck.fetchMailOptions.deleteMessage) {
+              flag = '\\Deleted'
+            }
+
+            var message = {}
+
+            var f = mailCheck.Imap.fetch(results, {
+              bodies: ''
+            })
+
+            f.on('message', function (msg) {
+              msg.on('body', function (stream) {
+                var buffer = ''
+                stream.on('data', function (chunk) {
+                  buffer += chunk.toString('utf8')
+                })
+
+                stream.once('end', function () {
+                  simpleParser(buffer, function (err, mail) {
+                    if (err) winston.warn(err)
+
+                    if (mail.headers.has('from')) {
+                      message.from = mail.headers.get('from').value[0].address
+                    }
+
+                    if (mail.subject) {
+                      message.subject = mail.subject
+                    } else {
+                      message.subject = message.from
+                    }
+
+                    if (_.isUndefined(mail.textAsHtml)) {
+                      var $ = cheerio.load(mail.html)
+                      var $body = $('body')
+                      message.body = $body.length > 0 ? $body.html() : mail.html
+                    } else {
+                      message.body = mail.textAsHtml
+                    }
+                    message.folder = 'INBOX'
+                    mailCheck.messages.push(message)
+                  })
+                })
+              })
+            })
+
+            f.on('end', function () {
+              async.series(
+                [
+                  function (cb) {
+                    mailCheck.Imap.addFlags(results, flag, cb)
+                  },
+                  function (cb) {
+                    mailCheck.Imap.closeBox(true, cb)
+                  }
+                ],
+                function (err) {
+                  if (err) winston.warn(err)
+                  return next()
+                }
+              )
+            })
+          }
+        ],
+        function (err) {
+          if (err) winston.warn(err)
+          mailCheck.Imap.end()
+          callback(null)
+        }
+      )
+    }
+  })
 }
 
 // todo  'Sent Items'  # Exchange (probably outlook) default sent folder, other email server may have a different name
-function openSentFolder (cb) {
-  mailCheck.Imap.openBox('Sent Items', cb)
+/*
+How to avoid such a case,  
+1, as a agent, post a comment, it will trigger a smtp to send a email to the client, 
+it also appends the email in to Sent folder.
+2, now start fetchSent job, which will add the reply done by agent who uses email client to do a reply.
+3, obviously we have to filter out the email generated in step 1.
+
+We should check if the message-id has been in the database already
+*/
+function openSentFolder (callback) {
+  //  mailCheck.Imap.openBox('Sent Items', cb)
+
+  mailCheck.Imap.openBox('Sent Items', function (err) {
+    if (err) {
+      mailCheck.Imap.end()
+      winston.debug(err)
+    } else {
+      async.waterfall(
+        [
+          function (next) {
+            // alternatively mailCheck.Imap.sort(['DATE'], [searchCriteria], next), where to save the lastcheck?
+            mailCheck.Imap.search([['SINCE', 'May 20, 2019'], ['BEFORE', Date.now()]], next)
+          },
+          function (results, next) {
+            if (_.size(results) < 1) {
+              winston.debug('MailCheck: Nothing to Fetch in SENT Folder.')
+              return next()
+            }
+
+            winston.debug('Processing %s Mail in SENT Folder', _.size(results))
+            // copy other code?
+
+            var message = {}
+
+            var f = mailCheck.Imap.fetch(results, {
+              bodies: ''
+            })
+
+            f.on('message', function (msg) {
+              msg.on('body', function (stream) {
+                var buffer = ''
+                stream.on('data', function (chunk) {
+                  buffer += chunk.toString('utf8')
+                })
+
+                stream.once('end', function () {
+                  simpleParser(buffer, function (err, mail) {
+                    if (err) winston.warn(err)
+
+                    if (mail.headers.has('from')) {
+                      message.from = mail.headers.get('from').value[0].address
+                    }
+
+                    if (mail.subject) {
+                      winston.debug('parse email 1: %s', mail.subject)
+                      message.subject = mail.subject
+                    } else {
+                      message.subject = message.from
+                      winston.debug('parse email 2: %s', mail.from)
+                    }
+
+                    if (_.isUndefined(mail.textAsHtml)) {
+                      var $ = cheerio.load(mail.html)
+                      var $body = $('body')
+                      message.body = $body.length > 0 ? $body.html() : mail.html
+                    } else {
+                      message.body = mail.textAsHtml
+                    }
+                    message.folder = 'SENT'
+                    mailCheck.messages.push(message)
+                  })
+                })
+              })
+            })
+
+            f.on('end', function () {
+              async.series(
+                [
+                  function (cb) {
+                    mailCheck.Imap.closeBox(true, cb)
+                  }
+                ],
+                function (err) {
+                  if (err) winston.warn(err)
+                  return next()
+                }
+              )
+            })
+          }
+        ],
+        function (err) {
+          if (err) winston.warn(err)
+          mailCheck.Imap.end()
+          callback(null)
+        }
+      )
+    }
+  })
 }
 
 // https://stackoverflow.com/questions/49807855/node-imap-sending-emails-but-not-saving-it-to-sent
