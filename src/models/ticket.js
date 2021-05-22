@@ -504,6 +504,25 @@ ticketSchema.methods.updateComment = function (ownerId, commentId, commentText, 
   return callback(null, self)
 }
 
+ticketSchema.methods.updateCommentMessageId = function (ownerId, commentId, messageId, callback) {
+  var self = this
+  var comment = _.find(self.comments, function (c) {
+    return c._id.toString() === commentId.toString()
+  })
+  if (_.isUndefined(comment)) return callback('Invalid Comment', null)
+
+  comment.messageId = messageId
+  /*
+  var historyItem = {
+    action: 'ticket:comment:updated',
+    description: 'Comment was updated: ' + commentId,
+    owner: ownerId
+  }
+  self.history.push(historyItem)
+*/
+  return callback(null, self)
+}
+
 /**
  * Removes a comment from the comment array on this ticket.
  * @instance

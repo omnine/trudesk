@@ -524,6 +524,8 @@ var notifications = require('../notifications') // Load Push Events
                         // todo Upload (save) the email to the "Sent" mailbox.
                         // mailer.AppendMail("Sent",info.messageId);
                         // modify comment's messageID
+                        ticket.updateCommentMessageId(tiket._id, comment._id, info.messageId, null) // no callback?
+
                         winston.debug('Sent [' + emails.length + '] emails.')
                       })
 
