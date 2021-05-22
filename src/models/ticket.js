@@ -1032,6 +1032,28 @@ ticketSchema.statics.getTicketByUid = function (uid, callback) {
 }
 
 /**
+ * Gets Single ticket (populate simple fields) with given UID.
+ * @memberof Ticket
+ * @static
+ * @method getSimpleTicketByUid
+ *
+ * @param {Number} uid Unique Id for ticket.
+ * @param {QueryCallback} callback MongoDB Query Callback
+ */
+ticketSchema.statics.getSimpleTicketByUid = function (uid, callback) {
+  if (_.isUndefined(uid)) return callback('Invalid Uid - TicketSchema.GetSimpleTicketByUid()', null)
+
+  var self = this
+
+  var q = self
+    .model(COLLECTION)
+    .findOne({ uid: uid, deleted: false })
+    .populate('comments', 'messageId')
+
+  return q.exec(callback)
+}
+
+/**
  * Gets Single ticket with given object _id.
  * @memberof Ticket
  * @static

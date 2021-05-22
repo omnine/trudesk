@@ -283,19 +283,29 @@ function handleMessages (messages, done) {
                 endIndex = message.subject.indexOf(']', startIndex)
                 if (endIndex > startIndex) {
                   var tid = message.subject.substring(startIndex, endIndex)
-                  Ticket.getTicketByUid(tid, function (err, ticket) {
-                    var comment = {
-                      owner: message.owner._id,
-                      date: new Date(),
-                      // https://stackoverflow.com/questions/7978987/get-the-actual-email-message-that-the-person-just-wrote-excluding-any-quoted-te/12611562#12611562
-                      comment: message.body // todo sounds like it is very hard, we can focus on MS Exchange perhaps.
+                  Ticket.getSimpleTicketByUid(tid, function (err, ticket) {
+                    var need = true
+                    for (comment in ticket.comments) {
+                      if (comment.messageId === message.messageId) {
+                        need = false
+                        break
+                      }
                     }
-                    winston.debug('Creating a comment on ticket %s from mail %s', tid, message.folder)
-                    return
-                    ticket.comments.push(comment)
-                    ticket.save(function (err, ticket) {
-                      return callback()
-                    })
+
+                    if (need) {
+                      var comment = {
+                        owner: message.owner._id,
+                        date: new Date(),
+                        // https://stackoverflow.com/questions/7978987/get-the-actual-email-message-that-the-person-just-wrote-excluding-any-quoted-te/12611562#12611562
+                        comment: message.body // todo sounds like it is very hard, we can focus on MS Exchange perhaps.
+                      }
+                      winston.debug('Creating a comment on ticket %s from mail %s', tid, message.folder)
+                      // if any comment in this ticket contains the message id, then it was genrated by comment post in web UI.
+                      ticket.comments.push(comment)
+                      ticket.save(function (err, ticket) {
+                        return callback()
+                      })
+                    }
                   })
                   return // will not do Ticket.create
                 }
@@ -520,6 +530,7 @@ function openSentFolder (callback) {
                     } else {
                       message.body = mail.textAsHtml
                     }
+                    message.messageId = mail.messageId // used to check if this mesage correspond to the comment done in trudesk web portal.
                     message.folder = 'SENT'
                     mailCheck.messages.push(message)
                   })
