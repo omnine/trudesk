@@ -566,7 +566,7 @@ function openSentFolder (callback) {
 // https://stackoverflow.com/questions/49807855/node-imap-sending-emails-but-not-saving-it-to-sent
 // https://github.com/nodemailer/nodemailer/issues/1032
 
-function appendIntoSentFolder (mailOptions, messageId) {
+mailCheck.appendIntoSentFolder = function (mailOptions, messageId) {
   let msg, htmlEntity, plainEntity
   //https://github.com/eface2face/mimemessage.js
   msg = mimemessage.factory({
