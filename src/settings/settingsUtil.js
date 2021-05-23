@@ -78,6 +78,7 @@ util.getSettings = function (callback) {
     s.defaultTicketType = parseSetting(settings, 'ticket:type:default', '')
     s.minSubjectLength = parseSetting(settings, 'ticket:minlength:subject', 10)
     s.minIssueLength = parseSetting(settings, 'ticket:minlength:issue', 10)
+    s.defaultIssueSiffixTemplate = parseSetting(settings, 'ticket:suffixtemplate:issue', 'ISSUE')
 
     s.defaultUserRole = parseSetting(settings, 'role:user:default', '')
 

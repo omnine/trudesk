@@ -28,6 +28,7 @@ import { showModal } from 'actions/common'
 
 import EnableSwitch from 'components/Settings/EnableSwitch'
 import NumberWithSave from 'components/Settings/NumberWithSave'
+import InputWithSave from 'components/Settings/InputWithSave'
 import Button from 'components/Button'
 import ButtonGroup from 'components/ButtonGroup'
 import TicketTypeBody from './ticketTypeBody'
@@ -301,6 +302,19 @@ class TicketsSettings extends React.Component {
             />
           }
         />
+        <SettingItem
+          title={'Issue Suffix Template'}
+          subtitle={'The text before the issue number appeared in email'}
+          component={
+            <InputWithSave
+              stateName='defaultIssueSiffixTemplate'
+              settingName='ticket:suffixtemplate:issue'
+              value={this.getSetting('defaultIssueSiffixTemplate')}
+              width={'60%'}
+            />
+          }
+        />
+
         <SplitSettingsPanel
           title={'Ticket Types'}
           subtitle={'Create/Modify Ticket Types'}
