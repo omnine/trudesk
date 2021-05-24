@@ -511,26 +511,33 @@ var notifications = require('../notifications') // Load Push Events
                     })
                     .then(function (html) {
                       // DISSUE is not a typo, just try to make it special.
-                      // todo should make it configurable in Setttings
-                      var mailOptions = {
-                        to: emails.join(),
-                        subject: '[DISSUE#' + ticket.uid + ']-' + ticket.subject,
-                        html: html,
-                        generateTextFromHTML: true
-                      }
+                      var settingSchema = require('../models/setting')
+                      settingSchema.getSetting('ticket:suffixtemplate:issue', function (err, setting) {
+                        var suffixtemplate = 'DISSUE'
+                        if (!err && setting && setting.value) {
+                          suffixtemplate = setting.value
+                        }
 
-                      mailer.sendMail(mailOptions, function (err, info) {
-                        if (err) winston.warn('[trudesk:events:sendSubscriberEmail] - ' + err)
-                        // Upload (save) the email to the "Sent" mailbox.
-                        var mailCheck = require('../mailer/mailCheck')
-                        mailCheck.appendIntoSentFolder(mailOptions, info.messageId)
-                        // modify comment's messageID
-                        ticket.updateCommentMessageId(tiket._id, comment._id, info.messageId, null) // no callback?
+                        var mailOptions = {
+                          to: emails.join(),
+                          subject: '[' + suffixtemplate + '#' + ticket.uid + ']-' + ticket.subject,
+                          html: html,
+                          generateTextFromHTML: true
+                        }
 
-                        winston.debug('Sent [' + emails.length + '] emails.')
+                        mailer.sendMail(mailOptions, function (err, info) {
+                          if (err) winston.warn('[trudesk:events:sendSubscriberEmail] - ' + err)
+                          // Upload (save) the email to the "Sent" mailbox.
+                          var mailCheck = require('../mailer/mailCheck')
+                          mailCheck.appendIntoSentFolder(mailOptions, info.messageId)
+                          // modify comment's messageID
+                          ticket.updateCommentMessageId(tiket._id, comment._id, info.messageId, null) // no callback?
+
+                          winston.debug('Sent [' + emails.length + '] emails.')
+                        })
+
+                        return c()
                       })
-
-                      return c()
                     })
                     .catch(function (err) {
                       winston.warn('[trudesk:events:sendSubscriberEmail] - ' + err)
