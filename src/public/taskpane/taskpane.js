@@ -57,15 +57,16 @@ function selectedMailItemChanged (eventArgs) {
 function doSomething (item) {
   //if the subject contains Ticket,  go to the ticket.
   // navigate to the related case
-  let si = item.subject.indexOf('[Ticket#62')
-
-  if (si > 0) {
-    let ei = item.subject.indexOf(']')
-    let ticket = item.subject.substring(si + 10, ei)
-    while (ticket[0] == '0') {
-      ticket = ticket.substring(1)
+  // todo better to use template defined in Settings
+  var startIndex = item.subject.indexOf('[DISSUE#')
+  if (startIndex >= 0) {
+    console.log('doSomething' + startIndex)
+    startIndex = startIndex + 8
+    var endIndex = item.subject.indexOf(']', startIndex)
+    if (endIndex > startIndex) {
+      var tid = item.subject.substring(startIndex, endIndex)
+      window.location.href = 'https://helpdesk.deepnetsecurity.com/tickets/' + tid
     }
-    window.location.href = 'https://helpdesk.deepnetsecurity.com/tickets/' + ticket
   }
 }
 
