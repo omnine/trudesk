@@ -13,6 +13,7 @@
  */
 
 var _ = require('lodash')
+var winston = require('winston')
 var permissions = require('../permissions')
 var Team = require('../models/team')
 var userSchema = require('../models/user')
@@ -22,7 +23,7 @@ var addinController = {}
 // get an API token after validation
 addinController.validateAgent = function (req, res) {
   //Outlook will get a JWT token from exchange server, we get msexchuid
-
+  winston.debug('msexchuid= %s', req.appctx.msexchuid)
   //We should validate the exchange identity token first
   //https://docs.microsoft.com/en-us/office/dev/add-ins/outlook/authenticate-a-user-with-an-identity-token
 

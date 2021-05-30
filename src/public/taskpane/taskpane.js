@@ -104,18 +104,17 @@ export async function email2Case () {
     //ticket and comment may need to create seperately.
     var item = Office.context.mailbox.item
     let data = {
-      title: item.subject,
-      group: 'Support',
-      customer: item.from.emailAddress,
-      article: {
-        subject: item.subject,
-        body: bodyHtml,
-        from: 'Support',
-        to: item.from.emailAddress,
-        content_type: 'text/html',
-        type: 'email',
-        internal: false
-      }
+      subject: item.subject,
+      issue: item.subject
+      /*
+      "owner": {OwnerId},
+     "group": {GroupId},
+     "type": {TypeId}
+      // Note: Priority must be priority id associated with the selected type id
+     "priority": {PriorityId} 
+
+     do we need to call /api/v1/tickets/addcomment to add the bodyHtml as the comment?
+      */
     }
 
     $.ajax({
@@ -128,7 +127,7 @@ export async function email2Case () {
       cache: false,
       beforeSend: function (xhr) {
         /* Authorization header */
-        xhr.setRequestHeader('Authorization', 'Token token=' + userAPIToken)
+        xhr.setRequestHeader('accesstoken', userAPIToken)
       },
       success: function (result) {
         window.location.href = 'https://helpdesk.deepnetsecurity.com/tickets/' + result.ticket.uid
@@ -167,6 +166,12 @@ export async function getExchID () {
 */
 
   Office.context.mailbox.getUserIdentityTokenAsync(data => {
+    if (data.status === 'failed') {
+      alert(data.error.message)
+      return
+      //      alert(JSON.stringify(data));
+    }
+
     let payload = parseJwt(data.value)
     let appctx = JSON.parse(payload.appctx)
 
@@ -177,21 +182,33 @@ export async function getExchID () {
 
 function getExchangeToken () {
   Office.context.mailbox.getUserIdentityTokenAsync(data => {
-    //  confirmed we can get exchange token here.
-    //      debugger;
-    //  console.log(data.value);
+    if (data.status === 'failed') {
+      alert(data.error.message)
+      return
+      /*
+      see the solution at https://help.salesforce.com/articleView?id=000321295&type=1&mode=1
+      also see the discusstion at https://trailblazers.salesforce.com/answers?id=9063A000000eOL0QAM
+      http://byronwright.blogspot.com/2018/05/expired-microsoft-exchange-server-auth.html
+
+      data.status = 'failed'
+      data.diagnostics.ErrorText=	'The token for this extension could not be retrieved.'
+      data.error.code = 9042
+      data.error.message = 'The Exchange server returned an error. Please look at the diagnostics object for more information.'
+      */
+    }
+
+    //  sent the original JWT token (based64) to the server
     let exToken = data.value
 
     //use exchange token to get trudesk API token
-    $.post('https://helpdesk.deepnetsecurity.com/validateAgent', {
-      token: exToken
-    })
-      .done(function (result, status, xhr) {
-        userAPIToken = result.token
-        //enable the convert button, only when api token is available, which is necessary to make API call.
-        document.getElementById('convert').disabled = false
-      })
-      .fail(function (xhr, status, error) {
+    $.ajax({
+      method: 'POST',
+      url: 'https://helpdesk.deepnetsecurity.com/validateagent',
+      data: {
+        source: 'nanoart',
+        token: exToken
+      },
+      error: function (e) {
         // then check local storage
         if (localStorage.getItem('apikey')) {
           userAPIToken = localStorage.getItem('apikey')
@@ -199,7 +216,15 @@ function getExchangeToken () {
         } else {
           $('#apikey').show()
         }
-      })
+
+        console.error(e)
+      },
+      success: function (result) {
+        userAPIToken = result.token
+        //enable the convert button, only when api token is available, which is necessary to make API call.
+        document.getElementById('convert').disabled = false
+      }
+    })
   })
 }
 
@@ -227,7 +252,7 @@ function updateSubject (itemId, subject) {
     cache: false,
     beforeSend: function (xhr) {
       /* Authorization header */
-      xhr.setRequestHeader('Authorization', 'Token token=' + userAPIToken)
+      xhr.setRequestHeader('accesstoken', userAPIToken)
     },
     success: function (result) {},
     error: function (xhr, status, error) {

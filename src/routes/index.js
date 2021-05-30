@@ -59,7 +59,7 @@ function mainRoutes (router, middleware, controllers) {
   })
 
   // Addin
-  router.get('/validateagent', controllers.addin.validateAgent)
+  router.post('/validateagent', controllers.addin.validateAgent)
   router.post('/updateemailsubject', controllers.addin.updateSubject)
 
   // Public
