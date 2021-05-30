@@ -14,6 +14,7 @@
 
 var _ = require('lodash')
 var winston = require('winston')
+var jwt = require('jsonwebtoken')
 var permissions = require('../permissions')
 var Team = require('../models/team')
 var userSchema = require('../models/user')
@@ -23,16 +24,19 @@ var addinController = {}
 // get an API token after validation
 addinController.validateAgent = function (req, res) {
   //Outlook will get a JWT token from exchange server, we get msexchuid
-  winston.debug('msexchuid= %s', req.appctx.msexchuid)
-  //We should validate the exchange identity token first
-  //https://docs.microsoft.com/en-us/office/dev/add-ins/outlook/authenticate-a-user-with-an-identity-token
+  var cert = fs.readFileSync('public.pem') // get public key
+  jwt.verify(req.token, cert, function (err, decoded) {
+    winston.debug('msexchuid= %s', decoded.appctx.msexchuid)
+    //We should validate the exchange identity token first
+    //https://docs.microsoft.com/en-us/office/dev/add-ins/outlook/authenticate-a-user-with-an-identity-token
 
-  //then check database to get API token
-  userSchema.findOne({ msexchuid: req.appctx.msexchuid }, function (err, user) {
-    if (err || !user) return apiUtils.sendApiError(res, 400, 'Invalid User')
-    //then return api token
+    //then check database to get API token
+    userSchema.findOne({ msexchuid: decoded.appctx.msexchuid }, function (err, user) {
+      if (err || !user) return apiUtils.sendApiError(res, 400, 'Invalid User')
+      //then return api token
 
-    return res.json({ token: user.accessToken })
+      return res.json({ token: user.accessToken })
+    })
   })
 }
 
