@@ -13,6 +13,7 @@
  */
 
 var _ = require('lodash')
+var async = require('async')
 var winston = require('winston')
 var jwt = require('jsonwebtoken')
 var permissions = require('../permissions')
@@ -25,7 +26,7 @@ var addinController = {}
 // get an API token after validation
 addinController.validateAgent = function (req, res) {
   var settingSchema = require('../models/setting')
-  var exToken = req.token
+  var exToken = req.body.token
   async.waterfall(
     [
       function (cb) {
@@ -41,7 +42,7 @@ addinController.validateAgent = function (req, res) {
       },
       function (cert, cb) {
         jwt.verify(exToken, cert, function (err, decoded) {
-          if (err) cb(err)
+          if (err) return cb(err)
           winston.debug('msexchuid= %s', decoded.appctx.msexchuid)
           cb(null, decoded.appctx.msexchuid)
           //Outlook will get a JWT token from exchange server, we get msexchuid
