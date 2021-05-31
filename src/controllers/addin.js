@@ -25,28 +25,46 @@ var addinController = {}
 // get an API token after validation
 addinController.validateAgent = function (req, res) {
   var settingSchema = require('../models/setting')
-  settingSchema.getSetting('gen:msex:authcert', function (err, setting) {
-    if (!err && setting && setting.value) {
-      var cert = setting.value
-      jwt.verify(req.token, cert, function (err, decoded) {
-        if (err) return apiUtils.sendApiError(res, 400, err.message)
-        winston.debug('msexchuid= %s', decoded.appctx.msexchuid)
-        //Outlook will get a JWT token from exchange server, we get msexchuid
-        //We should validate the exchange identity token first
-        //https://docs.microsoft.com/en-us/office/dev/add-ins/outlook/authenticate-a-user-with-an-identity-token
+  var exToken = req.token
+  async.waterfall(
+    [
+      function (cb) {
+        settingSchema.getSetting('gen:msex:authcert', function (err, setting) {
+          if (!err && setting && setting.value) {
+            var cert = setting.value
+            cb(null, cert)
+          } else {
+            return cb(err)
+            //            return apiUtils.sendApiError(res, 400, 'NO Exchange Auth Cert')
+          }
+        })
+      },
+      function (cert, cb) {
+        jwt.verify(exToken, cert, function (err, decoded) {
+          if (err) cb(err)
+          winston.debug('msexchuid= %s', decoded.appctx.msexchuid)
+          cb(null, decoded.appctx.msexchuid)
+          //Outlook will get a JWT token from exchange server, we get msexchuid
+          //We should validate the exchange identity token first
+          //https://docs.microsoft.com/en-us/office/dev/add-ins/outlook/authenticate-a-user-with-an-identity-token
 
+          //then check database to get API token
+        })
+      },
+      function (msexchuid, cb) {
         //then check database to get API token
-        userSchema.findOne({ msexchuid: decoded.appctx.msexchuid }, function (err, user) {
-          if (err || !user) return apiUtils.sendApiError(res, 400, 'Invalid User')
+        userSchema.findOne({ msexchuid: msexchuid }, function (err, user) {
+          if (err || !user) return cb(err)
           //then return api token
 
           return res.json({ token: user.accessToken })
         })
-      })
-    } else {
-      return apiUtils.sendApiError(res, 400, 'NO Exchange Auth Cert')
+      }
+    ],
+    function (err) {
+      if (err) return res.status(400).json({ error: err })
     }
-  })
+  )
 }
 
 //Post
