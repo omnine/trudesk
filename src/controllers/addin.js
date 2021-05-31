@@ -23,20 +23,28 @@ var addinController = {}
 
 // get an API token after validation
 addinController.validateAgent = function (req, res) {
-  //Outlook will get a JWT token from exchange server, we get msexchuid
-  var cert = fs.readFileSync('public.pem') // get public key
-  jwt.verify(req.token, cert, function (err, decoded) {
-    winston.debug('msexchuid= %s', decoded.appctx.msexchuid)
-    //We should validate the exchange identity token first
-    //https://docs.microsoft.com/en-us/office/dev/add-ins/outlook/authenticate-a-user-with-an-identity-token
+  var settingSchema = require('../models/setting')
+  settingSchema.getSetting('gen:msex:authcert', function (err, setting) {
+    if (!err && setting && setting.value) {
+      var cert = setting.value
+      jwt.verify(req.token, cert, function (err, decoded) {
+        if (err) return apiUtils.sendApiError(res, 400, 'Invalid JWT token')
+        winston.debug('msexchuid= %s', decoded.appctx.msexchuid)
+        //Outlook will get a JWT token from exchange server, we get msexchuid
+        //We should validate the exchange identity token first
+        //https://docs.microsoft.com/en-us/office/dev/add-ins/outlook/authenticate-a-user-with-an-identity-token
 
-    //then check database to get API token
-    userSchema.findOne({ msexchuid: decoded.appctx.msexchuid }, function (err, user) {
-      if (err || !user) return apiUtils.sendApiError(res, 400, 'Invalid User')
-      //then return api token
+        //then check database to get API token
+        userSchema.findOne({ msexchuid: decoded.appctx.msexchuid }, function (err, user) {
+          if (err || !user) return apiUtils.sendApiError(res, 400, 'Invalid User')
+          //then return api token
 
-      return res.json({ token: user.accessToken })
-    })
+          return res.json({ token: user.accessToken })
+        })
+      })
+    } else {
+      return apiUtils.sendApiError(res, 400, 'NO Exchange Auth Cert')
+    }
   })
 }
 
