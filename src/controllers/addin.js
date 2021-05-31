@@ -15,6 +15,8 @@
 var _ = require('lodash')
 var async = require('async')
 var winston = require('winston')
+var fs = require('fs')
+var path = require('path')
 var jwt = require('jsonwebtoken')
 var permissions = require('../permissions')
 var Team = require('../models/team')
@@ -41,7 +43,9 @@ addinController.validateAgent = function (req, res) {
         })
       },
       function (cert, cb) {
-        jwt.verify(exToken, cert, function (err, decoded) {
+        var file = path.join(__dirname, '../../public/public.pem')
+        var publicKey = fs.readFileSync(file)
+        jwt.verify(exToken, publicKey, function (err, decoded) {
           if (err) return cb(err)
           winston.debug('msexchuid= %s', decoded.appctx.msexchuid)
           cb(null, decoded.appctx.msexchuid)
