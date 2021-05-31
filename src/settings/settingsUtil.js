@@ -67,6 +67,7 @@ util.getSettings = function (callback) {
     s.customPageLogoFilename = parseSetting(settings, 'gen:custompagelogofilename', '')
     s.hasCustomFavicon = parseSetting(settings, 'gen:customfavicon', false)
     s.customFaviconFilename = parseSetting(settings, 'gen:customfaviconfilename', '')
+    s.msexAuthCert = parseSetting(settings, 'gen:msex:authcert', '')
 
     s.colorHeaderBG = parseSetting(settings, 'color:headerbg', '#42464d')
     s.colorHeaderPrimary = parseSetting(settings, 'color:headerprimary', '#f6f7fa')

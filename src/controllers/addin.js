@@ -18,6 +18,7 @@ var jwt = require('jsonwebtoken')
 var permissions = require('../permissions')
 var Team = require('../models/team')
 var userSchema = require('../models/user')
+var apiUtils = require('./api/apiUtils')
 
 var addinController = {}
 
@@ -28,7 +29,7 @@ addinController.validateAgent = function (req, res) {
     if (!err && setting && setting.value) {
       var cert = setting.value
       jwt.verify(req.token, cert, function (err, decoded) {
-        if (err) return apiUtils.sendApiError(res, 400, 'Invalid JWT token')
+        if (err) return apiUtils.sendApiError(res, 400, err.message)
         winston.debug('msexchuid= %s', decoded.appctx.msexchuid)
         //Outlook will get a JWT token from exchange server, we get msexchuid
         //We should validate the exchange identity token first
