@@ -60,7 +60,7 @@ addinController.validateAgent = function (req, res) {
       },
       function (msexchuid, cb) {
         //then check database to get API token
-        userSchema.findOne({ msexchuid: msexchuid }, function (err, user) {
+        userSchema.findOne({ msexchuid: msexchuid }, '+accessToken', function (err, user) {
           if (err) return cb(err)
           if (!user) return res.status(400).json({ success: false, error: 'No matched user' })
           //then return api token
