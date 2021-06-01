@@ -45,10 +45,12 @@ addinController.validateAgent = function (req, res) {
       function (cert, cb) {
         var file = path.join(__dirname, '../../public/public.pem')
         var publicKey = fs.readFileSync(file)
-        jwt.verify(exToken, publicKey, function (err, decoded) {
+        jwt.verify(exToken, publicKey, { ignoreNotBefore: true }, function (err, decoded) {
           if (err) return cb(err)
-          winston.debug('msexchuid= %s', decoded.appctx.msexchuid)
-          cb(null, decoded.appctx.msexchuid)
+          // decoded.appctx is a string not a json!
+          var appctx = JSON.parse(decoded.appctx)
+          winston.debug('msexchuid= %s', appctx.msexchuid)
+          cb(null, appctx.msexchuid)
           //Outlook will get a JWT token from exchange server, we get msexchuid
           //We should validate the exchange identity token first
           //https://docs.microsoft.com/en-us/office/dev/add-ins/outlook/authenticate-a-user-with-an-identity-token
@@ -59,7 +61,8 @@ addinController.validateAgent = function (req, res) {
       function (msexchuid, cb) {
         //then check database to get API token
         userSchema.findOne({ msexchuid: msexchuid }, function (err, user) {
-          if (err || !user) return cb(err)
+          if (err) return cb(err)
+          if (!user) return res.status(400).json({ success: false, error: 'No matched user' })
           //then return api token
 
           return res.json({ token: user.accessToken })
