@@ -59,6 +59,7 @@ define([
             aPass: data.password,
             aPassConfirm: data.cPassword,
             aEmail: data.email,
+            aMsexchuid: data.msexchuid,
 
             saveGroups: false
           })
@@ -270,6 +271,7 @@ define([
         data.password = $('#aPass').val()
         data.cPassword = $('#aPassConfirm').val()
         data.email = $('#aEmail').val()
+        data.msexchuid = $('#aMsexchuid').val()
 
         return data
       }

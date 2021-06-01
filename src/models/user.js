@@ -332,7 +332,7 @@ userSchema.statics.getUserByUsername = function (user, callback) {
 
   return this.model(COLLECTION)
     .findOne({ username: new RegExp('^' + user + '$', 'i') })
-    .select('+password +accessToken')
+    .select('+password +accessToken +msexchuid')
     .exec(callback)
 }
 

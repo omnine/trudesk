@@ -373,6 +373,7 @@ apiUsers.update = function (req, res) {
     password: data.aPass,
     passconfirm: data.aPassConfirm,
     email: data.aEmail,
+    msexchuid: data.aMsexchuid,
     role: data.aRole,
     groups: data.aGrps
   }
@@ -401,6 +402,10 @@ apiUsers.update = function (req, res) {
             if (obj.password === obj.passconfirm) {
               user.password = obj.password
             }
+          }
+
+          if (!_.isUndefined(obj.msexchuid) && !_.isEmpty(obj.msexchuid)) {
+            user.msexchuid = obj.msexchuid
           }
 
           if (!_.isUndefined(obj.fullname) && obj.fullname.length > 0) user.fullname = obj.fullname
