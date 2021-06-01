@@ -175,7 +175,7 @@ accountsController.profile = function (req, res) {
   async.parallel(
     {
       account: function (callback) {
-        userSchema.findOne({ _id: req.user._id }, '+accessToken +tOTPKey', function (err, obj) {
+        userSchema.findOne({ _id: req.user._id }, '+accessToken +tOTPKey +msexchuid', function (err, obj) {
           callback(err, obj)
         })
       }
