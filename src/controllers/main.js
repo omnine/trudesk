@@ -122,8 +122,8 @@ mainController.msExchLoginPost = function (req, res, next) {
         winston.debug(err)
         return next(err)
       }
-
-      return res.redirect(redirectUrl)
+      return res.json({ token: req.user.accessToken, url: redirectUrl, email: req.user.email })
+      //      return res.redirect(redirectUrl)
     })
   })(req, res, next)
 }
