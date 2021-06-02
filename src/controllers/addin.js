@@ -25,48 +25,56 @@ var apiUtils = require('./api/apiUtils')
 
 var addinController = {}
 
-// get an API token after validation
-// It can be another approach to login!
-addinController.validateAgent = function (req, res) {
-  var settingSchema = require('../models/setting')
-  var exToken = req.body.token
+//Post, create a case just link in mailCheck.js
+addinController.email2Case = function (req, res) {
+  //
+  var message = req.body
+
   async.waterfall(
     [
       function (cb) {
-        settingSchema.getSetting('gen:msex:authcert', function (err, setting) {
-          if (!err && setting && setting.value) {
-            var cert = setting.value
-            cb(null, cert)
-          } else {
-            return cb(err)
-            //            return apiUtils.sendApiError(res, 400, 'NO Exchange Auth Cert')
+        Ticket.create(
+          {
+            owner: message.owner._id,
+            group: message.group._id,
+            type: message.type._id,
+            status: 0,
+            priority: results.handlePriority,
+            subject: message.subject,
+            issue: message.body,
+            history: [HistoryItem],
+            subscribers: [message.owner._id] //the originator should be the first subscriber
+          },
+          function (err, ticket) {
+            if (err) {
+              winston.warn('Failed to create ticket from email: ' + err)
+              return cb(err)
+            }
+
+            emitter.emit('ticket:created', {
+              socketId: '',
+              ticket: ticket
+            })
+
+            res.json({ target: '/tickets/' + ticket.uid })
+            cb(null, ticket)
           }
-        })
+        )
       },
-      function (cert, cb) {
-        var file = path.join(__dirname, '../../public/public.pem')
-        var publicKey = fs.readFileSync(file)
-        jwt.verify(exToken, publicKey, { ignoreNotBefore: true }, function (err, decoded) {
-          if (err) return cb(err)
-          // decoded.appctx is a string not a json!
-          var appctx = JSON.parse(decoded.appctx)
-          winston.debug('msexchuid= %s', appctx.msexchuid)
-          cb(null, appctx.msexchuid)
-          //Outlook will get a JWT token from exchange server, we get msexchuid
-          //We should validate the exchange identity token first
-          //https://docs.microsoft.com/en-us/office/dev/add-ins/outlook/authenticate-a-user-with-an-identity-token
+      function (ticket, cb) {
+        let subject = message.subject
+        subject = '[DISSUE#' + ticket.uid + ']-' + subject
 
-          //then check database to get API token
-        })
-      },
-      function (msexchuid, cb) {
-        //then check database to get API token
-        userSchema.findOne({ msexchuid: msexchuid }, '+accessToken', function (err, user) {
-          if (err) return cb(err)
-          if (!user) return res.status(400).json({ success: false, error: 'No matched user' })
-          //then return api token
+        var ews = require('ews-javascript-api')
+        //create ExchangeService object
+        var exch = new ews.ExchangeService(ews.ExchangeVersion.Exchange2013)
+        exch.Credentials = new ews.WebCredentials('userName', 'password')
+        //set ews endpoint url to use
+        exch.Url = new ews.Uri('https://outlook.office365.com/Ews/Exchange.asmx') // you can also use exch.AutodiscoverUrl
 
-          return res.json({ token: user.accessToken })
+        ews.EmailMessage.bind(exch, message.itemId).then(function (email) {
+          email.SetSubject(subject)
+          email.update(ConflictResolutionMode.AlwaysOverwrite)
         })
       }
     ],
@@ -74,36 +82,6 @@ addinController.validateAgent = function (req, res) {
       if (err) return res.status(400).json({ error: err })
     }
   )
-}
-
-//Post
-addinController.updateSubject = function (req, res) {
-  var ews = require('ews-javascript-api')
-  //create ExchangeService object
-  var exch = new ews.ExchangeService(ews.ExchangeVersion.Exchange2013)
-  exch.Credentials = new ews.WebCredentials('userName', 'password')
-  //set ews endpoint url to use
-  exch.Url = new ews.Uri('https://outlook.office365.com/Ews/Exchange.asmx') // you can also use exch.AutodiscoverUrl
-
-  ews.EmailMessage.bind(exch, req.itemId).then(function (email) {
-    email.SetSubject(req.subject)
-    email.update(ConflictResolutionMode.AlwaysOverwrite)
-  })
-}
-
-//Post, create a case just link in mailCheck.js
-addinController.email2Case = function (req, res) {
-  var ews = require('ews-javascript-api')
-  //create ExchangeService object
-  var exch = new ews.ExchangeService(ews.ExchangeVersion.Exchange2013)
-  exch.Credentials = new ews.WebCredentials('userName', 'password')
-  //set ews endpoint url to use
-  exch.Url = new ews.Uri('https://outlook.office365.com/Ews/Exchange.asmx') // you can also use exch.AutodiscoverUrl
-
-  ews.EmailMessage.bind(exch, req.itemId).then(function (email) {
-    email.SetSubject(req.subject)
-    email.update(ConflictResolutionMode.AlwaysOverwrite)
-  })
 }
 
 module.exports = addinController

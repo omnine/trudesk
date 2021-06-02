@@ -51,17 +51,7 @@
     </main>
     <div id="message" style="color:red;"></div>   
     <div id="group_apikey" style="display: none;">
-        <h3>A valid API token is needed to convert this email to ticket.</h3>
-        <p>As an agent, you can create one at 
-            <a href="https://helpdesk.deepnetsecurity.com/#profile/token_access">Helpdesk</a>.</p>
-        <p>Save it to local storage.</p>
-        <!-- style="display: none;" -->
-        <div>
-            <label for="apikey" >API Token:</label>
-            <input type="text" id="apikey" name="apikey" size="40"/>
-            <button id="keysave" onclick="keySave()" disabled>Save</button>
-        </div>
-        <p>Alternatively, present your administrator the userID which can be obained 
+        <p>Present your administrator the userID which can be obained 
             by pressing the following button. Then he can associate it to your account at Helpdesk.</p>
         <button id="exchid" onclick="getExchID()">Show Exchange User ID</button>
         <div id="msg_exchid"></div>     

@@ -15,7 +15,6 @@ Office.onReady(info => {
     document.getElementById('run').onclick = run
     document.getElementById('convert').onclick = email2Case
     document.getElementById('exchid').onclick = getExchID
-    document.getElementById('keysave').onclick = keySave
 
     $('#apikey').on('input', function () {
       if ($('#apikey').val()) {
@@ -104,21 +103,14 @@ export async function email2Case () {
     //ticket and comment may need to create seperately.
     var item = Office.context.mailbox.item
     let data = {
+      itemId: item.itemId,
+      from: item.from,
       subject: item.subject,
-      issue: item.subject
-      /*
-      "owner": {OwnerId},
-     "group": {GroupId},
-     "type": {TypeId}
-      // Note: Priority must be priority id associated with the selected type id
-     "priority": {PriorityId} 
-
-     do we need to call /api/v1/tickets/addcomment to add the bodyHtml as the comment?
-      */
+      body: bodyHtml
     }
 
     $.ajax({
-      url: 'https://helpdesk.deepnetsecurity.com/api/v1/tickets/create',
+      url: 'https://helpdesk.deepnetsecurity.com/email2case',
       method: 'POST',
       dataType: 'json',
       crossDomain: true,
@@ -130,14 +122,7 @@ export async function email2Case () {
         xhr.setRequestHeader('accesstoken', userAPIToken)
       },
       success: function (result) {
-        window.location.href = 'https://helpdesk.deepnetsecurity.com/tickets/' + result.ticket.uid
-
-        // modify the subject by adding ticket number after the ticket is successfully created.
-        // unfortunately, in read form, we can't do that. item.subject is a string, not object.
-
-        let subject = item.subject
-        subject = '[DISSUE#' + result.ticket.uid + ']-' + subject
-        updateSubject(item.itemId, subject)
+        window.location.href = 'https://helpdesk.deepnetsecurity.com/tickets/' + result.target
       },
       error: function (xhr, status, error) {
         //show this block to allow change API Token
@@ -226,40 +211,5 @@ function getExchangeToken () {
         $('#message').html('Logged in as: ' + result.email)
       }
     })
-  })
-}
-
-function keySave () {
-  localStorage.setItem('apikey', $('#apikey').val())
-  userAPIToken = $('#apikey').val()
-  $('#group_apikey').hide()
-  document.getElementById('convert').disabled = false
-}
-
-// We have to ask the server to do the job
-function updateSubject (itemId, subject) {
-  let data = {
-    itemId: itemId,
-    subject: subject
-  }
-
-  $.ajax({
-    url: 'https://helpdesk.deepnetsecurity.com/outlook/updatesubject',
-    method: 'POST',
-    dataType: 'json',
-    crossDomain: true,
-    contentType: 'application/json; charset=utf-8',
-    data: JSON.stringify(data),
-    cache: false,
-    beforeSend: function (xhr) {
-      /* Authorization header */
-      xhr.setRequestHeader('accesstoken', userAPIToken)
-    },
-    success: function (result) {},
-    error: function (xhr, status, error) {
-      //show this block to allow change API Token
-      $('#group_apikey').show()
-      $('#message').html('Result: Update subject ' + xhr.status + ' ' + xhr.statusText)
-    }
   })
 }

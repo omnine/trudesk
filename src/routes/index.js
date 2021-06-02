@@ -60,8 +60,6 @@ function mainRoutes (router, middleware, controllers) {
   })
 
   // Addin
-  router.post('/validateagent', controllers.addin.validateAgent)
-  router.post('/updateemailsubject', middleware.redirectToLogin, controllers.addin.updateSubject)
   router.post('/email2case', middleware.redirectToLogin, controllers.addin.email2Case)
 
   // Public
