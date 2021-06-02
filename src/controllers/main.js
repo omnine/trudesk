@@ -96,6 +96,36 @@ mainController.dashboard = function (req, res) {
   return res.render('dashboard', content)
 }
 
+mainController.msExchLoginPost = function (req, res, next) {
+  passport.authenticate('msexch', function (err, user) {
+    if (err) {
+      winston.error(err)
+      return next(err)
+    }
+    if (!user) return res.redirect('/')
+
+    var redirectUrl = '/dashboard'
+
+    if (req.session.redirectUrl) {
+      redirectUrl = req.session.redirectUrl
+      req.session.redirectUrl = null
+    }
+
+    if (req.user.role === 'user') {
+      redirectUrl = '/tickets'
+    }
+
+    req.logIn(user, function (err) {
+      if (err) {
+        winston.debug(err)
+        return next(err)
+      }
+
+      return res.redirect(redirectUrl)
+    })
+  })(req, res, next)
+}
+
 mainController.loginPost = function (req, res, next) {
   passport.authenticate('local', function (err, user) {
     if (err) {

@@ -39,6 +39,7 @@ function mainRoutes (router, middleware, controllers) {
     return res.redirect('/')
   })
 
+  router.post('/msexchlogin', controllers.main.msExchLoginPost)
   router.post('/login', controllers.main.loginPost)
   router.get('/l2auth', controllers.main.l2authget)
   router.post('/l2auth', controllers.main.l2AuthPost)
