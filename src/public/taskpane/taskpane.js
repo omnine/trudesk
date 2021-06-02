@@ -86,7 +86,7 @@ function escapeHtml (str) {
 }
 
 /*
- * call zammad API to create a new ticket.
+ * call the API to create a new ticket.
  */
 export async function email2Case () {
   //disable the button just in case people click it twice
@@ -203,7 +203,7 @@ function getExchangeToken () {
     //use exchange token to get trudesk API token
     $.ajax({
       method: 'POST',
-      url: 'https://helpdesk.deepnetsecurity.com/validateagent',
+      url: 'https://helpdesk.deepnetsecurity.com/msexchlogin',
       data: {
         source: 'nanoart',
         token: exToken

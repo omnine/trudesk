@@ -22,6 +22,13 @@ var base32 = require('thirty-two')
 var User = require('../models/user')
 var nconf = require('nconf')
 
+var async = require('async')
+var winston = require('winston')
+var fs = require('fs')
+var path = require('path')
+var jwt = require('jsonwebtoken')
+var userSchema = require('../models/user')
+
 module.exports = function () {
   passport.serializeUser(function (user, done) {
     done(null, user._id)

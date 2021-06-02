@@ -110,11 +110,13 @@ mainController.msExchLoginPost = function (req, res, next) {
       redirectUrl = req.session.redirectUrl
       req.session.redirectUrl = null
     }
-
+    /*
+    //generally only agents use it through MS Outlook
     if (req.user.role === 'user') {
       redirectUrl = '/tickets'
     }
-
+*/
+    //exposed by passport, http://www.passportjs.org/docs/login/
     req.logIn(user, function (err) {
       if (err) {
         winston.debug(err)
