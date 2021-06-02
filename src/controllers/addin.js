@@ -26,6 +26,7 @@ var apiUtils = require('./api/apiUtils')
 var addinController = {}
 
 // get an API token after validation
+// It can be another approach to login!
 addinController.validateAgent = function (req, res) {
   var settingSchema = require('../models/setting')
   var exToken = req.body.token

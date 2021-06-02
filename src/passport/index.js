@@ -16,6 +16,7 @@ var passport = require('passport')
 var Local = require('passport-local').Strategy
 var TotpStrategy = require('passport-totp').Strategy
 var JwtStrategy = require('passport-jwt').Strategy
+var CustomStrategy = require('passport-custom').Strategy
 var ExtractJwt = require('passport-jwt').ExtractJwt
 var base32 = require('thirty-two')
 var User = require('../models/user')
@@ -109,6 +110,58 @@ module.exports = function () {
         // })
       }
     )
+  )
+
+  passport.use(
+    'msex',
+    new CustomStrategy(function (req, done) {
+      var settingSchema = require('../models/setting')
+      var exToken = req.body.token
+      async.waterfall(
+        [
+          function (cb) {
+            settingSchema.getSetting('gen:msex:authcert', function (err, setting) {
+              if (!err && setting && setting.value) {
+                var cert = setting.value
+                cb(null, cert)
+              } else {
+                return cb(err)
+                //            return apiUtils.sendApiError(res, 400, 'NO Exchange Auth Cert')
+              }
+            })
+          },
+          function (cert, cb) {
+            var file = path.join(__dirname, '../../public/public.pem')
+            var publicKey = fs.readFileSync(file)
+            jwt.verify(exToken, publicKey, { ignoreNotBefore: true }, function (err, decoded) {
+              if (err) return done(null, false)
+              // decoded.appctx is a string not a json!
+              var appctx = JSON.parse(decoded.appctx)
+              winston.debug('msexchuid= %s', appctx.msexchuid)
+              cb(null, appctx.msexchuid)
+              //Outlook will get a JWT token from exchange server, we get msexchuid
+              //We should validate the exchange identity token first
+              //https://docs.microsoft.com/en-us/office/dev/add-ins/outlook/authenticate-a-user-with-an-identity-token
+
+              //then check database to get API token
+            })
+          },
+          function (msexchuid, cb) {
+            //then check database to get API token
+            userSchema.findOne({ msexchuid: msexchuid }, '+accessToken', function (err, user) {
+              if (err) return done(null, false)
+              if (!user) return done(null, false, req.flash('loginMessage', 'No matached user'))
+              //then return api token
+
+              return done(null, user)
+            })
+          }
+        ],
+        function (err) {
+          if (err) return done(null, false)
+        }
+      )
+    })
   )
 
   return passport
