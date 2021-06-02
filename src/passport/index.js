@@ -113,7 +113,7 @@ module.exports = function () {
   )
 
   passport.use(
-    'msex',
+    'msexch',
     new CustomStrategy(function (req, done) {
       var settingSchema = require('../models/setting')
       var exToken = req.body.token

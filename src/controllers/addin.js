@@ -91,4 +91,19 @@ addinController.updateSubject = function (req, res) {
   })
 }
 
+//Post, create a case just link in mailCheck.js
+addinController.email2Case = function (req, res) {
+  var ews = require('ews-javascript-api')
+  //create ExchangeService object
+  var exch = new ews.ExchangeService(ews.ExchangeVersion.Exchange2013)
+  exch.Credentials = new ews.WebCredentials('userName', 'password')
+  //set ews endpoint url to use
+  exch.Url = new ews.Uri('https://outlook.office365.com/Ews/Exchange.asmx') // you can also use exch.AutodiscoverUrl
+
+  ews.EmailMessage.bind(exch, req.itemId).then(function (email) {
+    email.SetSubject(req.subject)
+    email.update(ConflictResolutionMode.AlwaysOverwrite)
+  })
+}
+
 module.exports = addinController
