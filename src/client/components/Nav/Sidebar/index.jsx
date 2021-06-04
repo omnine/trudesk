@@ -291,6 +291,12 @@ class Sidebar extends React.Component {
                 active={activeSubItem === 'settings-elasticsearch'}
               />
               <SubmenuItem
+                href={'/settings/ews'}
+                text={'EWS'}
+                icon={'search'}
+                active={activeSubItem === 'settings-ews'}
+              />
+              <SubmenuItem
                 text='Push Service'
                 icon='mobile_friendly'
                 href='/settings/tps'
