@@ -88,3 +88,9 @@ EWS in node,  the best one https://github.com/gautamsi/ews-javascript-api
             ]
         }
 ```
+
+### To Do
+
+- EWS settings
+- TypeSense support
+- Knowledge Base
