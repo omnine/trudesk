@@ -146,17 +146,29 @@ addinController.email2Case = function (req, res) {
           let subject = message.subject
           subject = '[DISSUE#' + ticket.uid + ']-' + subject
 
-          var ews = require('ews-javascript-api')
-          //create ExchangeService object
-          // todo read the credentials from settings or nconf
-          var exch = new ews.ExchangeService(ews.ExchangeVersion.Exchange2013)
-          exch.Credentials = new ews.WebCredentials('userName', 'password')
-          //set ews endpoint url to use
-          exch.Url = new ews.Uri('https://outlook.office365.com/Ews/Exchange.asmx') // you can also use exch.AutodiscoverUrl
+          //getSettings is too much?, otherwise need 3 nested functions
+          var settingsUtil = require('../settings/settingsUtil')
+          settingsUtil.getSettings(function (err, s) {
+            if (err) return cb(err)
+            var settings = s.data.settings
 
-          ews.EmailMessage.bind(exch, message.itemId).then(function (email) {
-            email.SetSubject(subject)
-            email.update(ConflictResolutionMode.AlwaysOverwrite)
+            var ews = require('ews-javascript-api')
+            //create ExchangeService object
+            // todo read the credentials from settings or nconf
+            var exch = new ews.ExchangeService(ews.ExchangeVersion.Exchange2013)
+            exch.Credentials = new ews.WebCredentials(settings.ewsUsername.value, settings.ewsPassword.value)
+            //set ews endpoint url to use
+            exch.Url = new ews.Uri(settings.ewsUrl.value) // you can also use exch.AutodiscoverUrl, 'https://outlook.office365.com/Ews/Exchange.asmx'
+
+            ews.EmailMessage.bind(exch, message.itemId).then(function (email) {
+              email.SetSubject(subject)
+              email.update(ConflictResolutionMode.AlwaysOverwrite)
+            })
+
+            content.siteTitle = settings.siteTitle.value
+
+            content.allowUserRegistration = settings.allowUserRegistration.value
+            content.mailerEnabled = settings.mailerEnabled.value
           })
         }
       ]
