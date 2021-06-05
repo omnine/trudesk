@@ -27,14 +27,14 @@ var TS = {}
 TS.indexName = process.env.ELASTICSEARCH_INDEX_NAME || 'trudesk'
 
 function checkConnection (callback) {
-  if (!TS.tsclient) return callback('Elasticsearch client not initialized. Restart Trudesk!')
+  if (!TS.tsclient) return callback('Typesense client not initialized. Restart Trudesk!')
 
   TS.tsclient.ping(
     {
       requestTimeout: 10000
     },
     function (err) {
-      if (err) return callback('Could not connect to Elasticsearch: ' + TS.host)
+      if (err) return callback('Could not connect to Typesense: ' + TS.host)
 
       return callback()
     }
@@ -98,18 +98,10 @@ TS.setupHooks = function () {
         tags: ticket.tags
       }
 
-      TS.tsclient.index(
-        {
-          index: TS.indexName,
-          type: 'doc',
-          id: ticket._id.toString(),
-          refresh: 'true',
-          body: cleanedTicket
-        },
-        function (err) {
-          if (err) winston.warn('Elasticsearch Error: ' + err)
-        }
-      )
+      TS.tsclient
+        .collections(TS.indexName)
+        .documents(ticket._id.toString())
+        .update(cleanedTicket)
     })
   })
 
@@ -148,6 +140,18 @@ TS.setupHooks = function () {
         status: ticket.status,
         tags: ticket.tags
       }
+
+      let document = {
+        id: _id,
+        company_name: 'Stark Industries',
+        num_employees: 5215,
+        country: 'USA'
+      }
+
+      TS.tsclient
+        .collections(TS.indexName)
+        .documents()
+        .create(cleanedTicket)
 
       TS.tsclient.index(
         {
@@ -232,14 +236,16 @@ TS.rebuildIndex = function () {
 }
 
 TS.getIndexCount = function (callback) {
-  if (_.isUndefined(TS.tsclient)) return callback('Elasticsearch has not initialized')
+  if (_.isUndefined(TS.tsclient)) return callback('Typesense has not initialized')
 
-  TS.tsclient.count(
-    {
-      index: TS.indexName
-    },
-    callback
-  )
+  TS.tsclient
+    .collections(TS.indexName)
+    .retrieve()
+    .then(function (r) {
+      var data = {}
+      data.count = r.num_documents
+      return callback(data)
+    })
 }
 
 TS.init = function (callback) {
