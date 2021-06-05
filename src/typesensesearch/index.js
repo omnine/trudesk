@@ -114,6 +114,7 @@ TS.setupHooks = function () {
 
       var _id = ticket._id.toString()
       var cleanedTicket = {
+        id: _id,
         uid: ticket.uid,
         subject: ticket.subject,
         issue: ticket.issue,
@@ -140,30 +141,13 @@ TS.setupHooks = function () {
         status: ticket.status,
         tags: ticket.tags
       }
-
-      let document = {
-        id: _id,
-        company_name: 'Stark Industries',
-        num_employees: 5215,
-        country: 'USA'
-      }
-
+      // todo need to create a schema
+      //  Typesense can index a multi-value array. In the schema, define the type of the field as string[]
+      // Typesense does not index a dictionary or nested fields though: they have to be flattened out. https://github.com/typesense/typesense/issues/256
       TS.tsclient
         .collections(TS.indexName)
         .documents()
         .create(cleanedTicket)
-
-      TS.tsclient.index(
-        {
-          index: TS.indexName,
-          type: 'doc',
-          id: _id,
-          body: cleanedTicket
-        },
-        function (err) {
-          if (err) winston.warn('Elasticsearch Error: ' + err)
-        }
-      )
     })
   })
 }
