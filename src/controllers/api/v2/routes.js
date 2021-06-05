@@ -65,5 +65,10 @@ module.exports = function (middleware, router, controllers) {
   router.get('/api/v2/es/rebuild', apiv2Auth, isAdmin, apiv2.elasticsearch.rebuild)
   router.get('/api/v2/es/status', apiv2Auth, isAdmin, apiv2.elasticsearch.status)
 
+  // Typesense search
+  router.get('/api/v2/ts/search', middleware.api, apiv2.typesensesearch.search)
+  router.get('/api/v2/ts/rebuild', apiv2Auth, isAdmin, apiv2.typesensesearch.rebuild)
+  router.get('/api/v2/ts/status', apiv2Auth, isAdmin, apiv2.typesensesearch.status)
+
   router.get('/api/v2/mailer/check', apiv2Auth, isAdmin, apiv2.mailer.check)
 }
