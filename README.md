@@ -92,4 +92,4 @@ EWS in node,  the best one https://github.com/gautamsi/ews-javascript-api
 ### To Do
 
 - TypeSense support
-- Knowledge Base
+- Knowledge Base, candidates: Raneto, Outline
