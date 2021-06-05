@@ -14,7 +14,7 @@
 
 var _ = require('lodash')
 var async = require('async')
-var es = require('../../../elasticsearch')
+var ts = require('../../../typesensesearch')
 var ticketSchema = require('../../../models/ticket')
 var groupSchema = require('../../../models/group')
 
@@ -22,7 +22,7 @@ var apiTypesenseSearch = {}
 var apiUtil = require('../apiUtils')
 
 apiTypesenseSearch.rebuild = function (req, res) {
-  es.rebuildIndex()
+  ts.rebuildIndex()
 
   return res.json({ success: true })
 }
@@ -33,10 +33,10 @@ apiTypesenseSearch.status = function (req, res) {
   async.parallel(
     [
       function (done) {
-        return es.checkConnection(done)
+        return ts.checkConnection(done)
       },
       function (done) {
-        es.getIndexCount(function (err, data) {
+        ts.getIndexCount(function (err, data) {
           if (err) return done(err)
           response.indexCount = !_.isUndefined(data.count) ? data.count : 0
           return done()
@@ -85,7 +85,7 @@ apiTypesenseSearch.search = function (req, res) {
         })
         // For docker we need to add a unique ID for the index.
         var obj = {
-          index: es.indexName,
+          index: ts.indexName,
           body: {
             size: limit,
             from: 0,
@@ -128,9 +128,9 @@ apiTypesenseSearch.search = function (req, res) {
     ],
     function (err, obj) {
       if (err) return apiUtil.sendApiError(res, 500, err.message)
-      if (!es || !es.esclient) return apiUtil.sendApiError(res, 400, 'Elasticsearch is not configured')
+      if (!es || !ts.tsclient) return apiUtil.sendApiError(res, 400, 'Elasticsearch is not configured')
 
-      es.esclient.search(obj).then(function (r) {
+      ts.tsclient.search(obj).then(function (r) {
         return res.send(r)
       })
     }

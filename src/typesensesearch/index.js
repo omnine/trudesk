@@ -17,7 +17,8 @@ var path = require('path')
 var async = require('async')
 var nconf = require('nconf')
 var winston = require('winston')
-var elasticsearch = require('elasticsearch')
+
+var Typesense = require('typesense')
 var emitter = require('../emitter')
 var moment = require('moment-timezone')
 var settingUtil = require('../settings/settingsUtil')
@@ -26,9 +27,9 @@ var TS = {}
 TS.indexName = process.env.ELASTICSEARCH_INDEX_NAME || 'trudesk'
 
 function checkConnection (callback) {
-  if (!TS.esclient) return callback('Elasticsearch client not initialized. Restart Trudesk!')
+  if (!TS.tsclient) return callback('Elasticsearch client not initialized. Restart Trudesk!')
 
-  TS.esclient.ping(
+  TS.tsclient.ping(
     {
       requestTimeout: 10000
     },
@@ -42,9 +43,9 @@ function checkConnection (callback) {
 
 TS.testConnection = function (callback) {
   if (process.env.ELEASTICSEARCH_URI) TS.host = process.env.ELEASTICSEARCH_URI
-  else TS.host = nconf.get('elasticsearch:host') + ':' + nconf.get('elasticsearch:port')
+  else TS.host = nconf.get('typesense:host') + ':' + nconf.get('typesense:port')
 
-  TS.esclient = new elasticsearch.Client({
+  TS.tsclient = new Typesense.Client({
     host: TS.host
   })
 
@@ -57,17 +58,11 @@ TS.setupHooks = function () {
   emitter.on('ticket:deleted', function (_id) {
     if (_.isUndefined(_id)) return false
 
-    TS.esclient.delete(
-      {
-        index: TS.indexName,
-        type: 'doc',
-        id: _id.toString(),
-        refresh: 'true'
-      },
-      function (err) {
-        if (err) winston.warn('Elasticsearch Error: ' + err)
-      }
-    )
+    TS.tsclient
+      .collections(TS.indexName)
+      .documents(_id.toString())
+      .delete()
+    //how to handle the error
   })
 
   emitter.on('ticket:updated', function (data) {
@@ -103,7 +98,7 @@ TS.setupHooks = function () {
         tags: ticket.tags
       }
 
-      TS.esclient.index(
+      TS.tsclient.index(
         {
           index: TS.indexName,
           type: 'doc',
@@ -154,7 +149,7 @@ TS.setupHooks = function () {
         tags: ticket.tags
       }
 
-      TS.esclient.index(
+      TS.tsclient.index(
         {
           index: TS.indexName,
           type: 'doc',
@@ -170,13 +165,20 @@ TS.setupHooks = function () {
 }
 
 TS.buildClient = function (host) {
-  if (TS.esclient) {
-    TS.esclient.close()
+  if (TS.tsclient) {
+    TS.tsclient.close()
   }
-  TS.esclient = new elasticsearch.Client({
-    host: host,
-    pingTimeout: 10000,
-    maxRetries: 5
+
+  TS.tsclient = new Typesense.Client({
+    nodes: [
+      {
+        host: host, // host, For Typesense Cloud use xxx.a1.typesense.net
+        port: '8108', // For Typesense Cloud use 443
+        protocol: 'http' // For Typesense Cloud use https
+      }
+    ],
+    apiKey: '<API_KEY>',
+    connectionTimeoutSeconds: 2
   })
 }
 
@@ -230,9 +232,9 @@ TS.rebuildIndex = function () {
 }
 
 TS.getIndexCount = function (callback) {
-  if (_.isUndefined(TS.esclient)) return callback('Elasticsearch has not initialized')
+  if (_.isUndefined(TS.tsclient)) return callback('Elasticsearch has not initialized')
 
-  TS.esclient.count(
+  TS.tsclient.count(
     {
       index: TS.indexName
     },
