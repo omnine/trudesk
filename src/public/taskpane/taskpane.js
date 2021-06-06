@@ -104,7 +104,7 @@ export async function email2Case () {
     var item = Office.context.mailbox.item
     let data = {
       itemId: item.itemId,
-      from: item.from,
+      from: item.from.emailAddress,
       subject: item.subject,
       body: bodyHtml
     }
@@ -122,7 +122,7 @@ export async function email2Case () {
         xhr.setRequestHeader('accesstoken', userAPIToken)
       },
       success: function (result) {
-        window.location.href = 'https://helpdesk.deepnetsecurity.com/tickets/' + result.target
+        window.location.href = 'https://helpdesk.deepnetsecurity.com/tickets/' + result.uid
       },
       error: function (xhr, status, error) {
         //show this block to allow change API Token

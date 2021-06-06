@@ -134,8 +134,8 @@ addinController.email2Case = function (req, res) {
                 ticket: ticket
               })
 
-              res.json({ target: '/tickets/' + ticket.uid })
-              cb(null, ticket)
+              res.json({ uid: ticket.uid })
+              return callback(null, ticket)
             }
           )
         }
@@ -164,11 +164,6 @@ addinController.email2Case = function (req, res) {
               email.SetSubject(subject)
               email.update(ConflictResolutionMode.AlwaysOverwrite)
             })
-
-            content.siteTitle = settings.siteTitle.value
-
-            content.allowUserRegistration = settings.allowUserRegistration.value
-            content.mailerEnabled = settings.mailerEnabled.value
           })
         }
       ]
