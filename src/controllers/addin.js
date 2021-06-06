@@ -144,7 +144,7 @@ addinController.email2Case = function (req, res) {
         'handleCreateTicket',
         function (ticket, cb) {
           var subject = message.subject
-          subject = '[DISSUE#' + ticket.uid + ']-' + subject
+          subject = '[DISSUE#' + ticket.handleCreateTicket.uid + ']-' + subject
 
           //getSettings is too much?, otherwise need 3 nested functions
           var settingsUtil = require('../settings/settingsUtil')
