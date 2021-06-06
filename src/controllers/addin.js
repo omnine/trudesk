@@ -160,7 +160,7 @@ addinController.email2Case = function (req, res) {
             //set ews endpoint url to use
             exch.Url = new ews.Uri(settings.ewsUrl.value) // you can also use exch.AutodiscoverUrl, 'https://outlook.office365.com/Ews/Exchange.asmx'
 
-            ews.EmailMessage.bind(exch, message.itemId).then(function (email) {
+            ews.EmailMessage.Bind(exch, new ews.ItemId(message.itemId)).then(function (email) {
               email.SetSubject(subject)
               email.update(ConflictResolutionMode.AlwaysOverwrite)
             })
