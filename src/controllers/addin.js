@@ -143,7 +143,7 @@ addinController.email2Case = function (req, res) {
       handleUpdateSubject: [
         'handleCreateTicket',
         function (ticket, cb) {
-          let subject = message.subject
+          var subject = message.subject
           subject = '[DISSUE#' + ticket.uid + ']-' + subject
 
           //getSettings is too much?, otherwise need 3 nested functions
@@ -159,7 +159,7 @@ addinController.email2Case = function (req, res) {
             exch.Credentials = new ews.ExchangeCredentials(settings.ewsUsername.value, settings.ewsPassword.value)
             //set ews endpoint url to use
             exch.Url = new ews.Uri(settings.ewsUrl.value) // you can also use exch.AutodiscoverUrl, 'https://outlook.office365.com/Ews/Exchange.asmx'
-            var ewsAuth = require('@ewsjs/xhr')
+            var ewsAuth = require('@ewsjs/xhr') // for NTLM auth
             const xhr = new ewsAuth.XhrApi({ rejectUnauthorized: false, gzip: true }).useNtlmAuthentication(
               settings.ewsUsername.value,
               settings.ewsPassword.value
@@ -167,7 +167,7 @@ addinController.email2Case = function (req, res) {
             exch.XHRApi = xhr
             ews.EmailMessage.Bind(exch, new ews.ItemId(message.itemId)).then(function (email) {
               email.SetSubject(subject)
-              email.update(ConflictResolutionMode.AlwaysOverwrite)
+              email.Update(ews.ConflictResolutionMode.AlwaysOverwrite) //2
             })
           })
         }
