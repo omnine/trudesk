@@ -155,11 +155,16 @@ addinController.email2Case = function (req, res) {
             var ews = require('ews-javascript-api')
             //create ExchangeService object
             // todo read the credentials from settings or nconf
-            var exch = new ews.ExchangeService(ews.ExchangeVersion.Exchange2013)
-            exch.Credentials = new ews.WebCredentials(settings.ewsUsername.value, settings.ewsPassword.value)
+            var exch = new ews.ExchangeService(ews.ExchangeVersion.Exchange2016)
+            exch.Credentials = new ews.ExchangeCredentials(settings.ewsUsername.value, settings.ewsPassword.value)
             //set ews endpoint url to use
             exch.Url = new ews.Uri(settings.ewsUrl.value) // you can also use exch.AutodiscoverUrl, 'https://outlook.office365.com/Ews/Exchange.asmx'
-
+            var ewsAuth = require('@ewsjs/xhr')
+            const xhr = new ewsAuth.XhrApi({ rejectUnauthorized: false, gzip: true }).useNtlmAuthentication(
+              settings.ewsUsername.value,
+              settings.ewsPassword.value
+            )
+            exch.XHRApi = xhr
             ews.EmailMessage.Bind(exch, new ews.ItemId(message.itemId)).then(function (email) {
               email.SetSubject(subject)
               email.update(ConflictResolutionMode.AlwaysOverwrite)
