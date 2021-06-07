@@ -15,7 +15,6 @@
 
 var _ = require('lodash')
 var async = require('async')
-var Imap = require('imap')
 var winston = require('winston')
 // var marked      = require('marked');
 //var cheerio = require('cheerio')
@@ -84,14 +83,6 @@ ewsCheck.init = function (settings) {
   var POLLING_INTERVAL = s.mailerCheckPolling.value
 
   if (!MAILERCHECK_ENABLED) return true
-
-  ewsCheck.Imap = new Imap({
-    user: MAILERCHECK_USER,
-    password: MAILERCHECK_PASS,
-    host: MAILERCHECK_HOST,
-    port: MAILERCHECK_PORT,
-    tls: MAILERCHECK_TLS
-  })
 
   ewsCheck.fetchMailOptions = {
     defaultTicketType: s.mailerCheckTicketType.value,
@@ -349,8 +340,6 @@ function openInboxFolder (callback) {
   async.waterfall(
     [
       function (next) {
-        ewsCheck.Imap.search(['UNSEEN'], next)
-
         const view = new ItemView(10)
         exch.FindItems(WellKnownFolderName.Inbox, 'isRead:false', view).then(
           function (items) {
@@ -386,7 +375,6 @@ function openInboxFolder (callback) {
     ],
     function (err) {
       if (err) winston.warn(err)
-      ewsCheck.Imap.end()
       callback(null)
     }
   )
@@ -406,7 +394,6 @@ function openSentFolder (callback) {
   async.waterfall(
     [
       function (next) {
-        // alternatively ewsCheck.Imap.sort(['DATE'], [searchCriteria], next), where to save the lastcheck?
         var settingUtil = require('../settings/settingsUtil')
         var curTime = new Date()
 
@@ -420,8 +407,6 @@ function openSentFolder (callback) {
           }
 
           settingUtil.setSetting('mailer:check:last_fetch', curTime, function (err) {
-            ewsCheck.Imap.search([['SINCE', last_fetch], ['BEFORE', curTime]], next)
-
             var startDate = new ews.DateTime('2016-09-14') //Year, month, day
             var greaterThanfilter = new ews.SearchFilter.IsGreaterThanOrEqualTo(
               ews.EmailMessageSchema.DateTimeReceived,
@@ -467,7 +452,6 @@ function openSentFolder (callback) {
     ],
     function (err) {
       if (err) winston.warn(err)
-      ewsCheck.Imap.end()
       callback(null)
     }
   )
