@@ -101,11 +101,12 @@ ewsCheck.init = function (settings) {
 }
 
 ewsCheck.refetch = function () {
+  /*
   if (_.isUndefined(ewsCheck.fetchMailOptions)) {
     winston.warn('Mailcheck.refetch() running before Mailcheck.init(); please run Mailcheck.init() prior')
     return
   }
-
+*/
   ewsCheck.fetchMail()
 }
 
@@ -128,7 +129,7 @@ function bindEWSReady () {
     )
     exch.XHRApi = xhr
     ewsCheck.exchService = exch
-    ewsCheck.fetchMail()
+    //    ewsCheck.fetchMail()
   })
 }
 
@@ -343,17 +344,17 @@ function openInboxFolder (callback) {
   ewsCheck.exchService.FindItems(ews.WellKnownFolderName.Inbox, 'isRead:false', view).then(
     function (response) {
       if (response.TotalCount < 1) {
-        winston.debug('MailCheck through EWS: Nothing to Fetch.')
+        winston.debug('MailCheck through EWS: Nothing to Fetch from INBOX.')
         return callback(null)
       }
       winston.debug('Processing %s Mail', response.TotalCount)
       for (const item of response.items) {
-        item.Load(new ews.PropertySet(ews.BasePropertySet.FirstClassProperties, adinationalProps)).then(function () {
+        item.Load().then(function () {
           var message = {}
-          message.from = item.from
+          message.from = item.From.Address
           message.subject = item.Subject
 
-          message.body = item.body
+          message.body = item.Body.Text
           message.folder = 'INBOX'
           ewsCheck.messages.push(message)
         })
@@ -393,7 +394,8 @@ function openSentFolder (callback) {
     }
 
     settingUtil.setSetting('mailer:check:last_fetch', curTime, function (err) {
-      var startDate = new ews.DateTime(curTime.valueOf())
+      //      var startDate = new ews.DateTime(curTime.valueOf())
+      var startDate = new ews.DateTime(2021, 6, 6)
       var greaterThanfilter = new ews.SearchFilter.IsGreaterThanOrEqualTo(
         ews.EmailMessageSchema.DateTimeSent,
         startDate
@@ -410,17 +412,17 @@ function openSentFolder (callback) {
           winston.debug('Processing %s Mail(s) in SENT Folder', response.TotalCount)
           var message = {}
           for (const item of response.items) {
-            item
-              .Load(new ews.PropertySet(ews.BasePropertySet.FirstClassProperties, adinationalProps))
-              .then(function () {
-                var message = {}
-                message.from = item.from
-                message.subject = item.Subject
-
-                message.body = item.body
-                message.folder = 'SENT'
-                ewsCheck.messages.push(message)
-              })
+            item.Load().then(function () {
+              var message = {}
+              message.from = item.From.Address
+              message.subject = item.Subject
+              message.body = item.Body.Text
+              //use this one
+              message.inReplyTo = item.inReplyTo
+              //                message.references = item.References
+              message.folder = 'SENT'
+              ewsCheck.messages.push(message)
+            })
           }
           return callback(null)
         },

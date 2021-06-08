@@ -384,6 +384,11 @@ function mainRoutes (router, middleware, controllers) {
       mailCheck.refetch()
       res.send('OK')
     })
+    router.get('/debug/ewscheck/refetch', function (req, res) {
+      var ewsCheck = require('../mailer/ewsCheck')
+      ewsCheck.refetch()
+      res.send('OK')
+    })
 
     router.get('/debug/cache/refresh', function (req, res) {
       var _ = require('lodash')
