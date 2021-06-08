@@ -127,6 +127,7 @@ function bindEWSReady () {
       settings.ewsPassword.value
     )
     exch.XHRApi = xhr
+    ewsCheck.exchService = exch
     ewsCheck.fetchMail()
   })
 }
@@ -337,50 +338,38 @@ function handleMessages (messages, done) {
 }
 
 function openInboxFolder (callback) {
-  async.waterfall(
-    [
-      function (next) {
-        const view = new ItemView(10)
-        exch.FindItems(WellKnownFolderName.Inbox, 'isRead:false', view).then(
-          function (items) {
-            if (_.size(items) < 1) {
-              winston.debug('MailCheck through EWS: Nothing to Fetch.')
-              return next()
-            }
-            winston.debug('Processing %s Mail', _.size(results))
-            for (const item of items) {
-              item
-                .Load(new ews.PropertySet(ews.BasePropertySet.FirstClassProperties, adinationalProps))
-                .then(function () {
-                  var message = {}
-                  console.log(item.Subject)
-                  console.log(item.MimeContent)
-                  console.log('----------------------')
-                  message.from = item.from
-                  message.subject = item.Subject
-
-                  message.body = item.body
-                  message.folder = 'INBOX'
-                  ewsCheck.messages.push(message)
-                })
-              item.IsRead = true
-              item.Update(ConflictResolutionMode.AutoResolve)
-            }
-          },
-          function (errorObj_ServiceException_usually) {
-            // do something with error
-          }
-        )
+  const view = new ews.ItemView(50) // big enough
+  //here we only check Unread email in Inbox, if it is Read, people may have processed in Outlook Add-in
+  ewsCheck.exchService.FindItems(ews.WellKnownFolderName.Inbox, 'isRead:false', view).then(
+    function (response) {
+      if (response.TotalCount < 1) {
+        winston.debug('MailCheck through EWS: Nothing to Fetch.')
+        return callback(null)
       }
-    ],
+      winston.debug('Processing %s Mail', response.TotalCount)
+      for (const item of response.items) {
+        item.Load(new ews.PropertySet(ews.BasePropertySet.FirstClassProperties, adinationalProps)).then(function () {
+          var message = {}
+          message.from = item.from
+          message.subject = item.Subject
+
+          message.body = item.body
+          message.folder = 'INBOX'
+          ewsCheck.messages.push(message)
+        })
+        item.IsRead = true
+        item.Update(ConflictResolutionMode.AutoResolve)
+      }
+      return callback(null)
+    },
     function (err) {
-      if (err) winston.warn(err)
-      callback(null)
+      // do something with error
+      winston.debug('MailCheck through EWS: Failed on FindItems')
+      return callback(err)
     }
   )
 }
 
-// todo  'Sent Items'  # Exchange (probably outlook) default sent folder, other email server may have a different name
 /*
 How to avoid such a case,  
 1, as a agent, post a comment, it will trigger a smtp to send a email to the client, 
@@ -391,70 +380,56 @@ it also appends the email in to Sent folder.
 We should check if the message-id has been in the database already
 */
 function openSentFolder (callback) {
-  async.waterfall(
-    [
-      function (next) {
-        var settingUtil = require('../settings/settingsUtil')
-        var curTime = new Date()
+  var settingUtil = require('../settings/settingsUtil')
+  var curTime = new Date()
 
-        var settingSchema = require('../models/setting')
-        settingSchema.getSetting('mailer:check:last_fetch', function (err, setting) {
-          if (!err && setting && setting.value) {
-            last_fetch = setting.value
-          } else {
-            last_fetch = new Date()
-            last_fetch.setDate(curTime.getDate() - 2)
+  var settingSchema = require('../models/setting')
+  settingSchema.getSetting('mailer:check:last_fetch', function (err, setting) {
+    if (!err && setting && setting.value) {
+      last_fetch = setting.value
+    } else {
+      last_fetch = new Date()
+      last_fetch.setDate(curTime.getDate() - 2)
+    }
+
+    settingUtil.setSetting('mailer:check:last_fetch', curTime, function (err) {
+      var startDate = new ews.DateTime(curTime.valueOf())
+      var greaterThanfilter = new ews.SearchFilter.IsGreaterThanOrEqualTo(
+        ews.EmailMessageSchema.DateTimeSent,
+        startDate
+      )
+
+      view = new ews.ItemView(100)
+      ewsCheck.exchService.FindItems(ews.WellKnownFolderName.SentItems, greaterThanfilter, view).then(
+        function (response) {
+          if (response.TotalCount < 1) {
+            winston.debug('MailCheck: Nothing to Fetch in SENT Folder.')
+            return callback(null)
           }
 
-          settingUtil.setSetting('mailer:check:last_fetch', curTime, function (err) {
-            var startDate = new ews.DateTime('2016-09-14') //Year, month, day
-            var greaterThanfilter = new ews.SearchFilter.IsGreaterThanOrEqualTo(
-              ews.EmailMessageSchema.DateTimeReceived,
-              startDate
-            )
+          winston.debug('Processing %s Mail(s) in SENT Folder', response.TotalCount)
+          var message = {}
+          for (const item of response.items) {
+            item
+              .Load(new ews.PropertySet(ews.BasePropertySet.FirstClassProperties, adinationalProps))
+              .then(function () {
+                var message = {}
+                message.from = item.from
+                message.subject = item.Subject
 
-            ;(view = new ews.ItemView(100)),
-              exch.FindItems(ews.WellKnownFolderName.SentItems, greaterThanfilter, view).then(
-                function (items) {
-                  if (_.size(items) < 1) {
-                    winston.debug('MailCheck: Nothing to Fetch in SENT Folder.')
-                    return next()
-                  }
-
-                  winston.debug('Processing %s Mail in SENT Folder', _.size(items))
-                  var message = {}
-                  for (const item of items) {
-                    item
-                      .Load(new ews.PropertySet(ews.BasePropertySet.FirstClassProperties, adinationalProps))
-                      .then(function () {
-                        var message = {}
-                        console.log(item.Subject)
-                        console.log(item.MimeContent)
-                        console.log('----------------------')
-                        message.from = item.from
-                        message.subject = item.Subject
-
-                        message.body = item.body
-                        message.folder = 'SENT'
-                        ewsCheck.messages.push(message)
-                      })
-                    item.IsRead = true
-                    item.Update(ConflictResolutionMode.AutoResolve)
-                  }
-                },
-                function (error) {
-                  console.log(error) //logs immediately, "[TypeError: this.GetXmlElementName is not a function]"
-                }
-              )
-          })
-        })
-      }
-    ],
-    function (err) {
-      if (err) winston.warn(err)
-      callback(null)
-    }
-  )
+                message.body = item.body
+                message.folder = 'SENT'
+                ewsCheck.messages.push(message)
+              })
+          }
+          return callback(null)
+        },
+        function (error) {
+          return callback(error)
+        }
+      )
+    })
+  })
 }
 
 // use the same data format as nodemailer

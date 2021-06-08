@@ -171,9 +171,17 @@ function launchServer (db) {
               settingSchema.getSettings(function (err, settings) {
                 if (err) return next(err)
 
-                var mailCheck = require('./src/mailer/mailCheck')
-                winston.debug('Starting MailCheck...')
-                mailCheck.init(settings)
+                //if EWS over IMAP
+                var ewsOverImap = true
+                if (ewsOverImap) {
+                  var ewsCheck = require('./src/mailer/ewsCheck')
+                  winston.debug('Starting MailCheck with EWS...')
+                  ewsCheck.init(settings)
+                } else {
+                  var mailCheck = require('./src/mailer/mailCheck')
+                  winston.debug('Starting MailCheck...')
+                  mailCheck.init(settings)
+                }
 
                 return next()
               })

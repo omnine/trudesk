@@ -151,7 +151,7 @@ addinController.email2Case = function (req, res) {
           settingsUtil.getSettings(function (err, s) {
             if (err) return cb(err)
             var settings = s.data.settings
-
+            /*
             var ews = require('ews-javascript-api')
             //create ExchangeService object
             // todo read the credentials from settings or nconf
@@ -165,7 +165,10 @@ addinController.email2Case = function (req, res) {
               settings.ewsPassword.value
             )
             exch.XHRApi = xhr
-            ews.EmailMessage.Bind(exch, new ews.ItemId(message.itemId)).then(function (email) {
+            // use the ready made 
+*/
+            var ewsCheck = require('../mailer/ewsCheck')
+            ews.EmailMessage.Bind(ewsCheck.exchService, new ews.ItemId(message.itemId)).then(function (email) {
               email.SetSubject(subject)
               email.Update(ews.ConflictResolutionMode.AlwaysOverwrite) //2
             })
