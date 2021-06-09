@@ -453,7 +453,9 @@ function toMD (messageBody) {
 ewsCheck.sendEWSMail = function (data, callback) {
   const message = new ews.EmailMessage(ewsCheck.exchService)
   message.Subject = data.subject
-  message.Body = new ews.MessageBody(ews.BodyType.HTML, data.html)
+
+  var escapeHtml = require('escape-html')
+  message.Body = new ews.MessageBody(ews.BodyType.HTML, escapeHtml(data.html))
   message.ToRecipients.Add(data.to)
   message.SendAndSaveCopy()
 }

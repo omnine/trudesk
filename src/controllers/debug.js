@@ -478,7 +478,7 @@ debugController.sendmail = function (req, res) {
   var mailOptions = {
     to: to,
     subject: 'Nanoart Test Email [Debugger]',
-    html: '<h5>Nanoart EWS send</h5>',
+    html: '<h5>Nanoart sending email through EWS</h5>',
     generateTextFromHTML: true
   }
 
