@@ -383,7 +383,7 @@ We should check if the message-id has been in the database already
 function openSentFolder (callback) {
   var settingUtil = require('../settings/settingsUtil')
   var curTime = new Date()
-
+  // last_fetch is the type javascript Date, which mongodb supports, it is originally used in node-imap
   var settingSchema = require('../models/setting')
   settingSchema.getSetting('mailer:check:last_fetch', function (err, setting) {
     if (!err && setting && setting.value) {
@@ -394,8 +394,9 @@ function openSentFolder (callback) {
     }
 
     settingUtil.setSetting('mailer:check:last_fetch', curTime, function (err) {
-      //      var startDate = new ews.DateTime(curTime.valueOf())
-      var startDate = new ews.DateTime(2021, 6, 6)
+      winston.debug('Checking emails in SENT folder since %s', last_fetch.toString())
+      var startDate = new ews.DateTime(last_fetch.valueOf()) // convert to the format ews needed.
+      //      var startDate = new ews.DateTime(2021, 6, 6)
       var greaterThanfilter = new ews.SearchFilter.IsGreaterThanOrEqualTo(
         ews.EmailMessageSchema.DateTimeSent,
         startDate
@@ -405,18 +406,18 @@ function openSentFolder (callback) {
       ewsCheck.exchService.FindItems(ews.WellKnownFolderName.SentItems, greaterThanfilter, view).then(
         function (response) {
           if (response.TotalCount < 1) {
-            winston.debug('MailCheck: Nothing to Fetch in SENT Folder.')
+            winston.debug('MailCheck with EWS: Nothing to Fetch in SENT Folder.')
             return callback(null)
           }
 
-          winston.debug('Processing %s Mail(s) in SENT Folder', response.TotalCount)
+          winston.debug('Processing %d Mail(s) in SENT Folder', response.TotalCount)
           var message = {}
           for (const item of response.items) {
             item.Load().then(function () {
               var message = {}
               message.from = item.From.Address
               message.subject = item.Subject
-              message.body = item.Body.Text
+              message.body = toMD(item.Body) // item.Body.Text
               //use this one
               message.inReplyTo = item.inReplyTo
               //                message.references = item.References
@@ -432,6 +433,20 @@ function openSentFolder (callback) {
       )
     })
   })
+}
+
+// use cheerio? just like in mailCheck.js?
+function toMD (messageBody) {
+  if (messageBody.BodyType == ews.BodyType.HTML) {
+    // For Node.js
+    var TurndownService = require('turndown')
+
+    var turndownService = new TurndownService()
+    var markdown = turndownService.turndown(messageBody.Text)
+    return markdown
+  } else {
+    return messageBody.Text
+  }
 }
 
 // use the same data format as nodemailer
