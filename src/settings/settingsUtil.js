@@ -117,6 +117,7 @@ util.getSettings = function (callback) {
     s.ewsUrl = parseSetting(settings, 'ews:url', '')
     s.ewsUsername = parseSetting(settings, 'ews:username', '')
     s.ewsPassword = parseSetting(settings, 'ews:password', '')
+    s.useEWSAsMailer = parseSetting(settings, 'useEWSAsMailer:enable', false)
 
     s.tpsEnabled = parseSetting(settings, 'tps:enable', false)
     s.tpsUsername = parseSetting(settings, 'tps:username', '')

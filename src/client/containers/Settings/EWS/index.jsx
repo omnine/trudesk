@@ -21,6 +21,7 @@ import { updateSetting, updateMultipleSettings } from 'actions/settings'
 
 import Button from 'components/Button'
 import SettingItem from 'components/Settings/SettingItem'
+import EnableSwitch from 'components/Settings/EnableSwitch'
 
 import helpers from 'lib/helpers'
 
@@ -79,9 +80,40 @@ class EWSSettingsContainer extends React.Component {
     this.props.updateMultipleSettings(payload)
   }
 
+  getSetting (name) {
+    return this.props.settings.getIn(['settings', name, 'value'])
+      ? this.props.settings.getIn(['settings', name, 'value'])
+      : ''
+  }
+
+  onUseEWSAsMailer (e) {
+    this.props.updateSetting({
+      name: 'useEWSAsMailer:enable',
+      value: e.target.checked,
+      stateName: 'useEWSAsMailer',
+      noSnackbar: true
+    })
+  }
+
   render () {
     return (
       <div className={this.props.active ? '' : 'hide'}>
+        <SettingItem
+          title={'Use it as the mailer'}
+          subtitle={<div>Once enabled, it is not necessary to configure SMTP and IMAP.</div>}
+          tooltip={'It only works with MS Exchange server or Office 365.'}
+          component={
+            <EnableSwitch
+              stateName={'useEWSAsMailer'}
+              label={'Enable'}
+              checked={this.getSetting('useEWSAsMailer')}
+              onChange={e => {
+                this.onUseEWSAsMailer(e)
+              }}
+            />
+          }
+        />
+
         <SettingItem
           title={'EWS Server Configuration'}
           tooltip={'This is only used for Outlook Addin.'}
