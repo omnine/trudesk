@@ -451,9 +451,9 @@ function toMD (messageBody) {
 
 // use the same data format as nodemailer
 ewsCheck.sendEWSMail = function (data, callback) {
-  const message = new EmailMessage(service)
+  const message = new ews.EmailMessage(ewsCheck.exchService)
   message.Subject = data.subject
-  message.Body = new MessageBody(BodyType.Text, data.text)
+  message.Body = new ews.MessageBody(ews.BodyType.HTML, data.html)
   message.ToRecipients.Add(data.to)
   message.SendAndSaveCopy()
 }

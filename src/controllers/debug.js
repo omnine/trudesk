@@ -475,6 +475,22 @@ debugController.sendmail = function (req, res) {
     return res.status(400).send('Invalid Email in querystring "email"')
   }
 
+  var mailOptions = {
+    to: to,
+    subject: 'Nanoart Test Email [Debugger]',
+    html: '<h5>Nanoart EWS send</h5>',
+    generateTextFromHTML: true
+  }
+
+  var ewsCheck = require('../mailer/ewsCheck')
+  ewsCheck.sendEWSMail(mailOptions, function (err) {
+    if (err) throw new Error(err)
+
+    return res.status(200).send('OK')
+  })
+
+  return
+
   var email = new Email({
     render: function (view, locals) {
       return new Promise(function (resolve, reject) {
