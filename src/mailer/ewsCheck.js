@@ -457,6 +457,12 @@ ewsCheck.sendEWSMail = function (data, callback) {
   var escapeHtml = require('escape-html')
   message.Body = new ews.MessageBody(ews.BodyType.HTML, escapeHtml(data.html))
   message.ToRecipients.Add(data.to)
+
+  var uuid = require('uuid')
+  var extID = 'omnine.' + uuid.v4() + '@deepnetsecurity.com' // NO < and > otherwise  The request failed schema validation
+  var PidTagInternetMessageId = new ews.ExtendedPropertyDefinition(4149, ews.MapiPropertyType.String)
+  message.SetExtendedProperty(PidTagInternetMessageId, extID)
+
   message.SendAndSaveCopy()
 }
 
