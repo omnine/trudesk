@@ -414,15 +414,19 @@ function openSentFolder (callback) {
           var message = {}
           for (const item of response.items) {
             item.Load().then(function () {
-              var message = {}
-              message.from = item.From.Address
-              message.subject = item.Subject
-              message.body = toMD(item.Body) // item.Body.Text
-              //use this one
-              message.inReplyTo = item.inReplyTo
-              //                message.references = item.References
-              message.folder = 'SENT'
-              ewsCheck.messages.push(message)
+              // bypass the sent emails triggered by posting the comment in Portal
+              //we can also skip the message which the subject donesn't contain 'DISSUE'
+              if (!item.InternetMessageId.startWith('omnine')) {
+                var message = {}
+                message.from = item.From.Address
+                message.subject = item.Subject
+                message.body = toMD(item.Body) // item.Body.Text
+                //use this one
+                message.inReplyTo = item.inReplyTo
+                //                message.references = item.References
+                message.folder = 'SENT'
+                ewsCheck.messages.push(message)
+              }
             })
           }
           return callback(null)
@@ -462,6 +466,8 @@ ewsCheck.sendEWSMail = function (data, ownMessageID, callback) {
   if (ownMessageID) {
     var uuid = require('uuid')
     var extID = 'omnine.' + uuid.v4() + '@deepnetsecurity.com' // NO '< ' and '>', otherwise got exception:  The request failed schema validation
+
+    //why 4149? see https://docs.microsoft.com/en-us/office/client-developer/outlook/mapi/pidtaginternetmessageid-canonical-property
     var PidTagInternetMessageId = new ews.ExtendedPropertyDefinition(4149, ews.MapiPropertyType.String)
     message.SetExtendedProperty(PidTagInternetMessageId, extID)
   }
