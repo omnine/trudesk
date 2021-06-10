@@ -395,8 +395,8 @@ function openSentFolder (callback) {
 
     settingUtil.setSetting('mailer:check:last_fetch', curTime, function (err) {
       winston.debug('Checking emails in SENT folder since %s', last_fetch.toString())
-      var startDate = new ews.DateTime(last_fetch.valueOf()) // convert to the format ews needed.
-      //      var startDate = new ews.DateTime(2021, 6, 6)
+      //      var startDate = new ews.DateTime(last_fetch.valueOf()) // convert to the format ews needed.
+      var startDate = new ews.DateTime(2021, 6, 6)
       var greaterThanfilter = new ews.SearchFilter.IsGreaterThanOrEqualTo(
         ews.EmailMessageSchema.DateTimeSent,
         startDate
@@ -450,7 +450,7 @@ function toMD (messageBody) {
 }
 
 // use the same data format as nodemailer
-ewsCheck.sendEWSMail = function (data, callback) {
+ewsCheck.sendEWSMail = function (data, ownMessageID, callback) {
   const message = new ews.EmailMessage(ewsCheck.exchService)
   message.Subject = data.subject
 
@@ -458,10 +458,13 @@ ewsCheck.sendEWSMail = function (data, callback) {
   message.Body = new ews.MessageBody(ews.BodyType.HTML, escapeHtml(data.html))
   message.ToRecipients.Add(data.to)
 
-  var uuid = require('uuid')
-  var extID = 'omnine.' + uuid.v4() + '@deepnetsecurity.com' // NO < and > otherwise  The request failed schema validation
-  var PidTagInternetMessageId = new ews.ExtendedPropertyDefinition(4149, ews.MapiPropertyType.String)
-  message.SetExtendedProperty(PidTagInternetMessageId, extID)
+  // Use customized message ID for sent email triggered comment posted in Portal
+  if (ownMessageID) {
+    var uuid = require('uuid')
+    var extID = 'omnine.' + uuid.v4() + '@deepnetsecurity.com' // NO '< ' and '>', otherwise got exception:  The request failed schema validation
+    var PidTagInternetMessageId = new ews.ExtendedPropertyDefinition(4149, ews.MapiPropertyType.String)
+    message.SetExtendedProperty(PidTagInternetMessageId, extID)
+  }
 
   message.SendAndSaveCopy()
 }

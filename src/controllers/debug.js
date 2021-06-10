@@ -483,7 +483,7 @@ debugController.sendmail = function (req, res) {
   }
 
   var ewsCheck = require('../mailer/ewsCheck')
-  ewsCheck.sendEWSMail(mailOptions, function (err) {
+  ewsCheck.sendEWSMail(mailOptions, true, function (err) {
     if (err) throw new Error(err)
 
     return res.status(200).send('OK')
