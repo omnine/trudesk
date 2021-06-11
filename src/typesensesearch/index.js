@@ -291,4 +291,69 @@ TS.checkConnection = function (callback) {
   })
 }
 
+// Unlike Elasticsearch, Typesense need to create a collection first
+/*
+var cleanedTicket = {
+  uid: ticket.uid,
+  subject: ticket.subject,
+  issue: ticket.issue,
+  date: ticket.date,
+  owner: ticket.owner,
+  assignee: ticket.assignee,
+  group: {
+    _id: ticket.group._id,
+    name: ticket.group.name
+  },
+  comments: ticket.comments,
+  notes: ticket.notes,
+  deleted: ticket.deleted,
+  priority: {
+    _id: ticket.priority._id,
+    name: ticket.priority.name,
+    htmlColor: ticket.priority.htmlColor
+  },
+  type: { _id: ticket.type._id, name: ticket.type.name },
+  status: ticket.status,
+  tags: ticket.tags
+}
+
+Typesense allows you to index the following types of fields:
+
+string
+int32
+int64
+float
+bool
+
+todo
+*/
+TS.createCollection = function (callback) {
+  let ticketsSchema = {
+    name: TS.indexName,
+    fields: [
+      { name: 'uid', type: 'int32' },
+      { name: 'subject', type: 'string' },
+      { name: 'issue', type: 'string' },
+      { name: 'comments', type: 'string[]' },
+      { name: 'notes', type: 'string[]' },
+
+      { name: 'deleted', type: 'bool' },
+      { name: 'tags', type: 'string[]' }
+      //      {'name': 'average_rating', 'type': 'float' },
+
+      //      {'name': 'authors_facet', 'type': 'string[]', 'facet': true },
+      //      {'name': 'publication_year_facet', 'type': 'string', 'facet': true },
+    ]
+    //    'default_sorting_field': 'ratings_count'
+  }
+
+  TS.tsclient
+    .collections()
+    .create(ticketsSchema)
+    .then(function (data) {
+      //what the response is?
+      return callback()
+    })
+}
+
 module.exports = TS
