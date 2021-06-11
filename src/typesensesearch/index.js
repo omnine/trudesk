@@ -165,6 +165,7 @@ TS.buildClient = function (host) {
         protocol: 'http' // For Typesense Cloud use https
       }
     ],
+    // get it from etc/typesense/typesense-server.ini
     apiKey: '<API_KEY>',
     connectionTimeoutSeconds: 2
   })
