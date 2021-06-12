@@ -34,7 +34,8 @@ class EWSSettingsContainer extends React.Component {
     this.state = {
       url: '',
       username: '',
-      password: ''
+      password: '',
+      authcert:''
     }
 
   }
@@ -60,6 +61,9 @@ class EWSSettingsContainer extends React.Component {
       if (!state.password)
       stateObj.password = nextProps.settings.getIn(['settings', 'ewsPassword', 'value']) || ''
 
+      if (!state.authcert)
+      stateObj.authcert = nextProps.settings.getIn(['settings', 'msexAuthCert', 'value']) || ''      
+
       return stateObj
     }
 
@@ -75,8 +79,12 @@ class EWSSettingsContainer extends React.Component {
   onFormSubmit (e) {
     e.preventDefault()
 
-    const payload = [{ name: 'ews:url', value: this.state.url }, { name: 'ews:username', value: this.state.username }, { name: 'ews:password', value: this.state.password }]
-
+    const payload = [{ name: 'ews:url', value: this.state.url }, 
+      { name: 'ews:username', value: this.state.username }, 
+      { name: 'ews:password', value: this.state.password },
+      { name: 'gen:msex:authcert', value: this.state.authcert } //should we change the key?
+    ]
+    
     this.props.updateMultipleSettings(payload)
   }
 
@@ -153,7 +161,8 @@ class EWSSettingsContainer extends React.Component {
               <textarea
                 className='md-input md-input-width-medium'
                 rows="10" cols="50"
-                defaultValue="{this.getSettingsValue('msexAuthCert\')}"
+                value={this.state.authcert}
+                onChange={e => this.onInputChanged(e, 'authcert')}
               />
             </div>
 
