@@ -417,7 +417,8 @@ function openSentFolder (callback) {
             item.Load().then(function () {
               // bypass the sent emails triggered by posting the comment in Portal
               //we can also skip the message which the subject donesn't contain 'DISSUE'
-              if (!item.InternetMessageId.startWith('omnine')) {
+              if (!item.InternetMessageId.startsWith('omnine')) {
+                // does it always have Message-Id?
                 var message = {}
                 message.from = item.From.Address
                 message.subject = item.Subject
