@@ -185,18 +185,6 @@ class GeneralSettings extends React.Component {
           subtitle='Allow users to create accounts on the login screen.'
           component={AllowUserRegistration}
         />
-        <SettingItem
-          title={'Exchange Auth Certificate'}
-          subtitle={'pem format'}
-          component={
-            <InputWithSave
-              stateName='msexAuthCert'
-              settingName='gen:msex:authcert'
-              value={this.getSettingsValue('msexAuthCert')}
-              width={'60%'}
-            />
-          }
-        />
       </div>
     )
   }
