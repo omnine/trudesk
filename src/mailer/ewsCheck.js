@@ -97,7 +97,7 @@ ewsCheck.init = function (settings) {
 
   ewsCheck.checkTimer = setInterval(function () {
     ewsCheck.fetchMail()
-  }, POLLING_INTERVAL)
+  }, POLLING_INTERVAL) // 1 minute = 60000
 }
 
 ewsCheck.refetch = function () {
@@ -412,9 +412,12 @@ function openSentFolder (callback) {
           }
 
           winston.debug('Processing %d Mail(s) in SENT Folder', response.TotalCount)
+          var additionalProps = [] // In order to load UniqueBody
+          additionalProps.push(ews.ItemSchema.UniqueBody)
+          var propertySet = new ews.PropertySet(ews.BasePropertySet.FirstClassProperties, additionalProps)
           var message = {}
           for (const item of response.items) {
-            item.Load().then(function () {
+            item.Load(propertySet).then(function () {
               // bypass the sent emails triggered by posting the comment in Portal
               //we can also skip the message which the subject donesn't contain 'DISSUE'
               if (!item.InternetMessageId.startsWith('omnine')) {
