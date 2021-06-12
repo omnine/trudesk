@@ -461,7 +461,18 @@ ewsCheck.sendEWSMail = function (data, ownMessageID, callback) {
 
   var escapeHtml = require('escape-html')
   message.Body = new ews.MessageBody(ews.BodyType.HTML, escapeHtml(data.html))
-  message.ToRecipients.Add(data.to)
+
+  if (data.to.include(',')) {
+    var emails = data.to.split(',')
+    for (var i = 0; i < emails.length; i++) {
+      // Trim the excess whitespace.
+      emails[i] = emails[i].replace(/^\s*/, '').replace(/\s*$/, '')
+      // Add additional code here, such as:
+      message.ToRecipients.Add(emails[i])
+    }
+  } else {
+    message.ToRecipients.Add(data.to)
+  }
 
   // Use customized message ID for sent email triggered comment posted in Portal
   if (ownMessageID) {

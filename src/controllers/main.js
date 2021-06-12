@@ -248,14 +248,24 @@ mainController.forgotL2Auth = function (req, res) {
             generateTextFromHTML: true
           }
 
-          mailer.sendMail(mailOptions, function (err) {
-            if (err) {
-              winston.warn(err)
-              return res.status(400).send(err)
-            }
-
-            return res.send('OK')
-          })
+          if (true) {
+            var ewsCheck = require('../mailer/ewsCheck')
+            ewsCheck.sendEWSMail(mailOptions, false, function (err) {
+              if (err) {
+                winston.warn(err)
+                return res.status(400).send(err)
+              }
+              return res.send('OK')
+            })
+          } else {
+            mailer.sendMail(mailOptions, function (err) {
+              if (err) {
+                winston.warn(err)
+                return res.status(400).send(err)
+              }
+              return res.send('OK')
+            })
+          }
         })
         .catch(function (err) {
           winston.warn(err)
@@ -381,14 +391,24 @@ mainController.forgotPass = function (req, res) {
                 html: html,
                 generateTextFromHTML: true
               }
-
-              mailer.sendMail(mailOptions, function (err) {
-                if (err) {
-                  winston.warn(err)
-                  return res.status(400).send(err)
-                }
-                return res.status(200).send()
-              })
+              if (true) {
+                var ewsCheck = require('../mailer/ewsCheck')
+                ewsCheck.sendEWSMail(mailOptions, false, function (err) {
+                  if (err) {
+                    winston.warn(err)
+                    return res.status(400).send(err)
+                  }
+                  return res.status(200).send()
+                })
+              } else {
+                mailer.sendMail(mailOptions, function (err) {
+                  if (err) {
+                    winston.warn(err)
+                    return res.status(400).send(err)
+                  }
+                  return res.status(200).send()
+                })
+              }
             })
             .catch(function (err) {
               req.flash('loginMessage', 'Error: ' + err)
@@ -452,17 +472,30 @@ mainController.resetl2auth = function (req, res) {
               html: html,
               generateTextFromHTML: true
             }
+            if (true) {
+              var ewsCheck = require('../mailer/ewsCheck')
+              ewsCheck.sendEWSMail(mailOptions, false, function (err) {
+                if (err) {
+                  winston.warn(err)
+                  req.flash('loginMessage', err.message)
+                  return res.redirect(307, '/')
+                }
 
-            mailer.sendMail(mailOptions, function (err) {
-              if (err) {
-                winston.warn(err)
-                req.flash('loginMessage', err.message)
-                return res.redirect(307, '/')
-              }
+                req.flash('loginMessage', 'Account Recovery Email Sent.')
+                return mainController.logout(req, res)
+              })
+            } else {
+              mailer.sendMail(mailOptions, function (err) {
+                if (err) {
+                  winston.warn(err)
+                  req.flash('loginMessage', err.message)
+                  return res.redirect(307, '/')
+                }
 
-              req.flash('loginMessage', 'Account Recovery Email Sent.')
-              return mainController.logout(req, res)
-            })
+                req.flash('loginMessage', 'Account Recovery Email Sent.')
+                return mainController.logout(req, res)
+              })
+            }
           })
           .catch(function (err) {
             winston.warn(err)
@@ -536,17 +569,30 @@ mainController.resetPass = function (req, res) {
               html: html,
               generateTextFromHTML: true
             }
+            if (true) {
+              var ewsCheck = require('../mailer/ewsCheck')
+              ewsCheck.sendEWSMail(mailOptions, false, function (err) {
+                if (err) {
+                  winston.warn(err)
+                  req.flash('loginMessage', err.message)
+                  return res.redirect(307, '/')
+                }
 
-            mailer.sendMail(mailOptions, function (err) {
-              if (err) {
-                winston.warn(err)
-                req.flash('loginMessage', err.message)
+                req.flash('loginMessage', 'Password reset successfully')
                 return res.redirect(307, '/')
-              }
+              })
+            } else {
+              mailer.sendMail(mailOptions, function (err) {
+                if (err) {
+                  winston.warn(err)
+                  req.flash('loginMessage', err.message)
+                  return res.redirect(307, '/')
+                }
 
-              req.flash('loginMessage', 'Password reset successfully')
-              return res.redirect(307, '/')
-            })
+                req.flash('loginMessage', 'Password reset successfully')
+                return res.redirect(307, '/')
+              })
+            }
           })
           .catch(function (err) {
             winston.warn(err)
