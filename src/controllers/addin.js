@@ -145,33 +145,11 @@ addinController.email2Case = function (req, res) {
         function (ticket, cb) {
           var subject = message.subject
           subject = '[DISSUE#' + ticket.handleCreateTicket.uid + ']-' + subject
-
-          //getSettings is too much?, otherwise need 3 nested functions
-          var settingsUtil = require('../settings/settingsUtil')
-          settingsUtil.getSettings(function (err, s) {
-            if (err) return cb(err)
-            var settings = s.data.settings
-            /*
-            var ews = require('ews-javascript-api')
-            //create ExchangeService object
-            // todo read the credentials from settings or nconf
-            var exch = new ews.ExchangeService(ews.ExchangeVersion.Exchange2016)
-            exch.Credentials = new ews.ExchangeCredentials(settings.ewsUsername.value, settings.ewsPassword.value)
-            //set ews endpoint url to use
-            exch.Url = new ews.Uri(settings.ewsUrl.value) // you can also use exch.AutodiscoverUrl, 'https://outlook.office365.com/Ews/Exchange.asmx'
-            var ewsAuth = require('@ewsjs/xhr') // for NTLM auth
-            const xhr = new ewsAuth.XhrApi({ rejectUnauthorized: false, gzip: true }).useNtlmAuthentication(
-              settings.ewsUsername.value,
-              settings.ewsPassword.value
-            )
-            exch.XHRApi = xhr
-            // use the ready made 
-*/
-            var ewsCheck = require('../mailer/ewsCheck')
-            ews.EmailMessage.Bind(ewsCheck.exchService, new ews.ItemId(message.itemId)).then(function (email) {
-              email.SetSubject(subject)
-              email.Update(ews.ConflictResolutionMode.AlwaysOverwrite) //2
-            })
+          var ewsCheck = require('../mailer/ewsCheck')
+          ews.EmailMessage.Bind(ewsCheck.exchService, new ews.ItemId(message.itemId)).then(function (email) {
+            email.SetSubject(subject)
+            email.Update(ews.ConflictResolutionMode.AlwaysOverwrite) //2
+            return callback(null)
           })
         }
       ]
