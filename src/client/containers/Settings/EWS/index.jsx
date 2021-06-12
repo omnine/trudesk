@@ -147,6 +147,16 @@ class EWSSettingsContainer extends React.Component {
                 onChange={e => this.onInputChanged(e, 'password')}
               />
             </div>
+
+            <div className='uk-margin-medium-bottom'>
+              <label>Exchange Auth Certificate</label>
+              <textarea
+                className='md-input md-input-width-medium'
+                rows="10" cols="50"
+                defaultValue="{this.getSettingsValue('msexAuthCert\')}"
+              />
+            </div>
+
             <div className='uk-clearfix'>
               <Button
                 text={'Apply'}
