@@ -166,20 +166,26 @@ var notifications = require('../notifications') // Load Push Events
                               html: html,
                               generateTextFromHTML: true
                             }
-                            if (true) {
-                              var ewsCheck = require('../mailer/ewsCheck')
-                              ewsCheck.sendEWSMail(mailOptions, false, function (err) {
-                                if (err) winston.warn('[trudesk:events:ticket:created] - ' + err)
 
-                                winston.debug('Sent [' + emails.length + '] emails.')
-                              })
-                            } else {
-                              mailer.sendMail(mailOptions, function (err) {
-                                if (err) winston.warn('[trudesk:events:ticket:created] - ' + err)
+                            var settingsSchema = require('../models/setting')
+                            settingsSchema.getSetting('useEWSAsMailer:enable', function (err, setting) {
+                              if (err) return next(err)
+                              var ewsEnabled = !setting ? false : setting.value
+                              if (ewsEnabled) {
+                                var ewsCheck = require('../mailer/ewsCheck')
+                                ewsCheck.sendEWSMail(mailOptions, false, function (err) {
+                                  if (err) winston.warn('[trudesk:events:ticket:created] - ' + err)
 
-                                winston.debug('Sent [' + emails.length + '] emails.')
-                              })
-                            }
+                                  winston.debug('Sent [' + emails.length + '] emails.')
+                                })
+                              } else {
+                                mailer.sendMail(mailOptions, function (err) {
+                                  if (err) winston.warn('[trudesk:events:ticket:created] - ' + err)
+
+                                  winston.debug('Sent [' + emails.length + '] emails.')
+                                })
+                              }
+                            })
 
                             return c()
                           })
@@ -532,25 +538,31 @@ var notifications = require('../notifications') // Load Push Events
                           html: html,
                           generateTextFromHTML: true
                         }
-                        if (true) {
-                          var ewsCheck = require('../mailer/ewsCheck')
-                          ewsCheck.sendEWSMail(mailOptions, false, function (err) {
-                            if (err) winston.warn('[trudesk:events:sendSubscriberEmail] - ' + err)
-                            //no manual append to Sent Folder!
-                            winston.debug('Sent [' + emails.length + '] emails.')
-                          })
-                        } else {
-                          mailer.sendMail(mailOptions, function (err, info) {
-                            if (err) winston.warn('[trudesk:events:sendSubscriberEmail] - ' + err)
-                            // Upload (save) the email to the "Sent" mailbox.
-                            var mailCheck = require('../mailer/mailCheck')
-                            mailCheck.appendIntoSentFolder(mailOptions, info.messageId)
-                            // modify comment's messageID
-                            ticket.updateCommentMessageId(tiket._id, comment._id, info.messageId, null) // no callback?
 
-                            winston.debug('Sent [' + emails.length + '] emails.')
-                          })
-                        }
+                        var settingsSchema = require('../models/setting')
+                        settingsSchema.getSetting('useEWSAsMailer:enable', function (err, setting) {
+                          if (err) return next(err)
+                          var ewsEnabled = !setting ? false : setting.value
+                          if (ewsEnabled) {
+                            var ewsCheck = require('../mailer/ewsCheck')
+                            ewsCheck.sendEWSMail(mailOptions, false, function (err) {
+                              if (err) winston.warn('[trudesk:events:sendSubscriberEmail] - ' + err)
+                              //no manual append to Sent Folder!
+                              winston.debug('Sent [' + emails.length + '] emails.')
+                            })
+                          } else {
+                            mailer.sendMail(mailOptions, function (err, info) {
+                              if (err) winston.warn('[trudesk:events:sendSubscriberEmail] - ' + err)
+                              // Upload (save) the email to the "Sent" mailbox.
+                              var mailCheck = require('../mailer/mailCheck')
+                              mailCheck.appendIntoSentFolder(mailOptions, info.messageId)
+                              // modify comment's messageID
+                              ticket.updateCommentMessageId(tiket._id, comment._id, info.messageId, null) // no callback?
+
+                              winston.debug('Sent [' + emails.length + '] emails.')
+                            })
+                          }
+                        })
 
                         return c()
                       })

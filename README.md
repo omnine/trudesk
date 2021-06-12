@@ -90,6 +90,6 @@ EWS in node,  the best one https://github.com/gautamsi/ews-javascript-api
 ```
 
 ### To Do
-
+- send email when the customers use the portal to create a ticket and comment
 - TypeSense support decide the collection schema
 - Knowledge Base, candidates: Raneto, Outline

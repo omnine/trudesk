@@ -608,23 +608,29 @@ userSchema.statics.createUserFromEmail = function (email, callback) {
                   html: html,
                   generateTextFromHTML: true
                 }
-                if (true) {
-                  var ewsCheck = require('../mailer/ewsCheck')
-                  ewsCheck.sendEWSMail(mailOptions, false, function (err) {
-                    if (err) throw new Error(err)
 
-                    return res.status(200).send('OK')
-                  })
-                } else {
-                  mailer.sendMail(mailOptions, function (err) {
-                    if (err) {
-                      winston.warn(err)
-                      return callback(err)
-                    }
+                var settingsSchema = require('../models/setting')
+                settingsSchema.getSetting('useEWSAsMailer:enable', function (err, setting) {
+                  if (err) return next(err)
+                  var ewsEnabled = !setting ? false : setting.value
+                  if (ewsEnabled) {
+                    var ewsCheck = require('../mailer/ewsCheck')
+                    ewsCheck.sendEWSMail(mailOptions, false, function (err) {
+                      if (err) throw new Error(err)
 
-                    return callback(null, { user: savedUser, group: group })
-                  })
-                }
+                      return res.status(200).send('OK')
+                    })
+                  } else {
+                    mailer.sendMail(mailOptions, function (err) {
+                      if (err) {
+                        winston.warn(err)
+                        return callback(err)
+                      }
+
+                      return callback(null, { user: savedUser, group: group })
+                    })
+                  }
+                })
               })
               .catch(function (err) {
                 winston.warn(err)
