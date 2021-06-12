@@ -396,8 +396,8 @@ function openSentFolder (callback) {
 
     settingUtil.setSetting('mailer:check:last_fetch', curTime, function (err) {
       winston.debug('Checking emails in SENT folder since %s', last_fetch.toString())
-      //      var startDate = new ews.DateTime(last_fetch.valueOf()) // convert to the format ews needed.
-      var startDate = new ews.DateTime(2021, 6, 6)
+      var startDate = new ews.DateTime(last_fetch.valueOf()) // convert to the format ews needed.
+      //      var startDate = new ews.DateTime(2021, 6, 6)
       var greaterThanfilter = new ews.SearchFilter.IsGreaterThanOrEqualTo(
         ews.EmailMessageSchema.DateTimeSent,
         startDate
