@@ -314,6 +314,13 @@ function mainRoutes (router, middleware, controllers) {
     middleware.loadCommonData,
     controllers.settings.elasticsearchSettings
   )
+  router.get(
+    '/settings/typesensesearch',
+    middleware.redirectToLogin,
+    middleware.loadCommonData,
+    controllers.settings.typesensesearchSettings
+  )
+
   router.get('/settings/tps', middleware.redirectToLogin, middleware.loadCommonData, controllers.settings.tpsSettings)
   router.get(
     '/settings/backup',

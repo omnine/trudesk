@@ -124,6 +124,14 @@ settingsController.elasticsearchSettings = function (req, res) {
   renderView(res, content)
 }
 
+settingsController.typesensesearchSettings = function (req, res) {
+  if (!checkPerms(req, 'settings:typesensesearch')) return res.redirect('/settings')
+
+  var content = initViewContent('typesensesearch', req)
+
+  renderView(res, content)
+}
+
 settingsController.tpsSettings = function (req, res) {
   if (!checkPerms(req, 'settings:tps')) return res.redirect('/settings')
 

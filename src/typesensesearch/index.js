@@ -148,7 +148,7 @@ TS.setupHooks = function () {
   })
 }
 
-TS.buildClient = function (host, port) {
+TS.buildClient = function (host, port, apikey) {
   if (TS.tsclient) {
     TS.tsclient.close()
   }
@@ -162,7 +162,7 @@ TS.buildClient = function (host, port) {
       }
     ],
     // get it from etc/typesense/typesense-server.ini
-    apiKey: '<API_KEY>',
+    apiKey: apikey,
     connectionTimeoutSeconds: 2
   })
 }
@@ -183,7 +183,7 @@ TS.rebuildIndex = function () {
 
     var TYPESENSESEARCH_URI = s.typesenseSearchHost.value + ':' + s.typesenseSearchPort.value
 
-    TS.buildClient(TYPESENSESEARCH_URI)
+    TS.buildClient(s.typesenseSearchHost.value, s.typesenseSearchPort.value, s.typesenseSearchAPIKey.value)
 
     global.esStatus = 'Rebuilding...'
 
@@ -253,9 +253,10 @@ TS.init = function (callback) {
     } else {
       TS.host = settings.typesenseSearchHost.value
       TS.port = settings.typesenseSearchPort.value
+      TS.apikey = settings.typesenseSearchAPIKey.value
     }
 
-    TS.buildClient(TS.host, TS.port)
+    TS.buildClient(TS.host, TS.port, TS.apikey)
 
     async.series(
       [
