@@ -7,8 +7,8 @@
    888 .  888      888   888  888   888  888    .o o.  )88b  888 `88b.
    "888" d888b     `V88V"V8P' `Y8bod88P" `Y8bod8P' 8""888P' o888o o888o
  ========================================================================
- Created:    09/08/2018
- Author:     Chris Brame
+ Created:    06/14/2021
+ Author:     Omnine
 
  **/
 
@@ -24,7 +24,7 @@ var moment = require('moment-timezone')
 var settingUtil = require('../settings/settingsUtil')
 
 var TS = {}
-TS.indexName = process.env.ELASTICSEARCH_INDEX_NAME || 'trudesk'
+TS.indexName = process.env.TYPESENSESEARCH_INDEX_NAME || 'trudesk'
 
 function checkConnection (callback) {
   if (!TS.tsclient) return callback('Typesense client not initialized. Restart Trudesk!')
@@ -42,7 +42,7 @@ function checkConnection (callback) {
 }
 
 TS.testConnection = function (callback) {
-  if (process.env.ELEASTICSEARCH_URI) TS.host = process.env.ELEASTICSEARCH_URI
+  if (process.env.TYPESENSESEARCH_URI) TS.host = process.env.TYPESENSESEARCH_URI
   else TS.host = nconf.get('typesense:host') + ':' + nconf.get('typesense:port')
 
   TS.tsclient = new Typesense.Client({
@@ -70,7 +70,7 @@ TS.setupHooks = function () {
 
     ticketSchema.getTicketById(data._id.toString(), function (err, ticket) {
       if (err) {
-        winston.warn('Elasticsearch Error: ' + err)
+        winston.warn('Typesensesearch Error: ' + err)
         return false
       }
 
@@ -108,7 +108,7 @@ TS.setupHooks = function () {
   emitter.on('ticket:created', function (data) {
     ticketSchema.getTicketById(data.ticket._id, function (err, ticket) {
       if (err) {
-        winston.warn('Elasticsearch Error: ' + err)
+        winston.warn('Typesensesearch Error: ' + err)
         return false
       }
 
@@ -181,13 +181,13 @@ TS.rebuildIndex = function () {
       winston.warn(err)
       return false
     }
-    if (!settings.data.settings.elasticSearchConfigured.value) return false
+    if (!settings.data.settings.typesenseSearchConfigured.value) return false
 
     var s = settings.data.settings
 
-    var ELASTICSEARCH_URI = s.elasticSearchHost.value + ':' + s.elasticSearchPort.value
+    var TYPESENSESEARCH_URI = s.typesenseSearchHost.value + ':' + s.typesenseSearchPort.value
 
-    TS.buildClient(ELASTICSEARCH_URI)
+    TS.buildClient(TYPESENSESEARCH_URI)
 
     global.esStatus = 'Rebuilding...'
 
@@ -196,8 +196,8 @@ TS.rebuildIndex = function () {
       env: {
         FORK: 1,
         NODE_ENV: global.env,
-        ELASTICSEARCH_INDEX_NAME: TS.indexName,
-        ELASTICSEARCH_URI: ELASTICSEARCH_URI,
+        TYPESENSESEARCH_INDEX_NAME: TS.indexName,
+        TYPESENSESEARCH_URI: TYPESENSESEARCH_URI,
         MONGODB_URI: global.CONNECTION_URI
       }
     })
@@ -239,21 +239,21 @@ TS.init = function (callback) {
   settingUtil.getSettings(function (err, s) {
     var settings = s.data.settings
 
-    var ENABLED = settings.elasticSearchConfigured.value
+    var ENABLED = settings.typesenseSearchConfigured.value
     if (!ENABLED) {
       if (_.isFunction(callback)) return callback()
 
       return false
     }
 
-    winston.debug('Initializing Elasticsearch...')
+    winston.debug('Initializing Typesensesearch...')
     global.esStatus = 'Initializing'
     TS.timezone = settings.timezone.value
 
     TS.setupHooks()
 
     if (process.env.ELATICSEARCH_URI) TS.host = process.env.ELATICSEARCH_URI
-    else TS.host = settings.elasticSearchHost.value + ':' + settings.elasticSearchPort.value
+    else TS.host = settings.typesenseSearchHost.value + ':' + settings.typesenseSearchPort.value
 
     TS.buildClient(TS.host)
 
@@ -263,7 +263,7 @@ TS.init = function (callback) {
           checkConnection(function (err) {
             if (err) return next(err)
 
-            winston.info('Elasticsearch Running... Connected.')
+            winston.info('Typesensesearch Running... Connected.')
             global.esStatus = 'Connected'
             return next()
           })
@@ -292,7 +292,7 @@ TS.checkConnection = function (callback) {
   })
 }
 
-// Unlike Elasticsearch, Typesense need to create a collection first
+// Unlike Typesensesearch, Typesense need to create a collection first
 /*
 var cleanedTicket = {
   uid: ticket.uid,

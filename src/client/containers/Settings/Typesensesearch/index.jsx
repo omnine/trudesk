@@ -7,7 +7,7 @@
  *    888 .  888      888   888  888   888  888    .o o.  )88b  888 `88b.
  *    "888" d888b     `V88V"V8P' `Y8bod88P" `Y8bod8P' 8""888P' o888o o888o
  *  ========================================================================
- *  Author:     Omnie
+ *  Author:     Omnine
  *  Updated:    6/14/21 2:25 AM
  *  Copyright (c) 2014-2019. All rights reserved.
  */
@@ -30,8 +30,8 @@ import UIKit from 'uikit'
 
 @observer
 class TypesensesearchSettingsContainer extends React.Component {
-  @observable esStatus = 'Not Configured'
-  @observable esStatusClass = ''
+  @observable tsStatus = 'Not Configured'
+  @observable tsStatusClass = ''
   @observable indexCount = 0
   @observable inSyncText = 'Not Configured'
   @observable inSyncClass = ''
@@ -41,7 +41,7 @@ class TypesensesearchSettingsContainer extends React.Component {
     super(props)
 
     this.state = {
-      host: false,
+      host: '',
       port: '',
 
       configured: false
@@ -67,12 +67,13 @@ class TypesensesearchSettingsContainer extends React.Component {
   static getDerivedStateFromProps (nextProps, state) {
     if (nextProps.settings) {
       let stateObj = { ...state }
-      if (state.host === false)
-        stateObj.host = nextProps.settings.getIn(['settings', 'elasticSearchHost', 'value']) || false
-      if (!state.port) stateObj.port = nextProps.settings.getIn(['settings', 'elasticSearchPort', 'value']) || ''
+      if (!state.host)
+        stateObj.host = nextProps.settings.getIn(['settings', 'typesenseSearchHost', 'value']) || ''
+      if (!state.port) 
+        stateObj.port = nextProps.settings.getIn(['settings', 'typesenseSearchPort', 'value']) || ''
 
       if (!state.configured)
-        stateObj.configured = nextProps.settings.getIn(['settings', 'elasticSearchConfigured', 'value']) || false
+        stateObj.configured = nextProps.settings.getIn(['settings', 'typesenseSearchConfigured', 'value']) || false
 
       return stateObj
     }
@@ -91,8 +92,8 @@ class TypesensesearchSettingsContainer extends React.Component {
     const self = this
     this.props
       .updateSetting({
-        stateName: 'elasticSearchEnabled',
-        name: 'es:enable',
+        stateName: 'typesenseSearchEnabled',
+        name: 'ts:enable',
         value: checked,
         noSnackbar: true
       })
@@ -103,8 +104,8 @@ class TypesensesearchSettingsContainer extends React.Component {
           })
         } else {
           this.setState({ configured: false }, () => {
-            self.esStatus = 'Not Configured'
-            self.esStatusClass = ''
+            self.tsStatus = 'Not Configured'
+            self.tsStatusClass = ''
             self.inSyncText = 'Not Configured'
             self.inSyncClass = ''
             self.indexCount = 0
@@ -122,17 +123,17 @@ class TypesensesearchSettingsContainer extends React.Component {
   onFormSubmit (e) {
     e.preventDefault()
 
-    const payload = [{ name: 'es:host', value: this.state.host }, { name: 'es:port', value: this.state.port }]
+    const payload = [{ name: 'ts:host', value: this.state.host }, { name: 'ts:port', value: this.state.port }]
 
     this.props.updateMultipleSettings(payload)
   }
 
   getStatus () {
     const self = this
-    // self.esStatus = 'Please Wait...'
+    // self.tsStatus = 'Please Wait...'
     // self.inSyncText = 'Please Wait...'
     // if (!this.state.configured) {
-    //   this.esStatus = 'Not Configured'
+    //   this.tsStatus = 'Not Configured'
     //   this.indexCount = 0
     //   this.inSyncText = 'Not Configured'
     //   this.inSyncClass = ''
@@ -141,15 +142,15 @@ class TypesensesearchSettingsContainer extends React.Component {
     // }
 
     axios
-      .get('/api/v2/es/status')
+      .get('/api/v2/ts/status')
       .then(res => {
         const data = res.data
         if (data.status.isRebuilding) {
-          self.esStatus = 'Rebuilding...'
-          self.esStatusClass = ''
-        } else self.esStatus = data.status.esStatus
-        if (self.esStatus.toLowerCase() === 'connected') self.esStatusClass = 'text-success'
-        else if (self.esStatus.toLowerCase() === 'error') self.esStatusClass = 'text-danger'
+          self.tsStatus = 'Rebuilding...'
+          self.tsStatusClass = ''
+        } else self.tsStatus = data.status.tsStatus
+        if (self.tsStatus.toLowerCase() === 'connected') self.tsStatusClass = 'text-success'
+        else if (self.tsStatus.toLowerCase() === 'error') self.tsStatusClass = 'text-danger'
 
         self.indexCount = data.status.indexCount.toLocaleString()
         if (data.status.inSync) {
@@ -166,8 +167,8 @@ class TypesensesearchSettingsContainer extends React.Component {
         } else self.disableRebuild = false
       })
       .catch(err => {
-        this.esStatus = 'Error'
-        this.esStatusClass = 'text-danger'
+        this.tsStatus = 'Error'
+        this.tsStatusClass = 'text-danger'
         this.inSyncText = 'Unknown'
         this.inSyncClass = ''
         if (err.error && err.error.message) helpers.UI.showSnackbar('Error: ' + err.error.message, true)
@@ -181,21 +182,21 @@ class TypesensesearchSettingsContainer extends React.Component {
     UIKit.modal.confirm(
       'Are you sure you want to rebuild the index?',
       function () {
-        self.esStatus = 'Rebuilding...'
+        self.tsStatus = 'Rebuilding...'
         self.inSyncText = 'Out of Sync'
         self.inSyncClass = 'bg-warn'
         self.indexCount = 0
         axios
-          .get('/api/v2/es/rebuild')
+          .get('/api/v2/ts/rebuild')
           .then(() => {
-            self.esStatus = 'Rebuilding...'
-            // $scope.esStatusClass = 'text-warning';
+            self.tsStatus = 'Rebuilding...'
+            // $scope.tsStatusClass = 'text-warning';
             helpers.UI.showSnackbar('Rebuilding Index...', false)
             self.disableRebuild = true
             setTimeout(self.getStatus, 3000)
           })
           .catch(function (err) {
-            Log.error('[trudesk:settings:es:RebuildIndex]', err)
+            Log.error('[trudesk:settings:ts:RebuildIndex]', err)
             helpers.UI.showSnackbar('Error: An unknown error occurred. Check Console.', true)
           })
       },
@@ -210,21 +211,21 @@ class TypesensesearchSettingsContainer extends React.Component {
     return (
       <div className={this.props.active ? '' : 'hide'}>
         <SettingItem
-          title={'Elasticsearch - Beta'}
-          subtitle={'Enable the Elasticsearch engine'}
+          title={'Typesensesearch - Beta'}
+          subtitle={'Enable the Typesensesearch engine'}
           component={
             <EnableSwitch
-              stateName={'elasticSearchEnabled'}
+              stateName={'typesenseSearchEnabled'}
               label={'Enable'}
-              checked={this.getSetting('elasticSearchEnabled')}
+              checked={this.getSetting('typesenseSearchEnabled')}
               onChange={e => this.onEnableChanged(e)}
             />
           }
         />
         <SettingItem
           title={'Connection Status'}
-          subtitle={'Current connection status to the Elasticsearch server.'}
-          component={<h4 className={`right mr-15 mt-15 ${this.esStatusClass}`}>{this.esStatus}</h4>}
+          subtitle={'Current connection status to the Typesensesearch server.'}
+          component={<h4 className={`right mr-15 mt-15 ${this.tsStatusClass}`}>{this.tsStatus}</h4>}
         />
         <SettingItem
           title={'Indexed Documents'}
@@ -238,9 +239,9 @@ class TypesensesearchSettingsContainer extends React.Component {
           component={<h4 className={'right mr-15 mt-15'}>{this.inSyncText}</h4>}
         />
         <SettingItem
-          title={'Elasticsearch Server Configuration'}
+          title={'Typesensesearch Server Configuration'}
           tooltip={'Changing server settings will require a rebuild of the index and server restart.'}
-          subtitle={'The connection settings to the Elasticsearch server.'}
+          subtitle={'The connection settings to the Typesensesearch server.'}
         >
           <form onSubmit={e => this.onFormSubmit(e)}>
             <div className='uk-margin-medium-bottom'>
@@ -249,7 +250,7 @@ class TypesensesearchSettingsContainer extends React.Component {
                 type='text'
                 className={'md-input md-input-width-medium'}
                 value={this.state.host}
-                disabled={!this.getSetting('elasticSearchEnabled')}
+                disabled={!this.getSetting('typesenseSearchEnabled')}
                 onChange={e => this.onInputChanged(e, 'host')}
               />
             </div>
@@ -259,7 +260,7 @@ class TypesensesearchSettingsContainer extends React.Component {
                 type='text'
                 className={'md-input md-input-width-medium'}
                 value={this.state.port}
-                disabled={!this.getSetting('elasticSearchEnabled')}
+                disabled={!this.getSetting('typesenseSearchEnabled')}
                 onChange={e => this.onInputChanged(e, 'port')}
               />
             </div>
@@ -269,7 +270,7 @@ class TypesensesearchSettingsContainer extends React.Component {
                 type={'submit'}
                 flat={true}
                 waves={true}
-                disabled={!this.getSetting('elasticSearchEnabled')}
+                disabled={!this.getSetting('typesenseSearchEnabled')}
                 style={'success'}
                 extraClass={'uk-float-right'}
               />

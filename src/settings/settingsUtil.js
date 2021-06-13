@@ -113,6 +113,14 @@ util.getSettings = function (callback) {
       value: s.elasticSearchEnabled.value !== false && !_.isEmpty(s.elasticSearchHost.value)
     }
 
+    // Typesensesearch
+    s.typesenseSearchEnabled = parseSetting(settings, 'ts:enable', false)
+    s.typesenseSearchHost = parseSetting(settings, 'ts:host', '')
+    s.typesenseSearchPort = parseSetting(settings, 'ts:port', 8108)
+    s.typesenseSearchConfigured = {
+      value: s.typesenseSearchEnabled.value !== false && !_.isEmpty(s.typesenseSearchHost.value)
+    }
+
     // EWS
     s.ewsUrl = parseSetting(settings, 'ews:url', '')
     s.ewsUsername = parseSetting(settings, 'ews:username', '')
