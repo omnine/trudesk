@@ -100,6 +100,14 @@ settingsController.mailerSettings = function (req, res) {
   renderView(res, content)
 }
 
+settingsController.ewsSettings = function (req, res) {
+  if (!checkPerms(req, 'settings:ews')) return res.redirect('/settings')
+
+  var content = initViewContent('ews', req)
+
+  renderView(res, content)
+}
+
 settingsController.permissionsSettings = function (req, res) {
   if (!checkPerms(req, 'settings:permissions')) return res.redirect('/settings')
 

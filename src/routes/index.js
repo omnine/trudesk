@@ -302,6 +302,8 @@ function mainRoutes (router, middleware, controllers) {
     middleware.loadCommonData,
     controllers.settings.mailerSettings
   )
+  router.get('/settings/ews', middleware.redirectToLogin, middleware.loadCommonData, controllers.settings.ewsSettings)
+
   router.get(
     '/settings/notifications',
     middleware.redirectToLogin,
