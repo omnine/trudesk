@@ -26,6 +26,7 @@ import PermissionsSettingsContainer from './Permissions'
 import TicketsSettings from './Tickets'
 import MailerSettingsContainer from './Mailer'
 import ElasticsearchSettingsContainer from './Elasticsearch'
+import TypesensesearchSettingsContainer from './Typesensesearch'
 import EWSSettingsContainer from './EWS'
 import TPSSettingsContainer from './TPS'
 import BackupRestoreSettingsContainer from './BackupRestore'
@@ -125,6 +126,13 @@ class SettingsContainer extends React.Component {
                 }}
               />
               <MenuItem
+                title={'Typesensesearch'}
+                active={this.state.activeCategory === 'settings-typesensesearch'}
+                onClick={e => {
+                  this.onMenuItemClick(e, 'typesensesearch')
+                }}
+              />
+              <MenuItem
                 title={'EWS'}
                 active={this.state.activeCategory === 'settings-ews'}
                 onClick={e => {
@@ -168,6 +176,7 @@ class SettingsContainer extends React.Component {
               <TicketsSettings active={this.state.activeCategory === 'settings-tickets'} />
               <MailerSettingsContainer active={this.state.activeCategory === 'settings-mailer'} />
               <ElasticsearchSettingsContainer active={this.state.activeCategory === 'settings-elasticsearch'} />
+              <TypesensesearchSettingsContainer active={this.state.activeCategory === 'settings-typesensesearch'} />
               <EWSSettingsContainer active={this.state.activeCategory === 'settings-ews'} />
               <TPSSettingsContainer active={this.state.activeCategory === 'settings-tps'} />
               <BackupRestoreSettingsContainer active={this.state.activeCategory === 'settings-backup'} />
