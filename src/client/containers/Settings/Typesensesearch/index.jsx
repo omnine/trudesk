@@ -43,6 +43,7 @@ class TypesensesearchSettingsContainer extends React.Component {
     this.state = {
       host: '',
       port: '',
+      apikey: '',
 
       configured: false
     }
@@ -71,6 +72,8 @@ class TypesensesearchSettingsContainer extends React.Component {
         stateObj.host = nextProps.settings.getIn(['settings', 'typesenseSearchHost', 'value']) || ''
       if (!state.port) 
         stateObj.port = nextProps.settings.getIn(['settings', 'typesenseSearchPort', 'value']) || ''
+        if (!state.apikey)
+        stateObj.apikey = nextProps.settings.getIn(['settings', 'typesenseSearchAPIKey', 'value']) || ''
 
       if (!state.configured)
         stateObj.configured = nextProps.settings.getIn(['settings', 'typesenseSearchConfigured', 'value']) || false
@@ -123,7 +126,11 @@ class TypesensesearchSettingsContainer extends React.Component {
   onFormSubmit (e) {
     e.preventDefault()
 
-    const payload = [{ name: 'ts:host', value: this.state.host }, { name: 'ts:port', value: this.state.port }]
+    const payload = [{ name: 'ts:host', value: this.state.host }, 
+      { name: 'ts:port', value: this.state.port },
+      { name: 'ts:apikey', value: this.state.apikey}
+    
+    ]
 
     this.props.updateMultipleSettings(payload)
   }
@@ -264,6 +271,16 @@ class TypesensesearchSettingsContainer extends React.Component {
                 onChange={e => this.onInputChanged(e, 'port')}
               />
             </div>
+            <div className='uk-margin-medium-bottom'>
+              <label>API Key</label>
+              <input
+                type='text'
+                className={'md-input md-input-width-medium'}
+                value={this.state.apikey}
+                disabled={!this.getSetting('typesenseSearchEnabled')}
+                onChange={e => this.onInputChanged(e, 'apikey')}
+              />
+            </div>            
             <div className='uk-clearfix'>
               <Button
                 text={'Apply'}

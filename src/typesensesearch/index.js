@@ -23,15 +23,17 @@ var emitter = require('../emitter')
 var moment = require('moment-timezone')
 var settingUtil = require('../settings/settingsUtil')
 
-var TS = {}
+var TS = { port: 8108 }
 TS.indexName = process.env.TYPESENSESEARCH_INDEX_NAME || 'trudesk'
 
 function checkConnection (callback) {
   if (!TS.tsclient) return callback('Typesense client not initialized. Restart Trudesk!')
 
-  winston.debug('Typesensesearch checking health')
   TS.tsclient.health.retrieve().then(function (res) {
-    return callback()
+    // res = {ok: true}
+    winston.debug('Typesensesearch checking health')
+    //should use try/catch
+    return callback(null)
   })
 }
 
@@ -146,7 +148,7 @@ TS.setupHooks = function () {
   })
 }
 
-TS.buildClient = function (host) {
+TS.buildClient = function (host, port) {
   if (TS.tsclient) {
     TS.tsclient.close()
   }
@@ -155,7 +157,7 @@ TS.buildClient = function (host) {
     nodes: [
       {
         host: host, // host, For Typesense Cloud use xxx.a1.typesense.net
-        port: '8108', // For Typesense Cloud use 443
+        port: port, // '8108'
         protocol: 'http' // For Typesense Cloud use https
       }
     ],
@@ -246,13 +248,14 @@ TS.init = function (callback) {
 
     TS.setupHooks()
 
-    if (process.env.ELATICSEARCH_URI) TS.host = process.env.ELATICSEARCH_URI
-    else {
+    if (process.env.TYPESENSESEARCH_URI) {
+      TS.host = process.env.TYPESENSESEARCH_URI
+    } else {
       TS.host = settings.typesenseSearchHost.value
       TS.port = settings.typesenseSearchPort.value
     }
 
-    TS.buildClient(TS.host)
+    TS.buildClient(TS.host, TS.port)
 
     async.series(
       [

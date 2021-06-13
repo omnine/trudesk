@@ -117,6 +117,7 @@ util.getSettings = function (callback) {
     s.typesenseSearchEnabled = parseSetting(settings, 'ts:enable', false)
     s.typesenseSearchHost = parseSetting(settings, 'ts:host', '')
     s.typesenseSearchPort = parseSetting(settings, 'ts:port', 8108)
+    s.typesenseSearchAPIKey = parseSetting(settings, 'ts:apikey', '')
     s.typesenseSearchConfigured = {
       value: s.typesenseSearchEnabled.value !== false && !_.isEmpty(s.typesenseSearchHost.value)
     }
