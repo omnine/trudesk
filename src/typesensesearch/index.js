@@ -29,16 +29,10 @@ TS.indexName = process.env.TYPESENSESEARCH_INDEX_NAME || 'trudesk'
 function checkConnection (callback) {
   if (!TS.tsclient) return callback('Typesense client not initialized. Restart Trudesk!')
 
-  TS.tsclient.ping(
-    {
-      requestTimeout: 10000
-    },
-    function (err) {
-      if (err) return callback('Could not connect to Typesense: ' + TS.host)
-
-      return callback()
-    }
-  )
+  winston.debug('Typesensesearch checking health')
+  TS.tsclient.health.retrieve().then(function (res) {
+    return callback()
+  })
 }
 
 TS.testConnection = function (callback) {
@@ -253,7 +247,10 @@ TS.init = function (callback) {
     TS.setupHooks()
 
     if (process.env.ELATICSEARCH_URI) TS.host = process.env.ELATICSEARCH_URI
-    else TS.host = settings.typesenseSearchHost.value + ':' + settings.typesenseSearchPort.value
+    else {
+      TS.host = settings.typesenseSearchHost.value
+      TS.port = settings.typesenseSearchPort.value
+    }
 
     TS.buildClient(TS.host)
 

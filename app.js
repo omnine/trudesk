@@ -155,6 +155,15 @@ function launchServer (db) {
           })
         },
         function (next) {
+          require('./src/typesensesearch').init(function (err) {
+            if (err) {
+              winston.error(err)
+            }
+
+            return next()
+          })
+        },
+        function (next) {
           require('./src/socketserver')(ws)
           return next()
         },
