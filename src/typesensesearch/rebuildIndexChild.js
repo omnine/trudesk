@@ -55,38 +55,41 @@ function setupDatabase (callback) {
 }
 
 function setupClient () {
-  TS.esclient = new elasticsearch.Client({
+  TS.tsclient = new elasticsearch.Client({
     host: process.env.ELASTICSEARCH_URI,
     pingTimeout: 10000,
     maxRetries: 5
   })
+
+  TS.tsclient = new Typesense.Client({
+    nodes: [
+      {
+        host: host, // host, For Typesense Cloud use xxx.a1.typesense.net
+        port: port, // '8108'
+        protocol: 'http' // For Typesense Cloud use https
+      }
+    ],
+    // get it from etc/typesense/typesense-server.ini
+    apiKey: apikey,
+    connectionTimeoutSeconds: 2
+  })
 }
 
+// delete a collection
 function deleteIndex (callback) {
-  TS.esclient.indices.exists(
-    {
-      index: TS.indexName
-    },
-    function (err, exists) {
-      if (err) return callback(err)
-      if (exists) {
-        TS.esclient.indices.delete(
-          {
-            index: TS.indexName
-          },
-          function (err) {
-            if (err) return callback(err)
-
-            return callback()
-          }
-        )
-      } else return callback()
-    }
-  )
+  TS.tsclient
+    .collections(TS.indexName)
+    .delete()
+    .then(function (res) {
+      return callback()
+    })
+    .catch(function (err) {
+      return callback(err)
+    })
 }
 
 function createIndex (callback) {
-  TS.esclient.indices.create(
+  TS.tsclient.indices.create(
     {
       index: TS.indexName,
       body: {
@@ -196,63 +199,22 @@ function createIndex (callback) {
 
 function sendAndEmptyQueue (bulk, callback) {
   if (bulk.length > 0) {
-    TS.esclient.bulk(
-      {
-        body: bulk,
-        timeout: '3m'
-      },
-      function (err) {
-        if (err) {
-          process.send({ success: false })
-          return process.exit()
-        } else {
-          winston.debug('Sent ' + bulk.length + ' documents to Elasticsearch!')
-          if (typeof callback === 'function') return callback()
-        }
-      }
-    )
+    //index multiple documents
+    TS.tsclient
+      .collections(TS.indexName)
+      .documents()
+      .import(bulk, { action: 'create' })
+      .then(function (res) {
+        winston.debug('Sent ' + bulk.length + ' documents to Typesensesearch!')
+        if (typeof callback === 'function') return callback()
+      })
+      .catch(function (err) {
+        process.send({ success: false })
+        return process.exit()
+      })
   } else if (typeof callback === 'function') return callback()
 
   return []
-}
-
-function crawlUsers (callback) {
-  var Model = require('../models/user')
-  var count = 0
-  var startTime = new Date().getTime()
-  var stream = Model.find({ deleted: false })
-    .lean()
-    .cursor()
-
-  var bulk = []
-
-  stream
-    .on('data', function (doc) {
-      count += 1
-      bulk.push({ index: { _index: TS.indexName, _type: 'doc', _id: doc._id } })
-      bulk.push({
-        datatype: 'user',
-        username: doc.username,
-        email: doc.email,
-        fullname: doc.fullname,
-        title: doc.title,
-        role: doc.role
-      })
-
-      if (count % 200 === 1) bulk = sendAndEmptyQueue(bulk)
-    })
-    .on('error', function (err) {
-      winston.error(err)
-      // Send Error Occurred - Kill Process
-      throw err
-    })
-    .on('close', function () {
-      winston.debug('Document Count: ' + count)
-      winston.debug('Duration is: ' + (new Date().getTime() - startTime))
-      bulk = sendAndEmptyQueue(bulk)
-
-      return callback()
-    })
 }
 
 function crawlTickets (callback) {
