@@ -86,44 +86,13 @@ apiTypesenseSearch.search = function (req, res) {
         var g = _.map(groups, function (i) {
           return i._id
         })
-        // For docker we need to add a unique ID for the index.
+
+        //Please check the counterpart in elasticsearch, we may need others,
         var obj = {
-          index: ts.indexName,
-          body: {
-            size: limit,
-            from: 0,
-            query: {
-              bool: {
-                must: {
-                  multi_match: {
-                    query: req.query['q'],
-                    type: 'cross_fields',
-                    operator: 'and',
-                    fields: [
-                      'uid^5',
-                      'subject^4',
-                      'issue^4',
-                      'owner.fullname',
-                      'owner.username',
-                      'owner.email',
-                      'comments.owner.email',
-                      'tags.normalized',
-                      'priority.name',
-                      'type.name',
-                      'group.name',
-                      'comments.comment^3',
-                      'notes.note^3',
-                      'dateFormatted'
-                    ],
-                    tie_breaker: 0.3
-                  }
-                },
-                filter: {
-                  terms: { 'group._id': g }
-                }
-              }
-            }
-          }
+          q: req.query['q'],
+          query_by: 'subject,issue,comments,notes' //by default do search in the 4 fields.
+          //          'query_by_weights': '1,1,1,1',
+          //          'sort_by': '_text_match:desc'
         }
 
         return next(null, obj)
