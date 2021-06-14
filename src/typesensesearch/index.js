@@ -29,12 +29,19 @@ TS.indexName = process.env.TYPESENSESEARCH_INDEX_NAME || 'trudesk'
 function checkConnection (callback) {
   if (!TS.tsclient) return callback('Typesense client not initialized. Restart Trudesk!')
 
-  TS.tsclient.health.retrieve().then(function (res) {
-    // res = {ok: true}
-    winston.debug('Typesensesearch checking health')
-    //should use try/catch
-    return callback(null)
-  })
+  TS.tsclient.health
+    .retrieve()
+    .then(function (res) {
+      // res = {ok: true}
+      winston.debug('Typesensesearch checking health OK')
+      //should use try/catch
+      return callback(null)
+    })
+    .catch(function (err) {
+      //    console.log("Promise Rejected");
+      winston.debug('Typesensesearch checking health failed')
+      return callback(null)
+    })
 }
 
 TS.testConnection = function (callback) {
@@ -168,7 +175,7 @@ TS.buildClient = function (host, port, apikey) {
 }
 
 TS.rebuildIndex = function () {
-  if (global.esRebuilding) {
+  if (global.tsRebuilding) {
     winston.warn('Index Rebuild attempted while already rebuilding!')
     return
   }
@@ -185,10 +192,10 @@ TS.rebuildIndex = function () {
 
     TS.buildClient(s.typesenseSearchHost.value, s.typesenseSearchPort.value, s.typesenseSearchAPIKey.value)
 
-    global.esStatus = 'Rebuilding...'
+    global.tsStatus = 'Rebuilding...'
 
     var fork = require('child_process').fork
-    var esFork = fork(path.join(__dirname, 'rebuildIndexChild.js'), {
+    var tsFork = fork(path.join(__dirname, 'rebuildIndexChild.js'), {
       env: {
         FORK: 1,
         NODE_ENV: global.env,
@@ -198,19 +205,19 @@ TS.rebuildIndex = function () {
       }
     })
 
-    global.esRebuilding = true
-    global.forks.push({ name: 'elasticsearchRebuild', fork: esFork })
+    global.tsRebuilding = true
+    global.forks.push({ name: 'typesensesearchRebuild', fork: tsFork })
 
-    esFork.once('message', function (data) {
-      global.esStatus = data.success ? 'Connected' : 'Error'
-      global.esRebuilding = false
+    tsFork.once('message', function (data) {
+      global.tsStatus = data.success ? 'Connected' : 'Error'
+      global.tsRebuilding = false
     })
 
-    esFork.on('exit', function () {
-      winston.debug('Rebuilding Process Closed: ' + esFork.pid)
-      global.esRebuilding = false
+    tsFork.on('exit', function () {
+      winston.debug('Rebuilding Process Closed: ' + tsFork.pid)
+      global.tsRebuilding = false
       global.forks = _.filter(global.forks, function (i) {
-        return i.name !== 'elasticsearchRebuild'
+        return i.name !== 'typesensesearchRebuild'
       })
     })
   })
@@ -227,11 +234,15 @@ TS.getIndexCount = function (callback) {
       data.count = r.num_documents
       return callback(data)
     })
+    .catch(function (err) {
+      winston.debug(err)
+      return callback(err)
+    })
 }
 
 TS.init = function (callback) {
-  global.esStatus = 'Not Configured'
-  global.esRebuilding = false
+  global.tsStatus = 'Not Configured'
+  global.tsRebuilding = false
   settingUtil.getSettings(function (err, s) {
     var settings = s.data.settings
 
@@ -243,7 +254,7 @@ TS.init = function (callback) {
     }
 
     winston.debug('Initializing Typesensesearch...')
-    global.esStatus = 'Initializing'
+    global.tsStatus = 'Initializing'
     TS.timezone = settings.timezone.value
 
     TS.setupHooks()
@@ -265,13 +276,13 @@ TS.init = function (callback) {
             if (err) return next(err)
 
             winston.info('Typesensesearch Running... Connected.')
-            global.esStatus = 'Connected'
+            global.tsStatus = 'Connected'
             return next()
           })
         }
       ],
       function (err) {
-        if (err) global.esStatus = 'Error'
+        if (err) global.tsStatus = 'Error'
 
         if (_.isFunction(callback)) return callback(err)
       }
@@ -280,16 +291,16 @@ TS.init = function (callback) {
 }
 
 TS.checkConnection = function (callback) {
-  // global.esStatus = 'Please Wait...'
+  // global.tsStatus = 'Please Wait...'
   return checkConnection(function (err) {
     if (err) {
-      global.esStatus = 'Error'
+      global.tsStatus = 'Error'
       winston.warn(err)
-      return callback()
+      return callback(err)
     }
 
-    global.esStatus = 'Connected'
-    return callback()
+    global.tsStatus = 'Connected'
+    return callback(null)
   })
 }
 

@@ -33,7 +33,10 @@ apiTypesenseSearch.status = function (req, res) {
   async.parallel(
     [
       function (done) {
-        return ts.checkConnection(done)
+        ts.checkConnection(function (err, data) {
+          if (err) return done(err)
+          return done()
+        })
       },
       function (done) {
         ts.getIndexCount(function (err, data) {
@@ -53,7 +56,7 @@ apiTypesenseSearch.status = function (req, res) {
     function (err) {
       if (err) return res.status(500).json({ success: false, error: err })
 
-      response.esStatus = global.esStatus
+      response.tsStatus = global.tsStatus
       response.isRebuilding = global.esRebuilding === true
       response.inSync = response.dbCount === response.indexCount
 
