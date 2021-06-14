@@ -232,7 +232,7 @@ TS.getIndexCount = function (callback) {
     .then(function (r) {
       var data = {}
       data.count = r.num_documents
-      return callback(data)
+      return callback(null, data)
     })
     .catch(function (err) {
       winston.debug(err)
@@ -338,7 +338,28 @@ int64
 float
 bool
 
-todo
+shell creation
+
+curl "http://localhost:8108/collections" -X POST -H "Content-Type: application/json" \
+      -H "X-TYPESENSE-API-KEY: your-api-key" -d '{
+        "name": "trudesk",
+        "fields": [
+          {"name": "uid", "type": "int32" },
+          {"name": "subject", "type": "string" },
+          {"name": "issue", "type": "string" },
+          {"name": "comments", "type": "string[]" },
+          {"name": "notes", "type": "string[]" },
+
+          {"name": "deleted", "type": "bool" },
+          {"name": "tags", "type": "string[]" },
+          {"name": "tags_facet", "type": "string[]", "facet": true },
+          {"name": "status", "type": "string" }
+
+        ],
+        "default_sorting_field": "uid"
+      }'
+
+
 */
 TS.createCollection = function (callback) {
   let ticketsSchema = {
@@ -351,13 +372,14 @@ TS.createCollection = function (callback) {
       { name: 'notes', type: 'string[]' },
 
       { name: 'deleted', type: 'bool' },
-      { name: 'tags', type: 'string[]' }
+      { name: 'tags', type: 'string[]' },
+      { name: 'tags_facet', type: 'string[]', facet: true },
+      { name: 'status', type: 'string' }
       //      {'name': 'average_rating', 'type': 'float' },
 
-      //      {'name': 'authors_facet', 'type': 'string[]', 'facet': true },
       //      {'name': 'publication_year_facet', 'type': 'string', 'facet': true },
-    ]
-    //    'default_sorting_field': 'ratings_count'
+    ],
+    default_sorting_field: 'uid'
   }
 
   TS.tsclient
