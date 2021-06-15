@@ -359,6 +359,7 @@ curl "http://localhost:8108/collections" -X POST -H "Content-Type: application/j
         "default_sorting_field": "uid"
       }'
 
+      is there any better field in ticket for default_sorting_field? status?
 
 */
 TS.createCollection = function (callback) {
@@ -368,18 +369,14 @@ TS.createCollection = function (callback) {
       { name: 'uid', type: 'int32' },
       { name: 'subject', type: 'string' },
       { name: 'issue', type: 'string' },
-      { name: 'comments', type: 'string[]' },
-      { name: 'notes', type: 'string[]' },
+      { name: 'comments', type: 'string[]', optional: true },
+      { name: 'notes', type: 'string[]', optional: true },
 
       { name: 'deleted', type: 'bool' },
-      { name: 'tags', type: 'string[]' },
-      { name: 'tags_facet', type: 'string[]', facet: true },
-      { name: 'status', type: 'string' }
-      //      {'name': 'average_rating', 'type': 'float' },
-
-      //      {'name': 'publication_year_facet', 'type': 'string', 'facet': true },
+      { name: 'tags', type: 'string[]', facet: true, optional: true },
+      { name: 'status', type: 'int32' }
     ],
-    default_sorting_field: 'uid'
+    default_sorting_field: 'status'
   }
 
   TS.tsclient

@@ -83,112 +83,29 @@ function deleteIndex (callback) {
 }
 
 function createIndex (callback) {
-  TS.tsclient.indices.create(
-    {
-      index: TS.indexName,
-      body: {
-        settings: {
-          index: {
-            number_of_replicas: 0
-          },
-          analysis: {
-            filter: {
-              leadahead: {
-                type: 'edge_ngram',
-                min_gram: 1,
-                max_gram: 20
-              },
-              email: {
-                type: 'pattern_capture',
-                preserve_original: true,
-                patterns: ['([^@]+)', '(\\p{L}+)', '(\\d+)', '@(.+)']
-              }
-            },
-            analyzer: {
-              leadahead: {
-                type: 'custom',
-                tokenizer: 'standard',
-                filter: ['lowercase', 'leadahead']
-              },
-              email: {
-                tokenizer: 'uax_url_email',
-                filter: ['email', 'lowercase', 'unique']
-              }
-            }
-          }
-        },
-        mappings: {
-          doc: {
-            properties: {
-              uid: {
-                type: 'text',
-                analyzer: 'leadahead',
-                search_analyzer: 'standard'
-              },
-              subject: {
-                type: 'text',
-                analyzer: 'leadahead',
-                search_analyzer: 'standard'
-              },
-              issue: {
-                type: 'text',
-                analyzer: 'leadahead',
-                search_analyzer: 'standard'
-              },
-              dateFormatted: {
-                type: 'text',
-                analyzer: 'leadahead',
-                search_analyzer: 'standard'
-              },
-              comments: {
-                properties: {
-                  comment: {
-                    type: 'text',
-                    analyzer: 'leadahead',
-                    search_analyzer: 'standard'
-                  },
-                  owner: {
-                    properties: {
-                      email: {
-                        type: 'text',
-                        analyzer: 'email'
-                      }
-                    }
-                  }
-                }
-              },
-              notes: {
-                properties: {
-                  note: {
-                    type: 'text',
-                    analyzer: 'leadahead',
-                    search_analyzer: 'standard'
-                  },
-                  owner: {
-                    properties: {
-                      email: {
-                        type: 'text',
-                        analyzer: 'email'
-                      }
-                    }
-                  }
-                }
-              },
-              owner: {
-                properties: {
-                  email: {
-                    type: 'text',
-                    analyzer: 'email'
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    callback
-  )
+  let ticketsSchema = {
+    name: TS.indexName,
+    fields: [
+      { name: 'uid', type: 'int32' },
+      { name: 'subject', type: 'string' },
+      { name: 'issue', type: 'string' },
+      { name: 'comments', type: 'string[]', optional: true },
+      { name: 'notes', type: 'string[]', optional: true },
+
+      { name: 'deleted', type: 'bool' },
+      { name: 'tags', type: 'string[]', facet: true, optional: true },
+      { name: 'status', type: 'int32' }
+    ],
+    default_sorting_field: 'status'
+  }
+
+  TS.tsclient
+    .collections()
+    .create(ticketsSchema)
+    .then(function (data) {
+      //what the response is?
+      return callback()
+    })
 }
 
 function sendAndEmptyQueue (bulk, callback) {
@@ -230,54 +147,32 @@ function crawlTickets (callback) {
       var comments = []
       if (doc.comments !== undefined) {
         doc.comments.forEach(function (c) {
-          comments.push({
-            comment: c.comment,
-            _id: c._id,
-            deleted: c.deleted,
-            date: c.date,
-            owner: {
-              _id: c.owner._id,
-              fullname: c.owner.fullname,
-              username: c.owner.username,
-              email: c.owner.email,
-              role: c.owner.role,
-              title: c.owner.title
-            }
-          })
+          comments.push(c.comment)
         })
       }
+      var tags = []
+      if (doc.tags !== undefined) {
+        doc.tags.forEach(function (t) {
+          tags.push(t.name)
+        })
+      }
+      var notes = []
+      if (doc.notes !== undefined) {
+        doc.notes.forEach(function (n) {
+          notes.push(n.note)
+        })
+      }
+
       bulk.push({
         uid: doc.uid,
-        owner: {
-          _id: doc.owner._id,
-          fullname: doc.owner.fullname,
-          username: doc.owner.username,
-          email: doc.owner.email,
-          role: doc.owner.role,
-          title: doc.owner.title
-        },
-        group: {
-          _id: doc.group._id,
-          name: doc.group.name
-        },
         status: doc.status,
         issue: doc.issue,
         subject: doc.subject,
-        date: doc.date,
-        dateFormatted: moment
-          .utc(doc.date)
-          .tz(TS.timezone)
-          .format('MMMM D YYYY'),
-        priority: {
-          _id: doc.priority._id,
-          name: doc.priority.name,
-          htmlColor: doc.priority.htmlColor
-        },
         type: { _id: doc.type._id, name: doc.type.name },
         deleted: doc.deleted,
         comments: comments,
-        notes: doc.notes,
-        tags: doc.tags
+        notes: notes,
+        tags: tags
       })
 
       if (count % 200 === 1) bulk = sendAndEmptyQueue(bulk)
