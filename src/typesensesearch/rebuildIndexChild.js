@@ -1,5 +1,5 @@
 var async = require('async')
-var elasticsearch = require('elasticsearch')
+var Typesense = require('typesense')
 var winston = require('winston')
 var moment = require('moment-timezone')
 var database = require('../database')
@@ -55,22 +55,16 @@ function setupDatabase (callback) {
 }
 
 function setupClient () {
-  TS.tsclient = new elasticsearch.Client({
-    host: process.env.ELASTICSEARCH_URI,
-    pingTimeout: 10000,
-    maxRetries: 5
-  })
-
   TS.tsclient = new Typesense.Client({
     nodes: [
       {
-        host: host, // host, For Typesense Cloud use xxx.a1.typesense.net
-        port: port, // '8108'
+        host: process.env.TYPESENSESEARCH_HOST, // host, For Typesense Cloud use xxx.a1.typesense.net
+        port: process.env.TYPESENSESEARCH_PORT, // '8108'
         protocol: 'http' // For Typesense Cloud use https
       }
     ],
     // get it from etc/typesense/typesense-server.ini
-    apiKey: apikey,
+    apiKey: process.env.TYPESENSESEARCH_APIKEY,
     connectionTimeoutSeconds: 2
   })
 }
@@ -233,7 +227,6 @@ function crawlTickets (callback) {
       stream.pause()
       count += 1
 
-      bulk.push({ index: { _index: TS.indexName, _type: 'doc', _id: doc._id } })
       var comments = []
       if (doc.comments !== undefined) {
         doc.comments.forEach(function (c) {
@@ -254,7 +247,6 @@ function crawlTickets (callback) {
         })
       }
       bulk.push({
-        datatype: 'ticket',
         uid: doc.uid,
         owner: {
           _id: doc.owner._id,

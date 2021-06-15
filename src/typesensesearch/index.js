@@ -188,8 +188,6 @@ TS.rebuildIndex = function () {
 
     var s = settings.data.settings
 
-    var TYPESENSESEARCH_URI = s.typesenseSearchHost.value + ':' + s.typesenseSearchPort.value
-
     TS.buildClient(s.typesenseSearchHost.value, s.typesenseSearchPort.value, s.typesenseSearchAPIKey.value)
 
     global.tsStatus = 'Rebuilding...'
@@ -200,7 +198,9 @@ TS.rebuildIndex = function () {
         FORK: 1,
         NODE_ENV: global.env,
         TYPESENSESEARCH_INDEX_NAME: TS.indexName,
-        TYPESENSESEARCH_URI: TYPESENSESEARCH_URI,
+        TYPESENSESEARCH_HOST: s.typesenseSearchHost.value,
+        TYPESENSESEARCH_PORT: s.typesenseSearchPort.value,
+        TYPESENSESEARCH_APIKEY: s.typesenseSearchAPIKey.value,
         MONGODB_URI: global.CONNECTION_URI
       }
     })
