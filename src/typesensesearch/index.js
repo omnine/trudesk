@@ -157,7 +157,7 @@ TS.setupHooks = function () {
 
 TS.buildClient = function (host, port, apikey) {
   if (TS.tsclient) {
-    TS.tsclient.close()
+    return
   }
 
   TS.tsclient = new Typesense.Client({
@@ -188,12 +188,13 @@ TS.rebuildIndex = function () {
 
     var s = settings.data.settings
 
-    TS.buildClient(s.typesenseSearchHost.value, s.typesenseSearchPort.value, s.typesenseSearchAPIKey.value)
+    //    TS.buildClient(s.typesenseSearchHost.value, s.typesenseSearchPort.value, s.typesenseSearchAPIKey.value)
 
     global.tsStatus = 'Rebuilding...'
 
     var fork = require('child_process').fork
     var tsFork = fork(path.join(__dirname, 'rebuildIndexChild.js'), {
+      execArgv: [], // this is important to inspect the child process, https://github.com/nodejs/node/issues/9435
       env: {
         FORK: 1,
         NODE_ENV: global.env,

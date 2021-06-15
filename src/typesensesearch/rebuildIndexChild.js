@@ -1,10 +1,24 @@
+/*
+ *       .                             .o8                     oooo
+ *    .o8                             "888                     `888
+ *  .o888oo oooo d8b oooo  oooo   .oooo888   .ooooo.   .oooo.o  888  oooo
+ *    888   `888""8P `888  `888  d88' `888  d88' `88b d88(  "8  888 .8P'
+ *    888    888      888   888  888   888  888ooo888 `"Y88b.   888888.
+ *    888 .  888      888   888  888   888  888    .o o.  )88b  888 `88b.
+ *    "888" d888b     `V88V"V8P' `Y8bod88P" `Y8bod8P' 8""888P' o888o o888o
+ *  ========================================================================
+ *  Author:     Omnine
+ *  Updated:    6/15/21 4:43 PM
+ *  Copyright (c) 2014-2019. All rights reserved.
+ */
+
 var async = require('async')
 var Typesense = require('typesense')
 var winston = require('winston')
 var moment = require('moment-timezone')
 var database = require('../database')
 
-global.env = process.env.NODE_ENV || 'production'
+global.env = process.env.NODE_ENV
 
 winston.setLevels(winston.config.cli.levels)
 winston.remove(winston.transports.Console)
@@ -19,7 +33,7 @@ winston.add(winston.transports.Console, {
       date.getDate() +
       ' ' +
       date.toTimeString().substr(0, 8) +
-      ' [Child:ElasticSearch:' +
+      ' [Child:TypesenseSearch:' +
       process.pid +
       ']'
     )
@@ -28,7 +42,7 @@ winston.add(winston.transports.Console, {
 })
 
 var TS = {}
-TS.indexName = process.env.ELASTICSEARCH_INDEX_NAME || 'trudesk'
+TS.indexName = process.env.TYPESENSESEARCH_INDEX_NAME || 'trudesk'
 
 function setupTimezone (callback) {
   var settingsSchema = require('../models/setting')
@@ -163,16 +177,16 @@ function crawlTickets (callback) {
         })
       }
 
+      //same order as the schema, but it doesn't matter
       bulk.push({
         uid: doc.uid,
-        status: doc.status,
-        issue: doc.issue,
         subject: doc.subject,
-        type: { _id: doc.type._id, name: doc.type.name },
-        deleted: doc.deleted,
+        issue: doc.issue,
         comments: comments,
         notes: notes,
-        tags: tags
+        deleted: doc.deleted,
+        tags: tags,
+        status: doc.status
       })
 
       if (count % 200 === 1) bulk = sendAndEmptyQueue(bulk)
@@ -222,6 +236,7 @@ function rebuild (callback) {
   setupClient()
   rebuild(function (err) {
     if (err) {
+      winston.debug('rebuild error happened')
       process.send({ success: false, error: err })
       return process.exit(0)
     }
