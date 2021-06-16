@@ -89,6 +89,8 @@ class SearchResults extends React.Component {
           {searchResults &&
             searchResults.map(item => {
               const doc = item.get('_source')
+              if(doc == null)
+                doc = item.get('document')  //Typesense, https://typesense.org/docs/0.20.0/api/documents.html#search
               return (
                 <li key={item.get('_id')} className={`search-results-item status-${doc.get('status')}`}>
                   <a href={`/tickets/${doc.get('uid')}`} onClick={e => this.onSearchItemClick(e)}>

@@ -90,6 +90,7 @@ apiTypesenseSearch.search = function (req, res) {
         //Please check the counterpart in elasticsearch, we may need others,
         var obj = {
           q: req.query['q'],
+          limit_hits: req.query['limit'],
           query_by: 'subject,issue,comments,notes' //by default do search in the 4 fields.
           //          'query_by_weights': '1,1,1,1',
           //          'sort_by': '_text_match:desc'
@@ -104,6 +105,7 @@ apiTypesenseSearch.search = function (req, res) {
 
       ts.tsclient.search(obj).then(function (r) {
         return res.send(r)
+        //see the sample result at https://typesense.org/docs/0.20.0/guide/building-a-search-application.html#searching-for-books
       })
     }
   )

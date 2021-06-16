@@ -165,7 +165,7 @@ class TicketsContainer extends React.Component {
     this.searchTerm = e.target.value
     if (this.searchTerm.length > 3) {
       SearchResults.toggleAnimation(true, true)
-      this.props.fetchSearchResults({ term: this.searchTerm })
+      this.props.fetchSearchResults({ term: this.searchTerm, engine:2 })  //1 for elastic, 2 for typesense
     } else {
       SearchResults.toggleAnimation(true, false)
     }
@@ -176,7 +176,7 @@ class TicketsContainer extends React.Component {
   }
 
   onSearchKeypress (e) {
-    if (this.searchTerm.length > 3) this.props.fetchSearchResults({ term: this.searchTerm })
+    if (this.searchTerm.length > 3) this.props.fetchSearchResults({ term: this.searchTerm, engine:2 })
 
     // e.persist()
     // if (e.charCode === 13) {

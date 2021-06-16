@@ -245,11 +245,17 @@ api.departments.delete = ({ _id }) => {
 }
 
 api.search = {}
-api.search.search = ({ limit, term }) => {
+api.search.search = ({ limit, term, engine }) => {
   const l = limit || 25
-  return axios.get(`/api/v2/es/search?limit=${l}&q=${term}`).then(res => {
-    return res.data
-  })
+  if (engine === 2) {
+    return axios.get(`/api/v2/ts/search?limit=${l}&q=${term}`).then(res => {
+      return res
+    })
+  } else {
+    return axios.get(`/api/v2/es/search?limit=${l}&q=${term}`).then(res => {
+      return res.data
+    })
+  }
 }
 
 api.settings = {}
