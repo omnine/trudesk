@@ -101,12 +101,16 @@ apiTypesenseSearch.search = function (req, res) {
     ],
     function (err, obj) {
       if (err) return apiUtil.sendApiError(res, 500, err.message)
-      if (!es || !ts.tsclient) return apiUtil.sendApiError(res, 400, 'TypeSenseSearch is not configured')
+      if (!ts || !ts.tsclient) return apiUtil.sendApiError(res, 400, 'TypeSenseSearch is not configured')
 
-      ts.tsclient.search(obj).then(function (r) {
-        return res.send(r)
-        //see the sample result at https://typesense.org/docs/0.20.0/guide/building-a-search-application.html#searching-for-books
-      })
+      ts.tsclient
+        .collections(ts.indexName)
+        .documents()
+        .search(obj)
+        .then(function (r) {
+          return res.send(r)
+          //see the sample result at https://typesense.org/docs/0.20.0/guide/building-a-search-application.html#searching-for-books
+        })
     }
   )
 }
