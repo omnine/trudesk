@@ -32,10 +32,20 @@ const searchReducer = handleActions(
     },
 
     [FETCH_SEARCH_RESULTS.SUCCESS]: (state, action) => {
-      return {
-        ...state,
-        loading: false,
-        results: fromJS(action.response.hits.hits)
+      if (action.response.engine === 2) {
+        //typesense engine
+        return {
+          ...state,
+          loading: false,
+          results: fromJS(action.response.data.hits)
+        }
+      } else {
+        //elastic engine
+        return {
+          ...state,
+          loading: false,
+          results: fromJS(action.response.hits.hits)
+        }
       }
     },
 

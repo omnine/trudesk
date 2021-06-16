@@ -24,6 +24,7 @@ function * fetchSearchResults ({ payload, meta }) {
   if (!payload.term) yield put({ type: FETCH_SEARCH_RESULTS.ERROR, error: { message: 'Invalid search Term' } })
   try {
     const response = yield call(api.search.search, payload)
+    response.engine = payload.engine //we support 2 engines
     yield put({ type: FETCH_SEARCH_RESULTS.SUCCESS, response, meta })
   } catch (error) {
     const errorText = error.response ? error.response.data.error : error
