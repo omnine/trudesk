@@ -45,7 +45,7 @@ class TopbarContainer extends React.Component {
   @observable notificationCount = 0
   @observable activeUserCount = 0
 
-  @observable showInfoBanner = true
+  @observable showInfoBanner = false
 
   constructor (props) {
     super(props)
