@@ -76,7 +76,7 @@ class SearchResults extends React.Component {
   }
 
   render () {
-    const { target, searchResults, error } = this.props
+    const { target, searchResults, engine, error } = this.props
     return (
       <div
         className={'search-results-container animate-in'}
@@ -88,9 +88,14 @@ class SearchResults extends React.Component {
         <ul className={'search-results-list'}>
           {searchResults &&
             searchResults.map(item => {
-              var doc = item.get('_source')
-              if(doc == null) { //how to pass the engine here?
+              var doc
+              if(engine === 2)
+              {
                 doc = item.get('document')  //Typesense, https://typesense.org/docs/0.20.0/api/documents.html#search
+                // todo need to tackle item.get('_id')
+              }
+              else {
+                doc = item.get('_source')
               }
               return (
                 <li key={item.get('_id')} className={`search-results-item status-${doc.get('status')}`}>
@@ -112,12 +117,14 @@ class SearchResults extends React.Component {
 SearchResults.propTypes = {
   target: PropTypes.string.isRequired,
   searchResults: PropTypes.object.isRequired,
+  engine: PropTypes.number,
   error: PropTypes.object,
   unloadSearchResults: PropTypes.func.isRequired
 }
 
 const mapStateToProps = state => ({
   searchResults: state.searchState.results,
+  engine: state.searchState.engine,
   error: state.searchState.error
 })
 

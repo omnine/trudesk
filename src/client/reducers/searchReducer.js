@@ -19,6 +19,7 @@ import { FETCH_SEARCH_RESULTS, UNLOAD_SEARCH_RESULTS } from 'actions/types'
 const initialState = {
   loading: false,
   results: List([]),
+  engine: 2,
   error: null
 }
 
@@ -37,6 +38,7 @@ const searchReducer = handleActions(
         return {
           ...state,
           loading: false,
+          engine: 2,
           results: fromJS(action.response.data.hits)
         }
       } else {
@@ -44,6 +46,7 @@ const searchReducer = handleActions(
         return {
           ...state,
           loading: false,
+          engine: 1,
           results: fromJS(action.response.hits.hits)
         }
       }
