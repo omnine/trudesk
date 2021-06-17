@@ -88,17 +88,19 @@ class SearchResults extends React.Component {
         <ul className={'search-results-list'}>
           {searchResults &&
             searchResults.map(item => {
-              var doc
+              var doc, idliKey
               if(engine === 2)
               {
                 doc = item.get('document')  //Typesense, https://typesense.org/docs/0.20.0/api/documents.html#search
                 // todo need to tackle item.get('_id')
+                idliKey = doc.get('uid')
               }
               else {
                 doc = item.get('_source')
+                idliKey = item.get('_id')
               }
               return (
-                <li key={item.get('_id')} className={`search-results-item status-${doc.get('status')}`}>
+                <li key={idliKey} className={`search-results-item status-${doc.get('status')}`}>
                   <a href={`/tickets/${doc.get('uid')}`} onClick={e => this.onSearchItemClick(e)}>
                     <span className='priority' style={{ background: `${doc.getIn(['priority', 'htmlColor'])}` }} />
                     <span className='uid'>{doc.get('uid')}</span>
