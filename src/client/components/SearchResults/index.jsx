@@ -92,7 +92,7 @@ class SearchResults extends React.Component {
               if(engine === 2)
               {
                 doc = item.get('document')  //Typesense, https://typesense.org/docs/0.20.0/api/documents.html#search
-                // todo need to tackle item.get('_id')
+                // we can also use idliKey = doc.get('id')
                 idliKey = doc.get('uid')
               }
               else {
