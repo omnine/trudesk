@@ -77,28 +77,37 @@ TS.setupHooks = function () {
         return false
       }
 
+      var _id = ticket._id.toString()
+      var comments = []
+      if (ticket.comments !== undefined) {
+        ticket.comments.forEach(function (c) {
+          comments.push(c.comment)
+        })
+      }
+      var tags = []
+      if (ticket.tags !== undefined) {
+        ticket.tags.forEach(function (t) {
+          tags.push(t.name)
+        })
+      }
+      var notes = []
+      if (ticket.notes !== undefined) {
+        ticket.notes.forEach(function (n) {
+          notes.push(n.note)
+        })
+      }
+
+      //for the update we only need to provide the CHANGED data, not necessary ALL, but the event doesn't tell the actual change.
       var cleanedTicket = {
+        id: _id,
         uid: ticket.uid,
         subject: ticket.subject,
         issue: ticket.issue,
-        date: ticket.date,
-        owner: ticket.owner,
-        assignee: ticket.assignee,
-        group: {
-          _id: ticket.group._id,
-          name: ticket.group.name
-        },
-        comments: ticket.comments,
-        notes: ticket.notes,
+        comments: comments,
+        notes: notes,
         deleted: ticket.deleted,
-        priority: {
-          _id: ticket.priority._id,
-          name: ticket.priority.name,
-          htmlColor: ticket.priority.htmlColor
-        },
-        type: { _id: ticket.type._id, name: ticket.type.name },
         status: ticket.status,
-        tags: ticket.tags
+        tags: tags
       }
 
       TS.tsclient
