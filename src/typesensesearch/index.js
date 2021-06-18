@@ -116,34 +116,37 @@ TS.setupHooks = function () {
       }
 
       var _id = ticket._id.toString()
+      var comments = []
+      if (ticket.comments !== undefined) {
+        ticket.comments.forEach(function (c) {
+          comments.push(c.comment)
+        })
+      }
+      var tags = []
+      if (ticket.tags !== undefined) {
+        ticket.tags.forEach(function (t) {
+          tags.push(t.name)
+        })
+      }
+      var notes = []
+      if (ticket.notes !== undefined) {
+        ticket.notes.forEach(function (n) {
+          notes.push(n.note)
+        })
+      }
+
       var cleanedTicket = {
         id: _id,
         uid: ticket.uid,
         subject: ticket.subject,
         issue: ticket.issue,
-        date: ticket.date,
-        dateFormatted: moment
-          .utc(ticket.date)
-          .tz(TS.timezone)
-          .format('MMMM D YYYY'),
-        owner: ticket.owner,
-        assignee: ticket.assignee,
-        group: {
-          _id: ticket.group._id,
-          name: ticket.group.name
-        },
-        comments: ticket.comments,
-        notes: ticket.notes,
+        comments: comments,
+        notes: notes,
         deleted: ticket.deleted,
-        priority: {
-          _id: ticket.priority._id,
-          name: ticket.priority.name,
-          htmlColor: ticket.priority.htmlColor
-        },
-        type: { _id: ticket.type._id, name: ticket.type.name },
         status: ticket.status,
-        tags: ticket.tags
+        tags: tags
       }
+
       // todo need to create a schema
       //  Typesense can index a multi-value array. In the schema, define the type of the field as string[]
       // Typesense does not index a dictionary or nested fields though: they have to be flattened out. https://github.com/typesense/typesense/issues/256

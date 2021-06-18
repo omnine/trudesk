@@ -96,6 +96,15 @@ function deleteIndex (callback) {
     })
 }
 
+/*
+If the document contains an id field of type string, Typesense would use that field as the identifier for the document. 
+Otherwise, Typesense would assign an identifier of its choice to the document.
+when update a document, we use mongodb id, just be compatible to elastic engine. 
+Otherwise we can just use ticket uid to save a field for the simplicity
+
+I don't think we need to add the id into schema fields.
+*/
+
 function createIndex (callback) {
   let ticketsSchema = {
     name: TS.indexName,
@@ -179,6 +188,7 @@ function crawlTickets (callback) {
 
       //same order as the schema, but it doesn't matter
       bulk.push({
+        id: doc._id.toString(), //Typesense would use that field as the identifier for the document
         uid: doc.uid,
         subject: doc.subject,
         issue: doc.issue,
