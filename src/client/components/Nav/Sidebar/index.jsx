@@ -299,7 +299,7 @@ class Sidebar extends React.Component {
               <SubmenuItem
                 href={'/settings/ews'}
                 text={'EWS'}
-                icon={'search'}
+                icon={'contact_mail'}
                 active={activeSubItem === 'settings-ews'}
               />
               <SubmenuItem
