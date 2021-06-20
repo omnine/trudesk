@@ -197,6 +197,7 @@ ES.rebuildIndex = function () {
 
     var fork = require('child_process').fork
     var esFork = fork(path.join(__dirname, 'rebuildIndexChild.js'), {
+      execArgv: [], // this is important to inspect the child process, https://github.com/nodejs/node/issues/9435
       env: {
         FORK: 1,
         NODE_ENV: global.env,

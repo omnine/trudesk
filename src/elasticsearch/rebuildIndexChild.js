@@ -56,7 +56,7 @@ function setupDatabase (callback) {
 
 function setupClient () {
   ES.esclient = new elasticsearch.Client({
-    host: process.env.ELASTICSEARCH_URI,
+    node: process.env.ELASTICSEARCH_URI,
     pingTimeout: 10000,
     maxRetries: 5
   })
@@ -196,10 +196,13 @@ function createIndex (callback) {
 
 function sendAndEmptyQueue (bulk, callback) {
   if (bulk.length > 0) {
+    const flatMap = (f, arr) => arr.reduce((x, y) => [...x, ...f(y)], [])
+    const body = flatMap(doc => [{ index: { _index: ES.indexName } }, doc], bulk)
+
     ES.esclient.bulk(
       {
-        body: bulk,
-        timeout: '3m'
+        body: body,
+        refresh: true
       },
       function (err) {
         if (err) {
