@@ -196,12 +196,14 @@ function createIndex (callback) {
 
 function sendAndEmptyQueue (bulk, callback) {
   if (bulk.length > 0) {
-    const flatMap = (f, arr) => arr.reduce((x, y) => [...x, ...f(y)], [])
-    const body = flatMap(doc => [{ index: { _index: ES.indexName } }, doc], bulk)
+    //    const flatMap = (f, arr) => arr.reduce((x, y) => [...x, ...f(y)], [])
+    //    const body = flatMap(doc => [{ index: { _index: ES.indexName } }, doc], bulk)
 
     ES.esclient.bulk(
       {
-        body: body,
+        body: bulk,
+        index: ES.indexName,
+        type: '_doc', // necessary for Elasticsearch ≤ 6?
         refresh: true
       },
       function (err) {
@@ -209,7 +211,7 @@ function sendAndEmptyQueue (bulk, callback) {
           process.send({ success: false })
           return process.exit()
         } else {
-          winston.debug('Sent ' + bulk.length + ' documents to Elasticsearch!')
+          winston.debug('Sent ' + bulk.length / 2 + ' documents to Elasticsearch!')
           if (typeof callback === 'function') return callback()
         }
       }
@@ -273,7 +275,7 @@ function crawlTickets (callback) {
     .on('data', function (doc) {
       stream.pause()
       count += 1
-
+      //aprt from index, bulk supports other operations, the odd line define the operation, the even line define the data
       bulk.push({ index: { _index: ES.indexName, _type: 'doc', _id: doc._id } })
       var comments = []
       if (doc.comments !== undefined) {
