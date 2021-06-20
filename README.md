@@ -104,3 +104,27 @@ Node.js run as windows service OK, https://github.com/coreybutler/node-windows
 Typesense: Unfortunately it only provides docker version.  
 Elastic: OK elasticsearch-service.bat command which will setup Elasticsearch to run as a service.  
 MongoDB: OK as a windows service
+
+### Libraries
+
+- [Text to ASCII Art](https://patorjk.com/software/taag/#p=display&f=Big%20Money-nw&t=nanodesk)
+- [AngularJS](https://angularjs.org/)
+- [Chosen](https://harvesthq.github.io/chosen/)
+- [D3](https://d3js.org/)
+- [Datatables](https://www.datatables.net/)
+- [Easy Pie Chart](https://rendro.github.io/easy-pie-chart/)
+- [History.JS](https://github.com/browserstate/history.js/)
+- [jQuery](https://jquery.com/)
+- [Js-cookie](https://github.com/js-cookie/js-cookie)
+- [Lodash](http://lodash.com/)
+- [MetricsGraphics.js](http://metricsgraphicsjs.org/)
+- [PACE](http://github.hubspot.com/pace/docs/welcome/)
+- [Simple Color Picker](https://github.com/tkrotoff/jquery-simplecolorpicker)
+- [Selectize.js](http://selectize.github.io/selectize.js/)
+- [Snackbar](http://www.polonel.com/snackbar)
+- [To Markdown](https://github.com/domchristie/to-markdown)
+- [UIKit](http://getuikit.com)
+- [Webpack](https://webpack.github.io/)
+- [Typesense](https://github.com/typesense/typesense)
+- [EWS javascript](https://github.com/gautamsi/ews-javascript-api)
+
