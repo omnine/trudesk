@@ -1,5 +1,5 @@
 var async = require('async')
-var elasticsearch = require('elasticsearch')
+var elasticsearch = require('@elastic/elasticsearch')
 var winston = require('winston')
 var moment = require('moment-timezone')
 var database = require('../database')

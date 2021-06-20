@@ -17,7 +17,7 @@ var path = require('path')
 var async = require('async')
 var nconf = require('nconf')
 var winston = require('winston')
-var elasticsearch = require('elasticsearch')
+var elasticsearch = require('@elastic/elasticsearch')
 var emitter = require('../emitter')
 var moment = require('moment-timezone')
 var settingUtil = require('../settings/settingsUtil')
@@ -28,24 +28,19 @@ ES.indexName = process.env.ELASTICSEARCH_INDEX_NAME || 'trudesk'
 function checkConnection (callback) {
   if (!ES.esclient) return callback('Elasticsearch client not initialized. Restart Trudesk!')
 
-  ES.esclient.ping(
-    {
-      requestTimeout: 10000
-    },
-    function (err) {
-      if (err) return callback('Could not connect to Elasticsearch: ' + ES.host)
+  ES.esclient.ping(function (err) {
+    if (err) return callback('Could not connect to Elasticsearch: ' + ES.node)
 
-      return callback()
-    }
-  )
+    return callback()
+  })
 }
 
 ES.testConnection = function (callback) {
-  if (process.env.ELEASTICSEARCH_URI) ES.host = process.env.ELEASTICSEARCH_URI
-  else ES.host = nconf.get('elasticsearch:host') + ':' + nconf.get('elasticsearch:port')
+  if (process.env.ELEASTICSEARCH_URI) ES.node = process.env.ELEASTICSEARCH_URI
+  else ES.node = 'http://' + nconf.get('elasticsearch:host') + ':' + nconf.get('elasticsearch:port')
 
   ES.esclient = new elasticsearch.Client({
-    host: ES.host
+    node: ES.node
   })
 
   checkConnection(callback)
@@ -169,12 +164,12 @@ ES.setupHooks = function () {
   })
 }
 
-ES.buildClient = function (host) {
+ES.buildClient = function (nodeURI) {
   if (ES.esclient) {
     ES.esclient.close()
   }
   ES.esclient = new elasticsearch.Client({
-    host: host,
+    node: nodeURI,
     pingTimeout: 10000,
     maxRetries: 5
   })
@@ -194,7 +189,7 @@ ES.rebuildIndex = function () {
 
     var s = settings.data.settings
 
-    var ELASTICSEARCH_URI = s.elasticSearchHost.value + ':' + s.elasticSearchPort.value
+    var ELASTICSEARCH_URI = 'http://' + s.elasticSearchHost.value + ':' + s.elasticSearchPort.value
 
     ES.buildClient(ELASTICSEARCH_URI)
 
@@ -259,10 +254,10 @@ ES.init = function (callback) {
 
     ES.setupHooks()
 
-    if (process.env.ELATICSEARCH_URI) ES.host = process.env.ELATICSEARCH_URI
-    else ES.host = settings.elasticSearchHost.value + ':' + settings.elasticSearchPort.value
+    if (process.env.ELATICSEARCH_URI) ES.node = process.env.ELATICSEARCH_URI
+    else ES.node = 'http://' + settings.elasticSearchHost.value + ':' + settings.elasticSearchPort.value
 
-    ES.buildClient(ES.host)
+    ES.buildClient(ES.node)
 
     async.series(
       [

@@ -127,4 +127,5 @@ MongoDB: OK as a windows service
 - [Webpack](https://webpack.github.io/)
 - [Typesense](https://github.com/typesense/typesense)
 - [EWS javascript](https://github.com/gautamsi/ews-javascript-api)
+- [Text to SVG/PNG](https://maketext.io/)
 
