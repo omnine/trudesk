@@ -90,6 +90,7 @@ EWS in node,  the best one https://github.com/gautamsi/ews-javascript-api
 ```
 
 ### To Do
+- upgrade to the latest software.
 - Review access control, src/permissions, is it enough? do we need casbin as the replacement?
 - Review socket.io, src/socketserver.js
 - send email when the customers use the portal to create a ticket and comment
