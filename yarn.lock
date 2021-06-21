@@ -898,6 +898,11 @@
     lodash.isundefined "^3.0.1"
     lodash.uniq "^4.5.0"
 
+"@handlebars/allow-prototype-access@1.0.5":
+  version "1.0.5"
+  resolved "https://registry.yarnpkg.com/@handlebars/allow-prototype-access/-/allow-prototype-access-1.0.5.tgz#364384d1879765aad210a61becd849afab3954b3"
+  integrity sha512-D5AJO9dM6B+1scVVQ4ma05cAku5M2dEnlycggIg6RW539TdQlgbNg1G1r86fNqqNI0CHv/TVwKEB9M6ILJQCWQ==
+
 "@iamstarkov/listr-update-renderer@0.4.1":
   version "0.4.1"
   resolved "https://registry.yarnpkg.com/@iamstarkov/listr-update-renderer/-/listr-update-renderer-0.4.1.tgz#d7c48092a2dcf90fd672b6c8b458649cb350c77e"
