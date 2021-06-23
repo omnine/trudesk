@@ -90,6 +90,7 @@ EWS in node,  the best one https://github.com/gautamsi/ews-javascript-api
 ```
 
 ### To Do
+- Package, [pkg](https://github.com/vercel/pkg) or [nexe](https://github.com/nexe/nexe)?
 - upgrade to the latest software.
 - Review access control, src/permissions, is it enough? do we need casbin as the replacement?
 - Review socket.io, src/socketserver.js
@@ -130,3 +131,12 @@ MongoDB: OK as a windows service
 - [EWS javascript](https://github.com/gautamsi/ews-javascript-api)
 - [Text to SVG/PNG](https://maketext.io/)
 
+### Installation Script
+
+/etc/typesense/typesense-server.ini
+Check service status: `systemctl status typesense-server`
+Check health: `curl http://localhost:8108/health`
+
+Elastic
+ curl -XGET 'http://localhost:9200'
+ curl http://localhost:9200/_cluster/health?pretty

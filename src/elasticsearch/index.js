@@ -36,7 +36,7 @@ function checkConnection (callback) {
 }
 
 ES.testConnection = function (callback) {
-  if (process.env.ELEASTICSEARCH_URI) ES.node = process.env.ELEASTICSEARCH_URI
+  if (process.env.ELASTICSEARCH_URI) ES.node = process.env.ELASTICSEARCH_URI
   else ES.node = 'http://' + nconf.get('elasticsearch:host') + ':' + nconf.get('elasticsearch:port')
 
   ES.esclient = new elasticsearch.Client({
