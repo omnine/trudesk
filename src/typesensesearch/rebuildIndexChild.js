@@ -93,7 +93,9 @@ function deleteIndex (callback) {
       return callback()
     })
     .catch(function (err) {
-      return callback(err)
+      // for example, No collection with name `trudesk` found.
+      // Ideally we should ONLY ignore this particular error
+      return callback() // callback(err)
     })
 }
 

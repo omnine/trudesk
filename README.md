@@ -90,6 +90,7 @@ EWS in node,  the best one https://github.com/gautamsi/ews-javascript-api
 ```
 
 ### To Do
+- After applying typesense setting, the service needs reboot
 - Package, [pkg](https://github.com/vercel/pkg) or [nexe](https://github.com/nexe/nexe)?
 - upgrade to the latest software.
 - Review access control, src/permissions, is it enough? do we need casbin as the replacement?
