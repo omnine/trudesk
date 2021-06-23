@@ -285,7 +285,8 @@ echo -e "";
 echo -e "Waiting for MongoDB to start...";
 sleep 10
 
-# what authSchema is for?
+# what authSchema is for? https://gist.github.com/michaeltreat/d3bdc989b54cff969df86484e091fd0c
+# the admin collection in v4.4 won't be changed with the following commands
 cat >/etc/mongosetup.js <<EOL
 db.system.users.remove({});
 db.system.version.remove({});
