@@ -143,7 +143,7 @@ addinController.email2Case = function (req, res) {
       ],
       handleUpdateSubject: [
         'handleCreateTicket',
-        function (ticket, cb) {
+        function (ticket, callback) {
           var subject = message.subject
           subject = '[DISSUE#' + ticket.handleCreateTicket.uid + ']-' + subject
           var ewsCheck = require('../mailer/ewsCheck')
