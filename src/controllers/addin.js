@@ -20,6 +20,7 @@ var emitter = require('../emitter')
 var userSchema = require('../models/user')
 var groupSchema = require('../models/group')
 var ticketTypeSchema = require('../models/tickettype')
+var ews = require('ews-javascript-api')
 
 var addinController = {}
 
