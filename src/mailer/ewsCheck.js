@@ -350,8 +350,11 @@ function openInboxFolder (callback) {
         return callback(null)
       }
       winston.debug('Processing %s Mail', response.TotalCount)
+      var additionalProps = [] // In order to load UniqueBody
+      additionalProps.push(ews.ItemSchema.UniqueBody)
+      var propertySet = new ews.PropertySet(ews.BasePropertySet.FirstClassProperties, additionalProps)
       for (const item of response.items) {
-        item.Load().then(function () {
+        item.Load(propertySet).then(function () {
           var message = {}
           message.from = item.From.Address
           message.subject = item.Subject
@@ -361,7 +364,7 @@ function openInboxFolder (callback) {
           ewsCheck.messages.push(message)
         })
         item.IsRead = true
-        item.Update(ConflictResolutionMode.AutoResolve)
+        item.Update(ews.ConflictResolutionMode.AutoResolve)
       }
       return callback(null)
     },
