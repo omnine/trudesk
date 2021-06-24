@@ -136,8 +136,10 @@ function bindEWSReady () {
 
 ewsCheck.fetchMail = function () {
   // Runs the tasks array of functions in series
-  async.waterfall([openSentFolder, openInboxFolder], function (err, result) {
+  async.waterfall([generateTimeRange, openInboxFolder, openSentFolder], function (err, endTime) {
     // result now equals 'done'
+    var settingUtil = require('../settings/settingsUtil')
+    settingUtil.setSetting('mailer:check:last_fetch', endTime, function (err) {})
   })
 }
 
@@ -340,14 +342,29 @@ function handleMessages (messages, done) {
   })
 }
 
-function openInboxFolder (callback) {
+/*
+It is not reliable to just check Unread flag, as the email might have been read by some agents in their Outlook clients.
+*/
+function openInboxFolder (beginTime, endTime, callback) {
+  var startDate = new ews.DateTime(beginTime.valueOf()) // convert to the format ews needed.
+  //      var startDate = new ews.DateTime(2021, 6, 6)
+  var greaterThanfilter = new ews.SearchFilter.IsGreaterThanOrEqualTo(
+    ews.EmailMessageSchema.DateTimeReceived,
+    startDate
+  )
+
+  var endDate = new ews.DateTime(endTime.valueOf())
+
+  var lessThanfilter = new ews.SearchFilter.IsLessThan(ews.EmailMessageSchema.DateTimeReceived, endDate)
+
+  var filter = new ews.SearchFilter.SearchFilterCollection(ews.LogicalOperator.And, [greaterThanfilter, lessThanfilter])
+
   const view = new ews.ItemView(50) // big enough
-  //here we only check Unread email in Inbox, if it is Read, people may have processed in Outlook Add-in
-  ewsCheck.exchService.FindItems(ews.WellKnownFolderName.Inbox, 'isRead:false', view).then(
+  ewsCheck.exchService.FindItems(ews.WellKnownFolderName.Inbox, filter, view).then(
     function (response) {
       if (response.TotalCount < 1) {
         winston.debug('MailCheck through EWS: Nothing to Fetch from INBOX.')
-        return callback(null)
+        return callback(null, beginTime, endTime)
       }
       winston.debug('Processing %s Mail', response.TotalCount)
       var additionalProps = [] // In order to load UniqueBody
@@ -366,7 +383,7 @@ function openInboxFolder (callback) {
         item.IsRead = true
         item.Update(ews.ConflictResolutionMode.AutoResolve)
       }
-      return callback(null)
+      return callback(null, beginTime, endTime)
     },
     function (err) {
       // do something with error
@@ -376,16 +393,7 @@ function openInboxFolder (callback) {
   )
 }
 
-/*
-How to avoid such a case,  
-1, as a agent, post a comment, it will trigger a smtp to send a email to the client, 
-it also appends the email in to Sent folder.
-2, now start fetchSent job, which will add the reply done by agent who uses email client to do a reply.
-3, obviously we have to filter out the email generated in step 1.
-
-We should check if the message-id has been in the database already
-*/
-function openSentFolder (callback) {
+function generateTimeRange (callback) {
   var settingUtil = require('../settings/settingsUtil')
   var curTime = new Date()
   // last_fetch is the type javascript Date, which mongodb supports, it is originally used in node-imap
@@ -397,55 +405,85 @@ function openSentFolder (callback) {
       last_fetch = new Date()
       last_fetch.setDate(curTime.getDate() - 2)
     }
+    var startDate = new ews.DateTime(last_fetch.valueOf()) // convert to the format ews needed.
+    //      var startDate = new ews.DateTime(2021, 6, 6)
+    var greaterThanfilter = new ews.SearchFilter.IsGreaterThanOrEqualTo(
+      ews.EmailMessageSchema.DateTimeReceived, //should we use DateTimeSent in Sent folder? todo,
+      startDate
+    )
 
-    settingUtil.setSetting('mailer:check:last_fetch', curTime, function (err) {
-      winston.debug('Checking emails in SENT folder since %s', last_fetch.toString())
-      var startDate = new ews.DateTime(last_fetch.valueOf()) // convert to the format ews needed.
-      //      var startDate = new ews.DateTime(2021, 6, 6)
-      var greaterThanfilter = new ews.SearchFilter.IsGreaterThanOrEqualTo(
-        ews.EmailMessageSchema.DateTimeSent,
-        startDate
-      )
+    var endDate = new ews.DateTime(curTime.valueOf())
 
-      view = new ews.ItemView(100)
-      ewsCheck.exchService.FindItems(ews.WellKnownFolderName.SentItems, greaterThanfilter, view).then(
-        function (response) {
-          if (response.TotalCount < 1) {
-            winston.debug('MailCheck with EWS: Nothing to Fetch in SENT Folder.')
-            return callback(null)
-          }
+    var lessThanfilter = new ews.SearchFilter.IsLessThan(ews.EmailMessageSchema.DateTimeReceived, endDate)
 
-          winston.debug('Processing %d Mail(s) in SENT Folder', response.TotalCount)
-          var additionalProps = [] // In order to load UniqueBody
-          additionalProps.push(ews.ItemSchema.UniqueBody)
-          var propertySet = new ews.PropertySet(ews.BasePropertySet.FirstClassProperties, additionalProps)
-          var message = {}
-          for (const item of response.items) {
-            item.Load(propertySet).then(function () {
-              // bypass the sent emails triggered by posting the comment in Portal
-              //we can also skip the message which the subject donesn't contain 'DISSUE'
-              if (!item.InternetMessageId.startsWith('omnine')) {
-                // does it always have Message-Id?
-                var message = {}
-                message.from = item.From.Address
-                message.subject = item.Subject
-                message.body = toMD(item.UniqueBody) // only replied email body instead of whole email body = item.Body,
-                //use this one
-                message.inReplyTo = item.inReplyTo
-                //                message.references = item.References
-                message.folder = 'SENT'
-                ewsCheck.messages.push(message)
-              }
-            })
-          }
-          return callback(null)
-        },
-        function (error) {
-          return callback(error)
-        }
-      )
-    })
+    var filter = new ews.SearchFilter.SearchFilterCollection(ews.LogicalOperator.And, [
+      greaterThanfilter,
+      lessThanfilter
+    ])
+
+    callback(null, last_fetch, curTime) //pass on the time range
   })
+}
+/*
+How to avoid such a case,  
+1, as a agent, post a comment, it will trigger a smtp to send a email to the client, 
+it also appends the email in to Sent folder.
+2, now start fetchSent job, which will add the reply done by agent who uses email client to do a reply.
+3, obviously we have to filter out the email generated in step 1.
+
+We should check if the message-id has been in the database already
+*/
+function openSentFolder (beginTime, endTime, callback) {
+  var startDate = new ews.DateTime(beginTime.valueOf()) // convert to the format ews needed.
+  //      var startDate = new ews.DateTime(2021, 6, 6)
+  var greaterThanfilter = new ews.SearchFilter.IsGreaterThanOrEqualTo(
+    ews.EmailMessageSchema.DateTimeSent, //should we use DateTimeSent in Sent folder? todo,
+    startDate
+  )
+
+  var endDate = new ews.DateTime(endTime.valueOf())
+
+  var lessThanfilter = new ews.SearchFilter.IsLessThan(ews.EmailMessageSchema.DateTimeSent, endDate)
+
+  var filter = new ews.SearchFilter.SearchFilterCollection(ews.LogicalOperator.And, [greaterThanfilter, lessThanfilter])
+
+  view = new ews.ItemView(100)
+  ewsCheck.exchService.FindItems(ews.WellKnownFolderName.SentItems, filter, view).then(
+    function (response) {
+      if (response.TotalCount < 1) {
+        winston.debug('MailCheck with EWS: Nothing to Fetch in SENT Folder.')
+        return callback(null, endTime)
+      }
+
+      winston.debug('Processing %d Mail(s) in SENT Folder', response.TotalCount)
+      var additionalProps = [] // In order to load UniqueBody
+      additionalProps.push(ews.ItemSchema.UniqueBody)
+      var propertySet = new ews.PropertySet(ews.BasePropertySet.FirstClassProperties, additionalProps)
+      var message = {}
+      for (const item of response.items) {
+        item.Load(propertySet).then(function () {
+          // bypass the sent emails triggered by posting the comment in Portal
+          //we can also skip the message which the subject donesn't contain 'DISSUE'
+          if (!item.InternetMessageId.startsWith('omnine')) {
+            // does it always have Message-Id?
+            var message = {}
+            message.from = item.From.Address
+            message.subject = item.Subject
+            message.body = toMD(item.UniqueBody) // only replied email body instead of whole email body = item.Body,
+            //use this one
+            message.inReplyTo = item.inReplyTo
+            //                message.references = item.References
+            message.folder = 'SENT'
+            ewsCheck.messages.push(message)
+          }
+        })
+      }
+      return callback(null, endTime)
+    },
+    function (error) {
+      return callback(error, endTime)
+    }
+  )
 }
 
 // use cheerio? just like in mailCheck.js?
