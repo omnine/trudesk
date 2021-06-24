@@ -154,7 +154,7 @@ var notifications = require('../notifications') // Load Push Events
                         if (err) return c(err)
                         if (!template) return c()
 
-                        var context = { base_url: baseUrl, ticket: ticket }
+                        var context = { base_url: baseUrl, ticket: ticket.toJSON() }
 
                         email
                           .render('new-ticket', context)
@@ -517,10 +517,17 @@ var notifications = require('../notifications') // Load Push Events
                 ticket.populate('comments.owner', function (err, ticket) {
                   if (err) winston.warn(err)
                   if (err) return c()
+                  /*
+                  The varibles are not rendered into html template, even we allowInsecurePrototypeAccess
+                  Here we should use json object instead of mongoose class object
+                  //https://github.com/handlebars-lang/handlebars.js/issues/1642
+                  Using mongoose lean might be another solution
+                  //https://stackoverflow.com/questions/59690923/handlebars-access-has-been-denied-to-resolve-the-property-from-because-it-is
 
+                  */
                   email
                     .render('ticket-comment-added', {
-                      ticket: ticket,
+                      ticket: ticket.toJSON(),
                       comment: comment
                     })
                     .then(function (html) {
