@@ -529,7 +529,7 @@ var notifications = require('../notifications') // Load Push Events
                     var mailOptions = {
                       to: emails.join(),
                       subject: '[' + suffixtemplate + '#' + ticket.uid + ']-' + ticket.subject,
-                      html: comment,
+                      html: comment.comment, //the body
                       generateTextFromHTML: true
                     }
 
