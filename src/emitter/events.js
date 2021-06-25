@@ -517,6 +517,50 @@ var notifications = require('../notifications') // Load Push Events
                 ticket.populate('comments.owner', function (err, ticket) {
                   if (err) winston.warn(err)
                   if (err) return c()
+                  //In order to keep as simple/traditional as email conversation, we only email out comment,
+                  // DISSUE is not a typo, just try to make it special.
+                  var settingSchema = require('../models/setting')
+                  settingSchema.getSetting('ticket:suffixtemplate:issue', function (err, setting) {
+                    var suffixtemplate = 'DISSUE'
+                    if (!err && setting && setting.value) {
+                      suffixtemplate = setting.value
+                    }
+
+                    var mailOptions = {
+                      to: emails.join(),
+                      subject: '[' + suffixtemplate + '#' + ticket.uid + ']-' + ticket.subject,
+                      html: comment,
+                      generateTextFromHTML: true
+                    }
+
+                    var settingsSchema = require('../models/setting')
+                    settingsSchema.getSetting('useEWSAsMailer:enable', function (err, setting) {
+                      if (err) return next(err)
+                      var ewsEnabled = !setting ? false : setting.value
+                      if (ewsEnabled) {
+                        var ewsCheck = require('../mailer/ewsCheck')
+                        ewsCheck.sendEWSMail(mailOptions, false, function (err) {
+                          if (err) winston.warn('[trudesk:events:sendSubscriberEmail] - ' + err)
+                          //no manual append to Sent Folder!
+                          winston.debug('Sent [' + emails.length + '] emails.')
+                        })
+                      } else {
+                        mailer.sendMail(mailOptions, function (err, info) {
+                          if (err) winston.warn('[trudesk:events:sendSubscriberEmail] - ' + err)
+                          // Upload (save) the email to the "Sent" mailbox.
+                          var mailCheck = require('../mailer/mailCheck')
+                          mailCheck.appendIntoSentFolder(mailOptions, info.messageId)
+                          // modify comment's messageID
+                          ticket.updateCommentMessageId(tiket._id, comment._id, info.messageId, null) // no callback?
+
+                          winston.debug('Sent [' + emails.length + '] emails.')
+                        })
+                      }
+                    })
+
+                    return c()
+                  })
+
                   /*
                   The varibles are not rendered into html template, even we allowInsecurePrototypeAccess
                   Here we should use json object instead of mongoose class object
@@ -525,6 +569,7 @@ var notifications = require('../notifications') // Load Push Events
                   //https://stackoverflow.com/questions/59690923/handlebars-access-has-been-denied-to-resolve-the-property-from-because-it-is
 
                   */
+                  /*
                   email
                     .render('ticket-comment-added', {
                       ticket: ticket.toJSON(),
@@ -578,6 +623,7 @@ var notifications = require('../notifications') // Load Push Events
                       winston.warn('[trudesk:events:sendSubscriberEmail] - ' + err)
                       return c(err)
                     })
+                    */
                 })
               }
             )

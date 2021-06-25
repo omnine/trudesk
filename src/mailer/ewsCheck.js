@@ -508,7 +508,7 @@ ewsCheck.sendEWSMail = function (data, ownMessageID, callback) {
   var escapeHtml = require('escape-html')
   message.Body = new ews.MessageBody(ews.BodyType.HTML, escapeHtml(data.html))
 
-  if (data.to.include(',')) {
+  if (data.to.includes(',')) {
     var emails = data.to.split(',')
     for (var i = 0; i < emails.length; i++) {
       // Trim the excess whitespace.
