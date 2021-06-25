@@ -140,6 +140,7 @@ ewsCheck.fetchMail = function () {
     // result now equals 'done'
     var settingUtil = require('../settings/settingsUtil')
     settingUtil.setSetting('mailer:check:last_fetch', endTime, function (err) {})
+    handleMessages(ewsCheck.messages, function () {})
   })
 }
 
