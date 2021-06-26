@@ -173,7 +173,7 @@ var notifications = require('../notifications') // Load Push Events
                               var ewsEnabled = !setting ? false : setting.value
                               if (ewsEnabled) {
                                 var ewsCheck = require('../mailer/ewsCheck')
-                                ewsCheck.sendEWSMail(mailOptions, true, function (err) {
+                                ewsCheck.sendEWSMail(mailOptions, false, function (err) {
                                   if (err) winston.warn('[trudesk:events:ticket:created] - ' + err)
 
                                   winston.debug('Sent [' + emails.length + '] emails.')
@@ -530,6 +530,7 @@ var notifications = require('../notifications') // Load Push Events
                       to: emails.join(),
                       subject: '[' + suffixtemplate + '#' + ticket.uid + ']-' + ticket.subject,
                       html: comment.comment, //the body
+                      messageId: comment.messageId,
                       generateTextFromHTML: true
                     }
 

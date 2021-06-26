@@ -921,10 +921,14 @@ apiTickets.postComment = function (req, res) {
     })
 
     comment = sanitizeHtml(comment).trim()
+    //for email message mapping
+    var uuid = require('uuid')
+    var extId = 'omnine.' + uuid.v4() + '@deepnetsecurity.com' // NO '< ' and '>', otherwise got exception:  The request failed schema validation
 
     var Comment = {
       owner: owner,
       date: new Date(),
+      messageId: extId,
       comment: xss(marked(comment))
     }
 

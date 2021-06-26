@@ -523,13 +523,12 @@ ewsCheck.sendEWSMail = function (data, ownMessageID, callback) {
   }
 
   // Use customized message ID for sent email triggered comment posted in Portal
-  if (ownMessageID) {
-    var uuid = require('uuid')
-    var extID = 'omnine.' + uuid.v4() + '@deepnetsecurity.com' // NO '< ' and '>', otherwise got exception:  The request failed schema validation
-
+  if (ownMessageID && data.messageId != null) {
+    //    var uuid = require('uuid')
+    //    var extID = 'omnine.' + uuid.v4() + '@deepnetsecurity.com' // NO '< ' and '>', otherwise got exception:  The request failed schema validation
     //why 4149? see https://docs.microsoft.com/en-us/office/client-developer/outlook/mapi/pidtaginternetmessageid-canonical-property
     var PidTagInternetMessageId = new ews.ExtendedPropertyDefinition(4149, ews.MapiPropertyType.String)
-    message.SetExtendedProperty(PidTagInternetMessageId, extID)
+    message.SetExtendedProperty(PidTagInternetMessageId, data.messageId)
   }
 
   message.SendAndSaveCopy()
