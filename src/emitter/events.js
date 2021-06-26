@@ -173,7 +173,7 @@ var notifications = require('../notifications') // Load Push Events
                               var ewsEnabled = !setting ? false : setting.value
                               if (ewsEnabled) {
                                 var ewsCheck = require('../mailer/ewsCheck')
-                                ewsCheck.sendEWSMail(mailOptions, false, function (err) {
+                                ewsCheck.sendEWSMail(mailOptions, true, function (err) {
                                   if (err) winston.warn('[trudesk:events:ticket:created] - ' + err)
 
                                   winston.debug('Sent [' + emails.length + '] emails.')
@@ -539,7 +539,8 @@ var notifications = require('../notifications') // Load Push Events
                       var ewsEnabled = !setting ? false : setting.value
                       if (ewsEnabled) {
                         var ewsCheck = require('../mailer/ewsCheck')
-                        ewsCheck.sendEWSMail(mailOptions, false, function (err) {
+                        //Use own messageID, todo, should create it when adding the comment
+                        ewsCheck.sendEWSMail(mailOptions, true, function (err) {
                           if (err) winston.warn('[trudesk:events:sendSubscriberEmail] - ' + err)
                           //no manual append to Sent Folder!
                           winston.debug('Sent [' + emails.length + '] emails.')
