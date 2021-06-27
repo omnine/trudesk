@@ -456,7 +456,6 @@ function openSentFolder (beginTime, endTime, callback) {
       var additionalProps = [] // In order to load UniqueBody
       additionalProps.push(ews.ItemSchema.UniqueBody)
       var propertySet = new ews.PropertySet(ews.BasePropertySet.FirstClassProperties, additionalProps)
-      var message = {}
       for (const item of response.items) {
         item.Load(propertySet).then(function () {
           // bypass the sent emails triggered by posting the comment in Portal
@@ -466,7 +465,10 @@ function openSentFolder (beginTime, endTime, callback) {
             var tid = getTID(item.Subject)
             if (tid != null) {
               var message = {}
-              message.from = item.From.Address
+//              message.from = item.From.Address
+//            In Sent folder we should swap from and to, otherwise will have "warn: No User found", we use the first one, 
+              var recips = item.ToRecipients.Items
+              message.from = recips[0].Address
               message.subject = item.Subject
               message.body = toMD(item.UniqueBody) // only replied email body instead of whole email body = item.Body,
               //use this one
