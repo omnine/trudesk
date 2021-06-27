@@ -457,6 +457,32 @@ function openSentFolder (beginTime, endTime, callback) {
       additionalProps.push(ews.ItemSchema.UniqueBody)
       var propertySet = new ews.PropertySet(ews.BasePropertySet.FirstClassProperties, additionalProps)
       for (const item of response.items) {
+        //we have to await here otherwise the following callback won't be done as expected.
+        await item.Load(propertySet)      
+        // bypass the sent emails triggered by posting the comment in Portal
+        //also skip the message which the subject doesn't contain 'DISSUE'
+        if (!item.InternetMessageId.startsWith('omnine')) {
+          // does it always have Message-Id?
+          var tid = getTID(item.Subject)
+          if (tid != null) {
+            var message = {}
+//              message.from = item.From.Address
+//            In Sent folder we should swap from and to, otherwise will have "warn: No User found", we use the first one, 
+            var recips = item.ToRecipients.Items
+            message.from = recips[0].Address
+            message.subject = item.Subject
+            message.body = toMD(item.UniqueBody) // only replied email body instead of whole email body = item.Body,
+            //use this one
+            message.inReplyTo = item.inReplyTo
+            //                message.references = item.References
+            message.messageId = item.InternetMessageId
+            message.tid = tid
+            message.folder = 'SENT'
+            ewsCheck.messages.push(message)
+          }
+        }
+      
+        /*
         item.Load(propertySet).then(function () {
           // bypass the sent emails triggered by posting the comment in Portal
           //also skip the message which the subject doesn't contain 'DISSUE'
@@ -481,6 +507,7 @@ function openSentFolder (beginTime, endTime, callback) {
             }
           }
         })
+        */
       }
       return callback(null, endTime)
     },
