@@ -363,6 +363,22 @@ function openInboxFolder (beginTime, endTime, callback) {
       additionalProps.push(ews.ItemSchema.UniqueBody)
       var propertySet = new ews.PropertySet(ews.BasePropertySet.FirstClassProperties, additionalProps)
       for (const item of response.items) {
+        await item.Load(propertySet)
+        
+        var tid = getTID(item.Subject)
+        if (tid != null) {
+          var message = {}
+          message.from = item.From.Address
+          message.subject = item.Subject
+
+          message.body = toMD(item.UniqueBody)
+          message.tid = tid
+          message.messageId = item.InternetMessageId
+          message.folder = 'INBOX'
+          ewsCheck.messages.push(message)
+        }
+        
+        /*
         item.Load(propertySet).then(function () {
           var tid = getTID(item.Subject)
           if (tid != null) {
@@ -377,6 +393,7 @@ function openInboxFolder (beginTime, endTime, callback) {
             ewsCheck.messages.push(message)
           }
         })
+        */
         item.IsRead = true
         item.Update(ews.ConflictResolutionMode.AutoResolve)
       }
