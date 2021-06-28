@@ -134,12 +134,15 @@ function bindEWSReady () {
 }
 
 ewsCheck.fetchMail = function () {
+  ewsCheck.messages = []
   // Runs the tasks array of functions in series
   async.waterfall([generateTimeRange, openInboxFolder, openSentFolder], function (err, endTime) {
     // result now equals 'done'
     var settingUtil = require('../settings/settingsUtil')
-    settingUtil.setSetting('mailer:check:last_fetch', endTime, function (err) {})
-    handleMessages(ewsCheck.messages, function () {})
+    settingUtil.setSetting('mailer:check:last_fetch', endTime, function (err) {}) // in theory it should be done after handleMessages
+    handleMessages(ewsCheck.messages, function () {
+      ewsCheck.messages = [] //empty the array, not necessary if we did it before waterfall.
+    })
   })
 }
 
