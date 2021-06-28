@@ -92,19 +92,18 @@ EWS in node,  the best one https://github.com/gautamsi/ews-javascript-api
 ```
 
 ### To Do
-- overhaul to typescript projec, https://dev.to/animo/convert-an-express-nodejs-app-from-javascript-to-typescript-302l
+- Overhaul to typescript projec, https://dev.to/animo/convert-an-express-nodejs-app-from-javascript-to-typescript-302l
 - After applying typesense setting, the service needs reboot
 - Package, [pkg](https://github.com/vercel/pkg) or [nexe](https://github.com/nexe/nexe)?
 - upgrade to the latest software.
 - Review access control, src/permissions, is it enough? do we need casbin as the replacement?
 - Review socket.io, src/socketserver.js
 - send email when the customers use the portal to create a ticket and comment
-- Elastic new javascript client. Currently it is using the legacy one.
 - TypeSense: decide the final collection schema
 - Knowledge Base, candidates: Raneto, Outline
 - License Control/Activation https://github.com/Cryptolens/cryptolens-nodejs
 - Deployment on Windows
-As a commecial on-premise product, Windows OS might be the favourite choice.
+- As a commecial on-premise product, Windows OS might be the favourite choice.
 
 Node.js run as windows service OK, https://github.com/coreybutler/node-windows  
 Typesense: Unfortunately it only provides docker version.  

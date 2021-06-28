@@ -129,7 +129,7 @@ function bindEWSReady () {
     )
     exch.XHRApi = xhr
     ewsCheck.exchService = exch
-    ewsCheck.fetchMail()
+    //    ewsCheck.fetchMail()
   })
 }
 
@@ -362,23 +362,34 @@ function openInboxFolder (beginTime, endTime, callback) {
       var additionalProps = [] // In order to load UniqueBody
       additionalProps.push(ews.ItemSchema.UniqueBody)
       var propertySet = new ews.PropertySet(ews.BasePropertySet.FirstClassProperties, additionalProps)
+      promises = []
       for (const item of response.items) {
-        await item.Load(propertySet)
-        
-        var tid = getTID(item.Subject)
-        if (tid != null) {
-          var message = {}
-          message.from = item.From.Address
-          message.subject = item.Subject
+        promises.push(item.Load(propertySet))
+      }
+      Promise.all(promises).then(srcs => {
+        for (const src of srcs) {
+          item = src.responses[0].item
+          var tid = getTID(item.Subject)
+          if (tid != null) {
+            var message = {}
+            message.from = item.From.Address
+            message.subject = item.Subject
 
-          message.body = toMD(item.UniqueBody)
-          message.tid = tid
-          message.messageId = item.InternetMessageId
-          message.folder = 'INBOX'
-          ewsCheck.messages.push(message)
+            message.body = toMD(item.UniqueBody)
+            message.tid = tid
+            message.messageId = item.InternetMessageId
+            message.folder = 'INBOX'
+            ewsCheck.messages.push(message)
+
+            item.IsRead = true
+            item.Update(ews.ConflictResolutionMode.AutoResolve)
+          }
         }
-        
-        /*
+
+        return callback(null, beginTime, endTime)
+      })
+
+      /*
         item.Load(propertySet).then(function () {
           var tid = getTID(item.Subject)
           if (tid != null) {
@@ -394,10 +405,6 @@ function openInboxFolder (beginTime, endTime, callback) {
           }
         })
         */
-        item.IsRead = true
-        item.Update(ews.ConflictResolutionMode.AutoResolve)
-      }
-      return callback(null, beginTime, endTime)
     },
     function (err) {
       // do something with error
@@ -473,33 +480,43 @@ function openSentFolder (beginTime, endTime, callback) {
       var additionalProps = [] // In order to load UniqueBody
       additionalProps.push(ews.ItemSchema.UniqueBody)
       var propertySet = new ews.PropertySet(ews.BasePropertySet.FirstClassProperties, additionalProps)
+
+      promises = []
       for (const item of response.items) {
-        //we have to await here otherwise the following callback won't be done as expected.
-        await item.Load(propertySet)      
-        // bypass the sent emails triggered by posting the comment in Portal
-        //also skip the message which the subject doesn't contain 'DISSUE'
-        if (!item.InternetMessageId.startsWith('omnine')) {
-          // does it always have Message-Id?
-          var tid = getTID(item.Subject)
-          if (tid != null) {
-            var message = {}
-//              message.from = item.From.Address
-//            In Sent folder we should swap from and to, otherwise will have "warn: No User found", we use the first one, 
-            var recips = item.ToRecipients.Items
-            message.from = recips[0].Address
-            message.subject = item.Subject
-            message.body = toMD(item.UniqueBody) // only replied email body instead of whole email body = item.Body,
-            //use this one
-            message.inReplyTo = item.inReplyTo
-            //                message.references = item.References
-            message.messageId = item.InternetMessageId
-            message.tid = tid
-            message.folder = 'SENT'
-            ewsCheck.messages.push(message)
+        promises.push(item.Load(propertySet))
+      }
+      Promise.all(promises).then(srcs => {
+        //ServiceResponseCollection
+        for (const src of srcs) {
+          item = src.responses[0].item // don't know why [0]
+          // bypass the sent emails triggered by posting the comment in Portal
+          //also skip the message which the subject doesn't contain 'DISSUE'
+          if (!item.InternetMessageId.startsWith('omnine')) {
+            // does it always have Message-Id?
+            var tid = getTID(item.Subject)
+            if (tid != null) {
+              var message = {}
+              //              message.from = item.From.Address
+              //            In Sent folder we should swap from and to, otherwise will have "warn: No User found", we use the first one,
+              var recips = item.ToRecipients.Items
+              message.from = recips[0].Address
+              message.subject = item.Subject
+              message.body = toMD(item.UniqueBody) // only replied email body instead of whole email body = item.Body,
+              //use this one
+              message.inReplyTo = item.inReplyTo
+              //                message.references = item.References
+              message.messageId = item.InternetMessageId
+              message.tid = tid
+              message.folder = 'SENT'
+              ewsCheck.messages.push(message)
+            }
           }
         }
-      
-        /*
+
+        return callback(null, endTime)
+      })
+
+      /*
         item.Load(propertySet).then(function () {
           // bypass the sent emails triggered by posting the comment in Portal
           //also skip the message which the subject doesn't contain 'DISSUE'
@@ -525,8 +542,6 @@ function openSentFolder (beginTime, endTime, callback) {
           }
         })
         */
-      }
-      return callback(null, endTime)
     },
     function (error) {
       return callback(error, endTime)
