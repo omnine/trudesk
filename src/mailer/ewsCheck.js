@@ -129,7 +129,7 @@ function bindEWSReady () {
     )
     exch.XHRApi = xhr
     ewsCheck.exchService = exch
-    //    ewsCheck.fetchMail()
+    ewsCheck.fetchMail()
   })
 }
 
