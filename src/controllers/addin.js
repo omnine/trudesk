@@ -162,4 +162,30 @@ addinController.email2Case = function (req, res) {
   )
 }
 
+//Covert conversations into a ticket plus comments, todo
+addinController.conversations2Case = function (req, res) {
+  var message = req.body
+  var additionalProps = [] // In order to load UniqueBody
+  additionalProps.push(ews.ItemSchema.Subject)
+  additionalProps.push(ews.ItemSchema.DateTimeReceived)
+  var propertySet = new ews.PropertySet(ews.BasePropertySet.FirstClassProperties, additionalProps)
+  // Identify the folders to ignore.
+  foldersToIgnore = [ews.WellKnownFolderName.DeletedItems, ews.WellKnownFolderName.Drafts]
+
+  ewsCheck.exchService
+    .GetConversationItems(
+      message.conversationId,
+      propertySet,
+      null,
+      foldersToIgnore,
+      ews.ConversationSortOrder.TreeOrderDescending
+    )
+    .then(result => {})
+}
+
+//Add the email as a comment of a ticker, todo
+addinController.emai2Comment = function (req, res) {
+  var message = req.body
+}
+
 module.exports = addinController
