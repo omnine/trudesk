@@ -84,6 +84,15 @@ function escapeHtml (str) {
     .replace(/'/g, "'")
 }
 
+// todo
+export async function email2Comment () {
+  // get the ticket no from input
+}
+
+export async function conversations2Case () {
+  // get MailItem.ConversationID as the paramter, https://docs.microsoft.com/en-us/office/vba/api/outlook.mailitem.conversationid
+}
+
 /*
  * call the API to create a new ticket.
  */
