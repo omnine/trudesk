@@ -196,16 +196,8 @@ esac
 
 echo -e ""
 
-read -r -p "Do you want to install Nginx locally? [y/N]: " response </dev/tty
-
-case $response in
-[yY]*)
-  start_spinner "${YELLOW}Installing Nginx${NC}"
-  apt-get update > /dev/null;
-  apt-get install nginx
-  stop_spinner $?
-  ;;
-esac
+# Nginx should be installed with letsencrypt
+# https://www.digitalocean.com/community/tutorials/how-to-secure-nginx-with-let-s-encrypt-on-ubuntu-20-04
 
 
 read -r -p "Do you want to install Typesensesearch locally? [y/N]: " response </dev/tty

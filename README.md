@@ -36,6 +36,8 @@ Password: password
 **Trudesk** is built with <a href="https://nodejs.org">nodejs</a> and <a href="https://mongodb.org">mongodb</a> and can run on any cloud provider, docker, bare-metal, or even a raspberry pi.
 Take it for a spin on Ubuntu 16.04 with a one liner - <br />`curl -L -s https://files.trudesk.io/install/install_ubuntu.sh | sudo bash`
 
+As we removed the folder `public/js` in git,  we need to run `yarn run webpackdist`. For dev client `yarn run webpackdev`.
+
 ### Documentation
 Online documentation: [https://docs.trudesk.io/docs](https://docs.trudesk.io/docs)
 
