@@ -180,7 +180,7 @@ class TypesensesearchSettingsContainer extends React.Component {
         this.inSyncText = 'Unknown'
         this.inSyncClass = ''
         if (err.error && err.error.message) helpers.UI.showSnackbar('Error: ' + err.error.message, true)
-        else helpers.UI.showSnackbar('Error: An unknown error occurred. Check Console.', true)
+        else helpers.UI.showSnackbar('Error: An unknown error occurred. Check Console. May need to restart Trudesk service', true)
         Log.error(err)
       })
   }
@@ -205,7 +205,7 @@ class TypesensesearchSettingsContainer extends React.Component {
           })
           .catch(function (err) {
             Log.error('[trudesk:settings:ts:RebuildIndex]', err)
-            helpers.UI.showSnackbar('Error: An unknown error occurred. Check Console.', true)
+            helpers.UI.showSnackbar('Error: An unknown error occurred. Check Console. May need to restart Trudesk service', true)
           })
       },
       {
