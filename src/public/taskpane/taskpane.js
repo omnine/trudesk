@@ -14,6 +14,7 @@ Office.onReady(info => {
     //    document.getElementById("app-body").style.display = "flex";
     document.getElementById('run').onclick = run
     document.getElementById('convert').onclick = email2Case
+    document.getElementById('convert-conversation').onclick = conversations2Case
     document.getElementById('exchid').onclick = getExchID
 
     $('#apikey').on('input', function () {
@@ -91,8 +92,6 @@ export async function email2Comment () {
 
 export async function conversations2Case () {
   // get MailItem.ConversationID as the paramter, https://docs.microsoft.com/en-us/javascript/api/outlook/office.messageread?view=outlook-js-1.5&preserve-view=true#conversationId
-  Office.context.mailbox.conversationId
-
   var item = Office.context.mailbox.item
   let data = {
     conversationId: item.conversationId
@@ -247,6 +246,7 @@ function getExchangeToken () {
         userAPIToken = result.token
         //enable the convert button, only when api token is available, which is necessary to make API call.
         document.getElementById('convert').disabled = false
+        document.getElementById('convert-conversation').disabled = false
         $('#message').html('Logged in as: ' + result.email)
       }
     })
