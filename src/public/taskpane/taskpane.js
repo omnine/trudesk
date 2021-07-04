@@ -90,7 +90,37 @@ export async function email2Comment () {
 }
 
 export async function conversations2Case () {
-  // get MailItem.ConversationID as the paramter, https://docs.microsoft.com/en-us/office/vba/api/outlook.mailitem.conversationid
+  // get MailItem.ConversationID as the paramter, https://docs.microsoft.com/en-us/javascript/api/outlook/office.messageread?view=outlook-js-1.5&preserve-view=true#conversationId
+  Office.context.mailbox.conversationId
+
+  var item = Office.context.mailbox.item
+  let data = {
+    conversationId: item.conversationId
+  }
+
+  $.ajax({
+    url: 'https://helpdesk.deepnetsecurity.com/conversations2case',
+    method: 'POST',
+    dataType: 'json',
+    crossDomain: true,
+    contentType: 'application/json; charset=utf-8',
+    data: JSON.stringify(data),
+    cache: false,
+    beforeSend: function (xhr) {
+      /* Authorization header */
+      xhr.setRequestHeader('accesstoken', userAPIToken)
+    },
+    success: function (result) {
+      window.location.href = 'https://helpdesk.deepnetsecurity.com/tickets/' + result.uid
+    },
+    error: function (xhr, status, error) {
+      //show this block to allow change API Token
+      $('#group_apikey').show()
+      $('#message').html('Result: ' + xhr.status + ' ' + xhr.statusText)
+
+      //remove cookies as well to avoid wrong csrf check
+    }
+  })
 }
 
 /*

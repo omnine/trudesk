@@ -29,10 +29,17 @@
         <button class="ms-font-xl" id="convert" onclick="email2Case()" disabled>Convert</button>
     </section>
     <section id="sideload-msg" class="ms-welcome__main">
-        <button class="ms-font-xl" id="convert-conversation" onclick="email2Case()" disabled>Convert the whole conversation</button>
+        <button class="ms-font-xl" id="convert-conversation" onclick="conversations2Case()" disabled>Convert the whole conversation</button>
     </section>
     <section id="sideload-msg" class="ms-welcome__main">
-        <button class="ms-font-xl" id="convert-comment" onclick="email2Case()" disabled>Add it as a comment</button>
+        <form action="/email2comment" id="email2comment" method="post">
+            <div class="uk-margin-medium-bottom">
+                <label for="code">Ticket Number</label>
+                <input type="text" id="code" class="md-input" name="code" />
+            </div>
+
+            <button class="btn no-ajaxy md-btn md-btn-flat md-btn-wave md-btn-flat-danger" type="submit">Add it as a comment</button>
+        </form>
     </section>    
 
     <main id="app-body" class="ms-welcome__main" style="display: none;">

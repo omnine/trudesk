@@ -61,6 +61,8 @@ function mainRoutes (router, middleware, controllers) {
 
   // Addin
   router.post('/email2case', middleware.redirectToLogin, controllers.addin.email2Case)
+  router.post('/conversations2case', middleware.redirectToLogin, controllers.addin.conversations2Case)
+  router.post('/email2comment', middleware.redirectToLogin, controllers.addin.email2Comment)
 
   // Public
   router.get('/newissue', controllers.tickets.pubNewIssue)

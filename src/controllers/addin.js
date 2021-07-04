@@ -184,7 +184,7 @@ addinController.conversations2Case = function (req, res) {
 }
 
 //Add the email as a comment of a ticker, todo
-addinController.emai2Comment = function (req, res) {
+addinController.email2Comment = function (req, res) {
   var message = req.body
 }
 
