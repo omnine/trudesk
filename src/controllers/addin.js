@@ -21,6 +21,7 @@ var userSchema = require('../models/user')
 var groupSchema = require('../models/group')
 var ticketTypeSchema = require('../models/tickettype')
 var ews = require('ews-javascript-api')
+var ewsCheck = require('../mailer/ewsCheck')
 
 var addinController = {}
 
@@ -146,7 +147,6 @@ addinController.email2Case = function (req, res) {
         function (ticket, callback) {
           var subject = message.subject
           subject = '[DISSUE#' + ticket.handleCreateTicket.uid + ']-' + subject
-          var ewsCheck = require('../mailer/ewsCheck')
           ews.EmailMessage.Bind(ewsCheck.exchService, new ews.ItemId(message.itemId)).then(function (email) {
             email.SetSubject(subject)
             email.Update(ews.ConflictResolutionMode.AlwaysOverwrite) //2
@@ -163,14 +163,18 @@ addinController.email2Case = function (req, res) {
 }
 
 //Covert conversations into a ticket plus comments, todo
+//https://github.com/MicrosoftDocs/office-developer-exchange-docs/blob/master/docs/exchange-web-services/how-to-work-with-conversations-by-using-ews-in-exchange.md
 addinController.conversations2Case = function (req, res) {
-  var message = req.body
-  var additionalProps = [] // In order to load UniqueBody
-  additionalProps.push(ews.ItemSchema.Subject)
-  additionalProps.push(ews.ItemSchema.DateTimeReceived)
-  var propertySet = new ews.PropertySet(ews.BasePropertySet.FirstClassProperties, additionalProps)
+  var message = req.body // Only contain conversationId
+  var propertySet = new ews.PropertySet(ews.BasePropertySet.IdOnly, [
+    ews.ItemSchema.Subject,
+    ews.ItemSchema.DateTimeReceived
+  ])
   // Identify the folders to ignore.
-  foldersToIgnore = [ews.WellKnownFolderName.DeletedItems, ews.WellKnownFolderName.Drafts]
+
+  var folder1 = new ews.FolderId(ews.WellKnownFolderName.DeletedItems)
+  var folder2 = new ews.FolderId(ews.WellKnownFolderName.Drafts)
+  foldersToIgnore = [folder1, folder2]
 
   ewsCheck.exchService
     .GetConversationItems(
@@ -180,7 +184,9 @@ addinController.conversations2Case = function (req, res) {
       foldersToIgnore,
       ews.ConversationSortOrder.TreeOrderDescending
     )
-    .then(result => {})
+    .then(result => {
+      winston.info('what is it')
+    })
 }
 
 //Add the email as a comment of a ticker, todo
