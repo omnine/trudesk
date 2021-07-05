@@ -176,16 +176,17 @@ addinController.conversations2Case = function (req, res) {
   var folder2 = new ews.FolderId(ews.WellKnownFolderName.Drafts)
   foldersToIgnore = [folder1, folder2]
 
+  var cid = new ews.ConversationId(message.conversationId)
+
   ewsCheck.exchService
-    .GetConversationItems(
-      message.conversationId,
-      propertySet,
-      null,
-      foldersToIgnore,
-      ews.ConversationSortOrder.TreeOrderDescending
-    )
-    .then(result => {
-      winston.info('what is it')
+    .GetConversationItems(cid, propertySet, null, foldersToIgnore, ews.ConversationSortOrder.TreeOrderDescending)
+    .then(response => {
+      response.ConversationNodes.Items.forEach(node => {
+        // Process each item in the conversation node.
+        node.Items.forEach(item => {
+          winston.info('what is it %s', item.Subject)
+        })
+      })
     })
 }
 
