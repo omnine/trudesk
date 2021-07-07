@@ -166,10 +166,17 @@ addinController.email2Case = function (req, res) {
 //https://github.com/MicrosoftDocs/office-developer-exchange-docs/blob/master/docs/exchange-web-services/how-to-work-with-conversations-by-using-ews-in-exchange.md
 addinController.conversations2Case = function (req, res) {
   var message = req.body // Only contain conversationId
+
+  /*
   var propertySet = new ews.PropertySet(ews.BasePropertySet.IdOnly, [
     ews.ItemSchema.Subject,
     ews.ItemSchema.DateTimeReceived
   ])
+*/
+
+  var additionalProps = [] // In order to load UniqueBody
+  additionalProps.push(ews.ItemSchema.UniqueBody)
+  var propertySet = new ews.PropertySet(ews.BasePropertySet.FirstClassProperties, additionalProps)
   // Identify the folders to ignore.
 
   var folder1 = new ews.FolderId(ews.WellKnownFolderName.DeletedItems)

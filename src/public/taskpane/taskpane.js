@@ -246,7 +246,7 @@ function getExchangeToken () {
         userAPIToken = result.token
         //enable the convert button, only when api token is available, which is necessary to make API call.
         document.getElementById('convert').disabled = false
-        //        document.getElementById('convert-conversation').disabled = false
+        document.getElementById('convert-conversation').disabled = false
         $('#message').html('Logged in as: ' + result.email)
       }
     })
