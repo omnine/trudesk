@@ -553,7 +553,7 @@ function openSentFolder (beginTime, endTime, callback) {
 }
 
 // use cheerio? just like in mailCheck.js?
-function toMD (messageBody) {
+ewsCheck.toMD = function (messageBody) {
   if (messageBody.BodyType == ews.BodyType.HTML) {
     // For Node.js
     var TurndownService = require('turndown')

@@ -191,6 +191,7 @@ addinController.conversations2Case = function (req, res) {
       response.ConversationNodes.Items.forEach(node => {
         // Process each item in the conversation node.
         node.Items.forEach(item => {
+          var content = ewsCheck.toMD(item.UniqueBody) // convert to markdown, much smaller and easier for indexing
           winston.info('what is it %s', item.Subject)
         })
       })
