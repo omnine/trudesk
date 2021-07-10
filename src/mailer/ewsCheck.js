@@ -10,7 +10,7 @@
  *  ========================================================================
  *  Author:     Omnine
  *  Updated:    1/20/21 4:43 PM
- *  Copyright (c) 2014-2019. All rights reserved.
+ *  Copyright (c) 2021-2022. All rights reserved.
  *  Use EWS to check email on Exchange server
  */
 
