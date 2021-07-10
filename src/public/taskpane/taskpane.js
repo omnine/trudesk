@@ -88,6 +88,29 @@ function escapeHtml (str) {
 // todo
 export async function email2Comment () {
   // get the ticket no from input
+  var tid = document.getElementById('ticket').value
+  var item = Office.context.mailbox.item
+  let data = {
+    itemId: item.itemId,
+    tid: tid
+  }
+  $.ajax({
+    url: 'https://helpdesk.deepnetsecurity.com/email2comment',
+    method: 'POST',
+    dataType: 'json',
+    crossDomain: true,
+    contentType: 'application/json; charset=utf-8',
+    data: JSON.stringify(data),
+    cache: false,
+    success: function (result) {
+      window.location.href = 'https://helpdesk.deepnetsecurity.com/tickets/' + tid
+    },
+    error: function (xhr, status, error) {
+      //show this block to allow change API Token
+      $('#group_apikey').show()
+      $('#message').html('Result: ' + xhr.status + ' ' + xhr.statusText)
+    }
+  })
 }
 
 export async function conversations2Case () {
