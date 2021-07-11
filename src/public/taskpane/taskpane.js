@@ -15,6 +15,7 @@ Office.onReady(info => {
     document.getElementById('run').onclick = run
     document.getElementById('convert').onclick = email2Case
     document.getElementById('convert-conversation').onclick = conversations2Case
+    document.getElementById('convert-comment').onclick = email2Comment
     document.getElementById('exchid').onclick = getExchID
 
     $('#apikey').on('input', function () {

@@ -32,14 +32,12 @@
         <button class="ms-font-xl" id="convert-conversation" onclick="conversations2Case()" disabled>Convert the whole conversation</button>
     </section>
     <section id="sideload-msg" class="ms-welcome__main">
-        <form action="/email2comment" id="email2comment" method="post">
-            <div class="uk-margin-medium-bottom" disabled>
-                <label for="code">Ticket Number</label>
-                <input type="text" id="ticket" class="md-input" name="code" />
+            <div class="uk-margin-medium-bottom">
+                <label for="tid">Ticket Number</label>
+                <input type="text" id="ticket" class="md-input" name="tid" />
             </div>
+            <button class="ms-font-xl" id="convert-comment" onclick="email2Comment()">Add it as a comment</button>
 
-            <button class="btn no-ajaxy md-btn md-btn-flat md-btn-wave md-btn-flat-danger" type="submit" disabled>Add it as a comment</button>
-        </form>
     </section>    
 
     <main id="app-body" class="ms-welcome__main" style="display: none;">

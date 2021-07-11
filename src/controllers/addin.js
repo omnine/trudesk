@@ -250,12 +250,16 @@ addinController.email2Comment = function (req, res) {
       // todo define error code list, also i18n
       res.json({ error: 101, message: 'cannot find the ticket' }) // todo does err contain something
     } else {
-      var propertySet = new ews.PropertySet(ews.ItemSchema.UniqueBody)
+      if (ticket === null) {
+        res.json({ error: 101, message: 'cannot find the ticket' })
+      } else {
+        var propertySet = new ews.PropertySet(ews.ItemSchema.UniqueBody)
 
-      ews.EmailMessage.Bind(ewsCheck.exchService, new ews.ItemId(message.itemId), propertySet).then(function (email) {
-        appendEmail(email, ticket)
-        res.json({ error: 0 })
-      })
+        ews.EmailMessage.Bind(ewsCheck.exchService, new ews.ItemId(message.itemId), propertySet).then(function (email) {
+          appendEmail(email, ticket)
+          res.json({ error: 0 })
+        })
+      }
     }
   })
 }
