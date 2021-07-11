@@ -103,7 +103,11 @@ export async function email2Comment () {
     data: JSON.stringify(data),
     cache: false,
     success: function (result) {
-      window.location.href = 'https://helpdesk.deepnetsecurity.com/tickets/' + tid
+      if (result.error == 0) {
+        window.location.href = 'https://helpdesk.deepnetsecurity.com/tickets/' + tid
+      } else {
+        $('#message').html('Result: ' + result.message)
+      }
     },
     error: function (xhr, status, error) {
       //show this block to allow change API Token

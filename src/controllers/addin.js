@@ -173,14 +173,18 @@ function createTicket (email) {
           ews.EmailMessage.Bind(ewsCheck.exchService, new ews.ItemId(message.itemId)).then(function (email) {
             email.SetSubject(subject)
             email.Update(ews.ConflictResolutionMode.AlwaysOverwrite) //2
-            return callback(null)
+            return callback(null, ticket)
           })
         }
       ]
     },
-    function (err) {
-      if (err) winston.warn(err)
-      return done(err)
+    function (err, ticket) {
+      if (err) {
+        winston.warn(err)
+        return null
+      }
+
+      return ticket
     }
   )
 }
@@ -242,12 +246,17 @@ addinController.conversations2Case = function (req, res) {
 addinController.email2Comment = function (req, res) {
   var message = req.body
   Ticket.getSimpleTicketByUid(message.tid, function (err, ticket) {
-    var propertySet = new ews.PropertySet(ews.ItemSchema.UniqueBody)
+    if (err) {
+      // todo define error code list, also i18n
+      res.json({ error: 101, message: 'cannot find the ticket' }) // todo does err contain something
+    } else {
+      var propertySet = new ews.PropertySet(ews.ItemSchema.UniqueBody)
 
-    ews.EmailMessage.Bind(ewsCheck.exchService, new ews.ItemId(message.itemId), propertySet).then(function (email) {
-      appendEmail(email, ticket)
-      res.json({ error: 0 })
-    })
+      ews.EmailMessage.Bind(ewsCheck.exchService, new ews.ItemId(message.itemId), propertySet).then(function (email) {
+        appendEmail(email, ticket)
+        res.json({ error: 0 })
+      })
+    }
   })
 }
 
