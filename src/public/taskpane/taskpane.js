@@ -153,6 +153,38 @@ export async function email2Case () {
   document.getElementById('convert').disabled = true
   //debugger;
 
+  //ticket and comment may need to create seperately.
+  var item = Office.context.mailbox.item
+  let data = {
+    itemId: item.itemId
+  }
+
+  $.ajax({
+    url: 'https://helpdesk.deepnetsecurity.com/email2case',
+    method: 'POST',
+    dataType: 'json',
+    crossDomain: true,
+    contentType: 'application/json; charset=utf-8',
+    data: JSON.stringify(data),
+    cache: false,
+    beforeSend: function (xhr) {
+      /* Authorization header */
+      xhr.setRequestHeader('accesstoken', userAPIToken)
+    },
+    success: function (result) {
+      window.location.href = 'https://helpdesk.deepnetsecurity.com/tickets/' + result.uid
+    },
+    error: function (xhr, status, error) {
+      //show this block to allow change API Token
+      $('#group_apikey').show()
+      $('#message').html('Result: ' + xhr.status + ' ' + xhr.statusText)
+
+      //remove cookies as well to avoid wrong csrf check
+    }
+  })
+
+  /*
+
   //Use office.js to get mail body content
   Office.context.mailbox.item.body.getAsync(Office.CoercionType.Html, result => {
     if (result.status === Office.AsyncResultStatus.Failed) {
@@ -179,7 +211,6 @@ export async function email2Case () {
       data: JSON.stringify(data),
       cache: false,
       beforeSend: function (xhr) {
-        /* Authorization header */
         xhr.setRequestHeader('accesstoken', userAPIToken)
       },
       success: function (result) {
@@ -194,6 +225,7 @@ export async function email2Case () {
       }
     })
   })
+  */
 }
 
 function parseJwt (token) {
