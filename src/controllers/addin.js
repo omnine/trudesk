@@ -253,8 +253,9 @@ addinController.email2Comment = function (req, res) {
       if (ticket === null) {
         res.json({ error: 101, message: 'cannot find the ticket' })
       } else {
-        var propertySet = new ews.PropertySet(ews.ItemSchema.UniqueBody)
-
+        var additionalProps = [] // In order to load UniqueBody
+        additionalProps.push(ews.ItemSchema.UniqueBody)
+        var propertySet = new ews.PropertySet(ews.BasePropertySet.FirstClassProperties, additionalProps)
         ews.EmailMessage.Bind(ewsCheck.exchService, new ews.ItemId(message.itemId), propertySet).then(function (email) {
           appendEmail(email, ticket)
           res.json({ error: 0 })
