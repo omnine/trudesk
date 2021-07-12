@@ -228,16 +228,27 @@ addinController.conversations2Case = function (req, res) {
     .then(response => {
       response.ConversationNodes.Items.forEach(node => {
         // Process each item in the conversation node.
-        var ticket = null
-        node.Items.forEach(email => {
-          var content = ewsCheck.toMD(email.UniqueBody) // convert to markdown, much smaller and easier for indexing
-          winston.info('what is it %s', email.Subject)
-          if (ticket === null) {
-            ticket = createTicket(email)
+        if (node.Items.length > 0) {
+          if (node.Items.length == 1) {
+            var email = node.Items[0]
+            createTicket(email)
           } else {
-            appendEmail(email, ticket)
+            const firstMail = node.Items.shift() // get the first one and also remove it from the array
+            async.waterfall(
+              [
+                createTicket,
+                function (items, next) {
+                  node.Items.forEach(email => {
+                    appendEmail(email, ticket)
+                  })
+                }
+              ],
+              function (err, endTime) {
+                // result now equals 'done'
+              }
+            )
           }
-        })
+        }
       })
     })
 }
