@@ -173,11 +173,10 @@ function createTicket (email, conversation, cb) {
         function (ticket, callback) {
           var subject = message.subject
           subject = '[DISSUE#' + ticket.handleCreateTicket.uid + ']-' + subject
-          ews.EmailMessage.Bind(ewsCheck.exchService, new ews.ItemId(message.itemId)).then(function (email) {
-            email.SetSubject(subject)
-            email.Update(ews.ConflictResolutionMode.AlwaysOverwrite) //2
-            return callback(null, ticket)
-          })
+          //email is from the function parameter, we don't need to do ews bind
+          email.SetSubject(subject)
+          email.Update(ews.ConflictResolutionMode.AlwaysOverwrite) //2
+          return callback(null, ticket)
         }
       ]
     },
