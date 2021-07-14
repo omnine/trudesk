@@ -47,7 +47,7 @@ function appendEmail (email, ticket) {
   email.Update(ews.ConflictResolutionMode.AlwaysOverwrite) //2
 }
 
-function createTicket (email) {
+function createTicket (email, conversation, cb) {
   var message = {}
   message.from = email.From.Address
   message.subject = email.Subject
@@ -184,7 +184,7 @@ function createTicket (email) {
         return null
       }
 
-      return ticket
+      return cb(null, ticket, conversation)
     }
   )
 }
@@ -195,7 +195,7 @@ addinController.email2Case = function (req, res) {
   var message = req.body
   var propertySet = new ews.PropertySet(ews.ItemSchema.UniqueBody)
   ews.EmailMessage.Bind(ewsCheck.exchService, new ews.ItemId(message.itemId), propertySet).then(function (email) {
-    createTicket(email)
+    createTicket(email, null)
     res.json({ error: 0 })
   })
 }
@@ -223,33 +223,40 @@ addinController.conversations2Case = function (req, res) {
 
   var cid = new ews.ConversationId(message.conversationId)
 
+  // what is the relationships? nodes/itmes? I saw 3 nodes, each contains one email item
+  // why the order on item is still not right?
+  // Anyway, let us put the items in array, then sort them
+  var emails = []
   ewsCheck.exchService
-    .GetConversationItems(cid, propertySet, null, foldersToIgnore, ews.ConversationSortOrder.TreeOrderDescending)
+    .GetConversationItems(cid, propertySet, null, foldersToIgnore, ews.ConversationSortOrder.DateOrderAscending) // oldest one on the top
     .then(response => {
       response.ConversationNodes.Items.forEach(node => {
         // Process each item in the conversation node.
-        if (node.Items.length > 0) {
-          if (node.Items.length == 1) {
-            var email = node.Items[0]
-            createTicket(email)
-          } else {
-            const firstMail = node.Items.shift() // get the first one and also remove it from the array
-            async.waterfall(
-              [
-                createTicket,
-                function (items, next) {
-                  node.Items.forEach(email => {
-                    appendEmail(email, ticket)
-                  })
-                }
-              ],
-              function (err, endTime) {
-                // result now equals 'done'
-              }
-            )
-          }
-        }
+        node.Items.forEach(item => {
+          emails.push(item)
+        })
       })
+
+      if (node.Items.length == 1) {
+        var email = node.Items[0]
+        createTicket(email, null)
+      } else {
+        const firstMail = node.Items.shift() // get the first one and also remove it from the array
+        async.waterfall(
+          [
+            //https://github.com/caolan/async/issues/14
+            async.apply(createTicket, firstMail, node.Items), // Pass arguments to the first function in waterfall
+            function (ticket, items, callback) {
+              items.forEach(email => {
+                appendEmail(email, ticket)
+              })
+            }
+          ],
+          function (err, endTime) {
+            // result now equals 'done'
+          }
+        )
+      }
     })
 }
 
