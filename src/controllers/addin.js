@@ -51,7 +51,11 @@ function createTicket (email, conversation, cb) {
   var message = {}
   message.from = email.From.Address
   message.subject = email.Subject
-  message.body = email.UniqueBody
+  message.body = ewsCheck.toMD(email.UniqueBody)
+  if (message.body.length == 0) {
+    //the email body may be empty, it will fail the validation on ticket creation
+    message.body = message.subject //use the subject
+  }
   //some fields are mandatory,
   async.auto(
     {
@@ -159,7 +163,6 @@ function createTicket (email, conversation, cb) {
                 ticket: ticket
               })
 
-              res.json({ uid: ticket.uid })
               return callback(null, ticket)
             }
           )
