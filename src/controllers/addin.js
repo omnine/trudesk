@@ -44,7 +44,7 @@ function appendEmail (email, ticket) {
   var subject = '[DISSUE#' + ticket.uid + ']-' + email.Subject
 
   email.SetSubject(subject) // with new subject
-  email.Update(ews.ConflictResolutionMode.AlwaysOverwrite) //2
+  email.Update(ews.ConflictResolutionMode.AlwaysOverwrite) //sounds like it doesn't work in Sent Items
 }
 
 function createTicket (email, conversation, cb) {
@@ -186,7 +186,7 @@ function createTicket (email, conversation, cb) {
         return null
       }
 
-      return cb(null, ticket, conversation)
+      return cb(null, ticket.handleCreateTicket, conversation) // pay attention to it! handleCreateTicket is the true model
     }
   )
 }
