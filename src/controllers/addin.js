@@ -236,16 +236,18 @@ addinController.conversations2Case = function (req, res) {
           emails.push(item)
         })
       })
+      //sort it with DateTimeCreated
+      emails.sort((a, b) => (a.DateTimeCreated.TotalMilliSeconds > b.DateTimeCreated.TotalMilliSeconds ? 1 : -1))
 
-      if (node.Items.length == 1) {
-        var email = node.Items[0]
+      if (emails.length == 1) {
+        var email = emails[0]
         createTicket(email, null)
       } else {
-        const firstMail = node.Items.shift() // get the first one and also remove it from the array
+        const firstMail = emails.shift() // get the first one and also remove it from the array
         async.waterfall(
           [
             //https://github.com/caolan/async/issues/14
-            async.apply(createTicket, firstMail, node.Items), // Pass arguments to the first function in waterfall
+            async.apply(createTicket, firstMail, emails), // Pass arguments to the first function in waterfall
             function (ticket, items, callback) {
               items.forEach(email => {
                 appendEmail(email, ticket)
