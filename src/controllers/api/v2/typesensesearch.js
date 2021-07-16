@@ -92,7 +92,7 @@ apiTypesenseSearch.search = function (req, res) {
         var obj = {
           q: req.query['q'],
           limit_hits: req.query['limit'],
-          query_by: 'subject,issue,comments,notes' //by default do search in the 4 fields.
+          query_by: 'subject,issue,comments,notes' //by default do search in the 4 fields. According to the doc, The order of the fields is important
           //          'query_by_weights': '1,1,1,1',
           //          'sort_by': '_text_match:desc'
         }
