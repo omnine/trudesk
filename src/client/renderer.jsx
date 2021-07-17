@@ -84,6 +84,17 @@ export default function (store) {
     ReactDOM.render(TeamsContainerWithProvider, document.getElementById('teams-container'))
   }
 
+  if (document.getElementById('owalite-container')) {
+    const OWALiteContainerWithProvider = (
+      <Provider store={store}>
+        <OWALiteContainer />
+      </Provider>
+    )
+
+    ReactDOM.render(OWALiteContainerWithProvider, document.getElementById('owalite-container'))
+  }
+
+
   if (document.getElementById('departments-container')) {
     const TeamsContainerWithProvider = (
       <Provider store={store}>

@@ -240,6 +240,8 @@ define('modules/ajaxify', [
               window.react.dom.unmountComponentAtNode(document.getElementById('groups-container'))
             if (document.getElementById('teams-container'))
               window.react.dom.unmountComponentAtNode(document.getElementById('teams-container'))
+            if (document.getElementById('owalite-container'))
+              window.react.dom.unmountComponentAtNode(document.getElementById('owalite-container'))
             if (document.getElementById('departments-container'))
               window.react.dom.unmountComponentAtNode(document.getElementById('departments-container'))
 

@@ -250,6 +250,9 @@ function mainRoutes (router, middleware, controllers) {
   // Teams
   router.get('/teams', middleware.redirectToLogin, middleware.loadCommonData, controllers.teams.get)
 
+  // Mails
+  router.get('/mails', middleware.redirectToLogin, middleware.loadCommonData, controllers.mails.get)
+
   // Departments
   router.get('/departments', middleware.redirectToLogin, middleware.loadCommonData, controllers.departments.get)
 
