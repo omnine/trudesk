@@ -193,7 +193,7 @@ class Sidebar extends React.Component {
           <SidebarItem text='Teams' icon='wc' href='/teams' class='navTeams' active={activeItem === 'teams'} />
         )}
         {sessionUser && Helpers.canUser('teams:view') && (
-          <SidebarItem text='Mails' icon='wc' href='/mails' class='navTeams' active={activeItem === 'mails'} />
+          <SidebarItem text='Mails' icon='mail' href='/mails' class='navMails' active={activeItem === 'mails'} />
         )}        
         {sessionUser && Helpers.canUser('departments:view') && (
           <SidebarItem
