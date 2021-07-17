@@ -26,15 +26,15 @@ mailController.get = function (req, res) {
   }
 
   var content = {}
-  content.title = 'Teams'
-  content.nav = 'teams'
+  content.title = 'Mails'
+  content.nav = 'mails'
 
   content.data = {}
   content.data.user = req.user
   content.data.common = req.viewdata
   content.data.teams = {}
 
-  return res.render('team', content)
+  return res.render('owalite', content) //must be one of the views under src/views
 }
 
 module.exports = mailController

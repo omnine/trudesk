@@ -22,6 +22,7 @@ import SettingsContainer from 'containers/Settings/SettingsContainer'
 import AccountsContainer from 'containers/Accounts'
 import GroupsContainer from 'containers/Groups'
 import TeamsContainer from 'containers/Teams'
+import OWALiteContainer from 'containers/OWALite'
 import DepartmentsContainer from 'containers/Departments'
 
 export default function (store) {

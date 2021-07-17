@@ -144,10 +144,9 @@ class OWALiteContainer extends React.Component {
     })
 
     return (
-      <div>TODO web mail</div>
       <div>
         <PageTitle
-          title={'Teams'}
+          title={'Emails'}
           shadow={true}
           rightComponent={
             <div className={'uk-grid uk-grid-collapse'}>
