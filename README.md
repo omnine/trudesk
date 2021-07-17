@@ -94,6 +94,7 @@ EWS in node,  the best one https://github.com/gautamsi/ews-javascript-api
 ```
 
 ### To Do
+- Web Mail, so it can be converted a ticket in web console, no need Outlook or OWA, https://www.npmjs.com/package/react-table
 - Language resource file, i18n, properties file or json file? Candidate: https://github.com/mashpie/i18n-node
 - Overhaul to typescript projec, https://dev.to/animo/convert-an-express-nodejs-app-from-javascript-to-typescript-302l
 - After applying typesense setting, the service needs reboot
