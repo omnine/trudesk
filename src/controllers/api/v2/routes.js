@@ -52,6 +52,9 @@ module.exports = function (middleware, router, controllers) {
   router.put('/api/v2/teams/:id', apiv2Auth, apiv2.teams.update)
   router.delete('/api/v2/teams/:id', apiv2Auth, apiv2.teams.delete)
 
+  // OWA
+  router.get('/api/v2/mails', apiv2Auth, apiv2.mails.get)
+
   // Departments
   router.get('/api/v2/departments', apiv2Auth, apiv2.departments.get)
   router.post('/api/v2/departments', apiv2Auth, apiv2.departments.create)
