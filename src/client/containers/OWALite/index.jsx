@@ -75,7 +75,7 @@ class OWALiteContainer extends React.Component {
   }
 
   render () {
-    const tableItems = this.props.teamsState.teams.map(team => {
+    const tableItems = this.props.mailsState.teams.map(team => {
       return (
         <TableRow key={team.get('_id')} className={'vam nbb'}>
           <TableCell style={{ fontWeight: 500, padding: '18px 15px' }}>{team.get('name')}</TableCell>
@@ -151,15 +151,15 @@ class OWALiteContainer extends React.Component {
         <PageContent id={'teams-page-content'} padding={0} paddingBottom={0}>
           <Table
             headers={[
-              <TableHeader key={0} width={'25%'} height={40} text={'Name'} padding={'8px 8px 8px 15px'} />,
-              <TableHeader key={1} width={'50%'} text={'Team Members'} />,
-              <TableHeader key={2} width={130} text={'Team Actions'} />
+              <TableHeader key={0} width={'25%'} height={40} text={'From'} padding={'8px 8px 8px 15px'} />,
+              <TableHeader key={1} width={'50%'} text={'Subject'} />,
+              <TableHeader key={2} width={130} text={'Mail Actions'} />
             ]}
           >
-            {this.props.teamsState.teams.size < 1 && (
+            {this.props.mailsState.teams.size < 1 && (
               <TableRow>
                 <TableCell colSpan={3}>
-                  <h5 style={{ paddingLeft: 8 }}>No Teams</h5>
+                  <h5 style={{ paddingLeft: 8 }}>No Mails</h5>
                 </TableCell>
               </TableRow>
             )}
@@ -172,7 +172,7 @@ class OWALiteContainer extends React.Component {
 }
 
 OWALiteContainer.propTypes = {
-  teamsState: PropTypes.object.isRequired,
+  mailsState: PropTypes.object.isRequired,
   fetchMails: PropTypes.func.isRequired,
   unloadMails: PropTypes.func.isRequired,
   deleteMail: PropTypes.func.isRequired,
@@ -180,7 +180,7 @@ OWALiteContainer.propTypes = {
 }
 
 const mapStateToProps = state => ({
-  teamsState: state.teamsState
+  mailsState: state.mailsState
 })
 
 export default connect(

@@ -15,6 +15,7 @@
 
 var _ = require('lodash')
 var async = require('async')
+var winston = require('winston')
 var ews = require('ews-javascript-api')
 
 var Team = require('../../../models/team')
@@ -47,7 +48,7 @@ apiMails.get = function (req, res) {
     page: page
   }
 
-  var startDate = new ews.DateTime.Now() // convert to the format ews needed.
+  var startDate = ews.DateTime.Now
   startDate = startDate.AddDays(-7) // 1 week
   //      var startDate = new ews.DateTime(2021, 6, 6)
   var greaterThanfilter = new ews.SearchFilter.IsGreaterThanOrEqualTo(
