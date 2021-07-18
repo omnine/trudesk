@@ -15,8 +15,11 @@
 
 var _ = require('lodash')
 var async = require('async')
+var ews = require('ews-javascript-api')
+
 var Team = require('../../../models/team')
 var apiUtils = require('../apiUtils')
+var ewsCheck = require('../../../mailer/ewsCheck')
 
 var apiMails = {}
 
@@ -44,11 +47,37 @@ apiMails.get = function (req, res) {
     page: page
   }
 
-  Team.getWithObject(obj, function (err, results) {
-    if (err) return apiUtils.sendApiError(res, 400, err.message)
+  var startDate = new ews.DateTime.Now() // convert to the format ews needed.
+  startDate = startDate.AddDays(-7) // 1 week
+  //      var startDate = new ews.DateTime(2021, 6, 6)
+  var greaterThanfilter = new ews.SearchFilter.IsGreaterThanOrEqualTo(
+    ews.EmailMessageSchema.DateTimeReceived,
+    startDate
+  )
 
-    return apiUtils.sendApiSuccess(res, { count: results.length, teams: results })
-  })
+  //  var endDate = new ews.DateTime(endTime.valueOf())
+  //  var lessThanfilter = new ews.SearchFilter.IsLessThan(ews.EmailMessageSchema.DateTimeReceived, endDate)
+  //  var filter = new ews.SearchFilter.SearchFilterCollection(ews.LogicalOperator.And, [greaterThanfilter, lessThanfilter])
+
+  const view = new ews.ItemView(50) // big enough
+  ewsCheck.exchService.FindItems(ews.WellKnownFolderName.Inbox, greaterThanfilter, view).then(
+    function (response) {
+      winston.debug('Processing %s Mail in Inbox', response.TotalCount)
+      var results = []
+      for (const item of response.items) {
+        var message = {}
+        message.from = item.From.Address
+        message.subject = item.Subject
+        //      received time and size?
+        results.push(message)
+      }
+      return apiUtils.sendApiSuccess(res, { count: results.length, mails: results })
+    },
+    function (err) {
+      // do something with error
+      if (err) return apiUtils.sendApiError(res, 400, err.message)
+    }
+  )
 }
 
 apiMails.create = function (req, res) {

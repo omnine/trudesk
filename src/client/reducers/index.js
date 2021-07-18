@@ -24,6 +24,7 @@ import tagsSettings from './tagsReducer'
 import accountsState from './accountsReducer'
 import groupsState from './groupsReducer'
 import teamsState from './teamsReducer'
+import mailsState from './mailsReducer'
 import departmentsState from './departmentsReducer'
 import searchState from './searchReducer'
 
@@ -53,6 +54,7 @@ const IndexReducer = combineReducers({
   accountsState,
   groupsState,
   teamsState,
+  mailsState,
   departmentsState,
   settings,
   tagsSettings

@@ -18,7 +18,7 @@ import { handleActions } from 'redux-actions'
 import { CREATE_MAIL, DELETE_MAIL, FETCH_MAILS, UNLOAD_MAILS } from 'actions/types'
 
 const initialState = {
-  teams: List([])
+  mails: List([])
 }
 
 const reducer = handleActions(
@@ -26,33 +26,33 @@ const reducer = handleActions(
     [FETCH_MAILS.SUCCESS]: (state, action) => {
       return {
         ...state,
-        teams: fromJS(action.payload.response.teams)
+        mails: fromJS(action.payload.response.mails)
       }
     },
 
     [CREATE_MAIL.SUCCESS]: (state, action) => {
       const resTeam = action.response.team
-      const withInsertedTeam = state.teams.push(fromJS(resTeam))
+      const withInsertedTeam = state.mails.push(fromJS(resTeam))
       return {
         ...state,
-        teams: withInsertedTeam.sortBy(team => team.get('name'))
+        mails: withInsertedTeam.sortBy(team => team.get('name'))
       }
     },
 
     [DELETE_MAIL.SUCCESS]: (state, action) => {
-      const idx = state.teams.findIndex(t => {
+      const idx = state.mails.findIndex(t => {
         return t.get('_id') === action.payload._id
       })
       return {
         ...state,
-        teams: state.teams.delete(idx)
+        mails: state.mails.delete(idx)
       }
     },
 
     [UNLOAD_MAILS.SUCCESS]: state => {
       return {
         ...state,
-        teams: state.teams.clear()
+        mails: state.mails.clear()
       }
     }
   },
