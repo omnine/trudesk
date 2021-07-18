@@ -54,7 +54,7 @@ class OWALiteContainer extends React.Component {
     this.props.showModal('CREATE_TEAM')
   }
 
-  onDeleteMailClick (_id) {
+  onDeleteMailClick (_id) { //InternetMessageId
     UIKit.modal.confirm(
       `<h2>Are you sure?</h2>
         <p style="font-size: 15px;">
@@ -75,42 +75,11 @@ class OWALiteContainer extends React.Component {
   }
 
   render () {
-    const tableItems = this.props.mailsState.mails.map(team => {
+    const tableItems = this.props.mailsState.mails.map(mail => {
       return (
-        <TableRow key={team.get('_id')} className={'vam nbb'}>
-          <TableCell style={{ fontWeight: 500, padding: '18px 15px' }}>{team.get('name')}</TableCell>
-          <TableCell style={{ padding: '13px 8px 8px 8px' }}>
-            {team.get('members') &&
-              team.get('members').size > 0 &&
-              team
-                .get('members')
-                .filter(user => {
-                  return !user.get('deleted')
-                })
-                .map(user => {
-                  const profilePic = user.get('image') || 'defaultProfile.jpg'
-                  return (
-                    <div
-                      key={user.get('_id')}
-                      className={'uk-float-left uk-position-relative mb-10'}
-                      data-uk-tooltip={'{pos: "bottom"}'}
-                      title={user.get('fullname')}
-                    >
-                      <img
-                        style={{ width: 25, height: 25, marginRight: 5 }}
-                        className={'round'}
-                        src={`/uploads/users/${profilePic}`}
-                        alt={user.get('fullname')}
-                      />
-                      <span
-                        data-user-status-id={user.get('_id')}
-                        className='user-offline uk-border-circle'
-                        style={{ width: 13, height: 13 }}
-                      />
-                    </div>
-                  )
-                })}
-          </TableCell>
+        <TableRow key={mail.get('_id')} className={'vam nbb'}>
+          <TableCell style={{ fontWeight: 500, padding: '18px 15px' }}>{mail.get('from')}</TableCell>
+          <TableCell style={{ padding: '13px 8px 8px 8px' }}>{mail.get('subject')}</TableCell>
           <TableCell style={{ textAlign: 'right', paddingRight: 15 }}>
             <ButtonGroup>
               {helpers.canUser('teams:delete', true) && (
@@ -119,7 +88,7 @@ class OWALiteContainer extends React.Component {
                   style={'danger'}
                   small={true}
                   waves={true}
-                  onClick={() => this.onDeleteMailClick(team.get('_id'))}
+                  onClick={() => this.onDeleteMailClick(mail.get('_id'))}
                 />
               )}
             </ButtonGroup>
