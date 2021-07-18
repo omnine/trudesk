@@ -17,7 +17,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 
-import { fetchTeams, unloadTeams, deleteTeam } from 'actions/teams'
+import { fetchMails, unloadMails, deleteMail } from 'actions/mails'
 import { showModal } from 'actions/common'
 
 import PageTitle from 'components/PageTitle'
@@ -38,7 +38,7 @@ class OWALiteContainer extends React.Component {
   }
 
   componentDidMount () {
-    this.props.fetchTeams({ page: 0, limit: 1000 })
+    this.props.fetchMails({ page: 0, limit: 1000 })
   }
 
   componentDidUpdate () {
@@ -46,7 +46,7 @@ class OWALiteContainer extends React.Component {
   }
 
   componentWillUnmount () {
-    this.props.unloadTeams()
+    this.props.unloadMails()
   }
 
   onCreateTeamClick (e) {
@@ -54,30 +54,18 @@ class OWALiteContainer extends React.Component {
     this.props.showModal('CREATE_TEAM')
   }
 
-  onEditTeamClick (team) {
-    if (team.members) {
-      team.members = team.members.map(m => {
-        return m._id
-      })
-    } else {
-      team.members = []
-    }
-
-    this.props.showModal('EDIT_TEAM', { team })
-  }
-
-  onDeleteTeamClick (_id) {
+  onDeleteMailClick (_id) {
     UIKit.modal.confirm(
       `<h2>Are you sure?</h2>
         <p style="font-size: 15px;">
             <span class="uk-text-danger" style="font-size: 15px;">This is a permanent action.</span> 
         </p>
         <p style="font-size: 12px;">
-            Agents may lose access to resources once this team is deleted.
+            Agents may lose access to resources once this mail is deleted.
         </p>
         `,
       () => {
-        this.props.deleteTeam({ _id })
+        this.props.deleteMail({ _id })
       },
       {
         labels: { Ok: 'Yes', Cancel: 'No' },
@@ -125,16 +113,13 @@ class OWALiteContainer extends React.Component {
           </TableCell>
           <TableCell style={{ textAlign: 'right', paddingRight: 15 }}>
             <ButtonGroup>
-              {helpers.canUser('teams:update', true) && (
-                <Button text={'Edit'} small={true} waves={true} onClick={() => this.onEditTeamClick(team.toJS())} />
-              )}
               {helpers.canUser('teams:delete', true) && (
                 <Button
                   text={'Delete'}
                   style={'danger'}
                   small={true}
                   waves={true}
-                  onClick={() => this.onDeleteTeamClick(team.get('_id'))}
+                  onClick={() => this.onDeleteMailClick(team.get('_id'))}
                 />
               )}
             </ButtonGroup>
@@ -188,9 +173,9 @@ class OWALiteContainer extends React.Component {
 
 OWALiteContainer.propTypes = {
   teamsState: PropTypes.object.isRequired,
-  fetchTeams: PropTypes.func.isRequired,
-  unloadTeams: PropTypes.func.isRequired,
-  deleteTeam: PropTypes.func.isRequired,
+  fetchMails: PropTypes.func.isRequired,
+  unloadMails: PropTypes.func.isRequired,
+  deleteMail: PropTypes.func.isRequired,
   showModal: PropTypes.func.isRequired
 }
 
@@ -200,5 +185,5 @@ const mapStateToProps = state => ({
 
 export default connect(
   mapStateToProps,
-  { fetchTeams, unloadTeams, deleteTeam, showModal }
+  { fetchMails, unloadMails, deleteMail, showModal }
 )(OWALiteContainer)

@@ -70,6 +70,12 @@ export const SAVE_EDIT_TEAM = defineAction('SAVE_EDIT_TEAM', [PENDING, SUCCESS, 
 export const DELETE_TEAM = defineAction('DELETE_TEAM', [PENDING, SUCCESS, ERROR])
 export const UNLOAD_TEAMS = defineAction('UNLOAD_TEAMS', [SUCCESS])
 
+// Mails
+export const FETCH_MAILS = defineAction('FETCH_MAILS', [PENDING, SUCCESS, ERROR])
+export const CREATE_MAIL = defineAction('CREATE_MAIL', [PENDING, SUCCESS, ERROR])
+export const DELETE_MAIL = defineAction('DELETE_MAIL', [PENDING, SUCCESS, ERROR])
+export const UNLOAD_MAILS = defineAction('UNLOAD_MAILS', [SUCCESS])
+
 // Departments
 export const FETCH_DEPARTMENTS = defineAction('FETCH_DEPARTMENTS', [PENDING, SUCCESS, ERROR])
 export const CREATE_DEPARTMENT = defineAction('CREATE_DEPARTMENT', [PENDING, SUCCESS, ERROR])

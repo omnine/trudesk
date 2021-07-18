@@ -14,7 +14,7 @@
  */
 
 import { call, put, takeLatest } from 'redux-saga/effects'
-import { CREATE_TEAM, DELETE_TEAM, FETCH_TEAMS, HIDE_MODAL, SAVE_EDIT_TEAM, UNLOAD_TEAMS } from 'actions/types'
+import { CREATE_MAIL, DELETE_MAIL, FETCH_MAILS, HIDE_MODAL, UNLOAD_MAILS } from 'actions/types'
 
 import Log from '../../logger'
 import api from '../../api'
@@ -22,64 +22,51 @@ import helpers from 'lib/helpers'
 
 function * fetchMails ({ payload, meta }) {
   try {
-    const response = yield call(api.teams.getWithPage, payload)
-    yield put({ type: FETCH_TEAMS.SUCCESS, payload: { response, payload }, meta })
+    const response = yield call(api.mails.getWithPage, payload)
+    yield put({ type: FETCH_MAILS.SUCCESS, payload: { response, payload }, meta })
   } catch (error) {
     const errorText = error.response ? error.response.data.error : error
     helpers.UI.showSnackbar(`Error: ${errorText}`, true)
     Log.error(errorText, error)
-    yield put({ type: FETCH_TEAMS.ERROR, error })
+    yield put({ type: FETCH_MAILS.ERROR, error })
   }
 }
 
-function * createTeam ({ payload }) {
+function * createMail ({ payload }) {
   try {
-    const response = yield call(api.teams.create, payload)
-    yield put({ type: CREATE_TEAM.SUCCESS, response })
+    const response = yield call(api.mails.create, payload)
+    yield put({ type: CREATE_MAIL.SUCCESS, response })
     yield put({ type: HIDE_MODAL.ACTION })
   } catch (error) {
     const errorText = error.response.data.error
     helpers.UI.showSnackbar(`Error: ${errorText}`, true)
-    yield put({ type: CREATE_TEAM.ERROR, error })
+    yield put({ type: CREATE_MAIL.ERROR, error })
   }
 }
 
-function * updateTeam ({ payload }) {
+function * deleteMail ({ payload }) {
   try {
-    const response = yield call(api.teams.updateTeam, payload)
-    yield put({ type: SAVE_EDIT_TEAM.SUCCESS, response })
-    yield put({ type: HIDE_MODAL.ACTION })
-  } catch (error) {
-    const errorText = error.response.data.error
-    helpers.UI.showSnackbar(`Error: ${errorText}`, true)
-    yield put({ type: SAVE_EDIT_TEAM.ERROR, error })
-  }
-}
-
-function * deleteTeam ({ payload }) {
-  try {
-    const response = yield call(api.teams.deleteTeam, payload)
-    yield put({ type: DELETE_TEAM.SUCCESS, payload, response })
+    const response = yield call(api.mails.deleteMail, payload)
+    yield put({ type: DELETE_MAIL.SUCCESS, payload, response })
   } catch (error) {
     const errorText = error.response ? error.response.data.error : error
     helpers.UI.showSnackbar(`Error: ${errorText}`, true)
     Log.error(errorText, error)
-    yield put({ type: DELETE_TEAM.ERROR, error })
+    yield put({ type: DELETE_MAIL.ERROR, error })
   }
 }
 
 function * unloadThunk ({ payload, meta }) {
   try {
-    yield put({ type: UNLOAD_TEAMS.SUCCESS, payload, meta })
+    yield put({ type: UNLOAD_MAILS.SUCCESS, payload, meta })
   } catch (error) {
     Log.error(error)
   }
 }
 
 export default function * watcher () {
-  yield takeLatest(FETCH_TEAMS.ACTION, fetchMails)
-  yield takeLatest(CREATE_TEAM.ACTION, createTeam)
-  yield takeLatest(SAVE_EDIT_TEAM.ACTION, updateTeam)
-  yield takeLatest(DELETE_TEAM.ACTION, deleteTeam)
-  yield takeLatest(UNLOAD_TEAMS.ACTION, unloadThunk)
+  yield takeLatest(FETCH_MAILS.ACTION, fetchMails)
+  yield takeLatest(CREATE_MAIL.ACTION, createMail)
+  yield takeLatest(DELETE_MAIL.ACTION, deleteMail)
+  yield takeLatest(UNLOAD_MAILS.ACTION, unloadThunk)
 }
