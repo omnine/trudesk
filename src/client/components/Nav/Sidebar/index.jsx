@@ -135,6 +135,9 @@ class Sidebar extends React.Component {
             </Submenu>
           </SidebarItem>
         )}
+        {sessionUser && Helpers.canUser('teams:view') && (
+          <SidebarItem text='Mails' icon='mail' href='/mails' class='navMails' active={activeItem === 'mails'} />
+        )}  
         <SidebarItem
           text='Messages'
           icon='chat'
@@ -192,9 +195,7 @@ class Sidebar extends React.Component {
         {sessionUser && Helpers.canUser('teams:view') && (
           <SidebarItem text='Teams' icon='wc' href='/teams' class='navTeams' active={activeItem === 'teams'} />
         )}
-        {sessionUser && Helpers.canUser('teams:view') && (
-          <SidebarItem text='Mails' icon='mail' href='/mails' class='navMails' active={activeItem === 'mails'} />
-        )}        
+      
         {sessionUser && Helpers.canUser('departments:view') && (
           <SidebarItem
             text='Departments'

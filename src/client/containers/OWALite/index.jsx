@@ -75,7 +75,7 @@ class OWALiteContainer extends React.Component {
   }
 
   render () {
-    const tableItems = this.props.mailsState.teams.map(team => {
+    const tableItems = this.props.mailsState.mails.map(team => {
       return (
         <TableRow key={team.get('_id')} className={'vam nbb'}>
           <TableCell style={{ fontWeight: 500, padding: '18px 15px' }}>{team.get('name')}</TableCell>
@@ -156,7 +156,7 @@ class OWALiteContainer extends React.Component {
               <TableHeader key={2} width={130} text={'Mail Actions'} />
             ]}
           >
-            {this.props.mailsState.teams.size < 1 && (
+            {this.props.mailsState.mails.size < 1 && (
               <TableRow>
                 <TableCell colSpan={3}>
                   <h5 style={{ paddingLeft: 8 }}>No Mails</h5>
