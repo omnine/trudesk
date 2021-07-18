@@ -19,6 +19,7 @@ import TicketSaga from './tickets'
 import AccountSaga from './accounts'
 import GroupSaga from './groups'
 import TeamSaga from './teams'
+import MailSaga from './mails'
 import DepartmentSaga from './departments'
 import SearchSaga from './search'
 
@@ -30,6 +31,7 @@ export default function * IndexSagas () {
     AccountSaga(),
     GroupSaga(),
     TeamSaga(),
+    MailSaga(),
     DepartmentSaga(),
     SearchSaga()
   ])
