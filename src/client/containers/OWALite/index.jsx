@@ -85,15 +85,13 @@ class OWALiteContainer extends React.Component {
         <TableRow key={mail.get('_id')} className={'vam nbb'}>
           <TableCell style={{ fontWeight: 500, padding: '18px 15px' }}>{mail.get('from')}</TableCell>
           <TableCell style={{ padding: '13px 8px 8px 8px' }}>{mail.get('subject')}</TableCell>
-          <TableCell style={{ textAlign: 'right', paddingRight: 15 }}>
+          <TableCell style={{ paddingRight: 5 }}>
             <DropdownTrigger pos={'bottom-right'} offset={5} extraClass={'uk-float-left'}>
               <PageTitleButton fontAwesomeIcon={'fa-tasks'} />
               <Dropdown small={true} width={120}>
-                <DropdownItem text={'Create'} onClick={() => this.props.showModal('CREATE_TICKET')} />
-                <DropdownSeparator />
-                <DropdownItem text={'Set Open'} onClick={() => this.onSetStatus(1)} />
-                <DropdownItem text={'Set Pending'} onClick={() => this.onSetStatus(2)} />
-                <DropdownItem text={'Set Closed'} onClick={() => this.onSetStatus(3)} />
+                <DropdownItem text={'Convert'} onClick={() => this.props.showModal('CREATE_TICKET')} />
+                <DropdownItem text={'Conversation'} onClick={() => this.onSetStatus(1)} />
+                <DropdownItem text={'Comment'} onClick={() => this.onSetStatus(2)} />
                 {helpers.canUser('tickets:delete', true) && <DropdownSeparator />}
                 {helpers.canUser('tickets:delete', true) && (
                   <DropdownItem text={'Delete'} extraClass={'text-danger'} onClick={() => this.onDeleteMailClick(mail.get('_id'))} />
