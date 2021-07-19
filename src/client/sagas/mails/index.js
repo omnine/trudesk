@@ -14,7 +14,15 @@
  */
 
 import { call, put, takeLatest } from 'redux-saga/effects'
-import { CREATE_MAIL, DELETE_MAIL, FETCH_MAILS, HIDE_MODAL, UNLOAD_MAILS, EMAIL_COMMENT } from 'actions/types'
+import {
+  CREATE_MAIL,
+  DELETE_MAIL,
+  READ_MAIL,
+  FETCH_MAILS,
+  HIDE_MODAL,
+  UNLOAD_MAILS,
+  EMAIL_COMMENT
+} from 'actions/types'
 
 import Log from '../../logger'
 import api from '../../api'
@@ -53,6 +61,18 @@ function * email2Comment ({ payload }) {
     const errorText = error.response.data.error
     helpers.UI.showSnackbar(`Error: ${errorText}`, true)
     yield put({ type: EMAIL_COMMENT.ERROR, error })
+  }
+}
+
+function * readMail ({ payload }) {
+  try {
+    const response = yield call(api.mails.readMail, payload)
+    yield put({ type: READ_MAIL.SUCCESS, payload, response })
+  } catch (error) {
+    const errorText = error.response ? error.response.data.error : error
+    helpers.UI.showSnackbar(`Error: ${errorText}`, true)
+    Log.error(errorText, error)
+    yield put({ type: READ_MAIL.ERROR, error })
   }
 }
 

@@ -17,7 +17,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 
-import { fetchMails, unloadMails, deleteMail } from 'actions/mails'
+import { fetchMails, unloadMails, deleteMail, readMail } from 'actions/mails'
 import { showModal } from 'actions/common'
 
 import PageTitle from 'components/PageTitle'
@@ -59,7 +59,7 @@ class OWALiteContainer extends React.Component {
     this.props.showModal('CREATE_TEAM')
   }
 
-  onDeleteMailClick (_id) { //InternetMessageId
+  onDeleteMailClick (_id) { 
     UIKit.modal.confirm(
       `<h2>Are you sure?</h2>
         <p style="font-size: 15px;">
@@ -79,7 +79,7 @@ class OWALiteContainer extends React.Component {
     )
   }
 
-  onConvertConversationClick (_id) { //InternetMessageId
+  onConvertConversationClick (_id) {
     UIKit.modal.confirm(
       `<h2>Are you sure?</h2>
         <p style="font-size: 15px;">
@@ -96,7 +96,7 @@ class OWALiteContainer extends React.Component {
     )
   }
 
-  onConvertEmailClick (_id) { //InternetMessageId
+  onConvertEmailClick (_id) {
     UIKit.modal.confirm(
       `<h2>Are you sure?</h2>
         <p style="font-size: 15px;">
@@ -113,6 +113,9 @@ class OWALiteContainer extends React.Component {
     )
   }
   
+  onReadMailClick (_id) { //ItemId
+    this.props.readMail({ _id })
+  }
 
   render () {
     const tableItems = this.props.mailsState.mails.map(mail => {
@@ -128,6 +131,7 @@ class OWALiteContainer extends React.Component {
                 <DropdownItem text={'Conversation'} onClick={() => this.onConvertConversationClick(mail.get('_id'))} />
                 <DropdownItem text={'Comment'} onClick={() => this.props.showModal('EMAIL_COMMENT',{itemId: mail.get('_id') })} />
                 {helpers.canUser('tickets:delete', true) && <DropdownSeparator />}
+                <DropdownItem text={'Read'} onClick={() => this.onReadMailClick(mail.get('_id'))} />
                 {helpers.canUser('tickets:delete', true) && (
                   <DropdownItem text={'Delete'} extraClass={'text-danger'} onClick={() => this.onDeleteMailClick(mail.get('_id'))} />
                 )}
@@ -175,6 +179,9 @@ class OWALiteContainer extends React.Component {
             )}
             {tableItems}
           </Table>
+          <div>
+            {this.props.mailsState.mailbody}
+          </div>
         </PageContent>
       </div>
     )
@@ -186,6 +193,7 @@ OWALiteContainer.propTypes = {
   fetchMails: PropTypes.func.isRequired,
   unloadMails: PropTypes.func.isRequired,
   deleteMail: PropTypes.func.isRequired,
+  readMail: PropTypes.func.isRequired,
   showModal: PropTypes.func.isRequired
 }
 
@@ -195,5 +203,5 @@ const mapStateToProps = state => ({
 
 export default connect(
   mapStateToProps,
-  { fetchMails, unloadMails, deleteMail, showModal }
+  { fetchMails, unloadMails, deleteMail, readMail, showModal }
 )(OWALiteContainer)

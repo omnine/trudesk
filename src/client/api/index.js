@@ -232,8 +232,14 @@ api.mails.getWithPage = payload => {
   })
 }
 api.mails.email2Comment = payload => {
-  //same payload like in taskpane
+  //same payload like in taskpane, otherwise it should put into /api/v2/mails
   return axios.post('/email2comment', payload).then(res => {
+    return res.data
+  })
+}
+api.mails.readMail = payload => {
+  //same payload like in taskpane
+  return axios.post('/api/v2/mails/read', payload).then(res => {
     return res.data
   })
 }

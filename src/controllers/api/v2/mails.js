@@ -82,6 +82,16 @@ apiMails.get = function (req, res) {
   )
 }
 
+apiMails.read = function (req, res) {
+  var message = req.body
+  if (!message) return apiUtils.sendApiError_InvalidPostData(res)
+  var propertySet = new ews.PropertySet(ews.ItemSchema.Body)
+  ews.EmailMessage.Bind(ewsCheck.exchService, new ews.ItemId(message.itemId), propertySet).then(function (email) {
+    createTicket(email, null)
+    res.json({ error: 0, body: email.Body.Text })
+  })
+}
+
 apiMails.create = function (req, res) {
   var postData = req.body
   if (!postData) return apiUtils.sendApiError_InvalidPostData(res)
