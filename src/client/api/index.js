@@ -232,9 +232,8 @@ api.mails.getWithPage = payload => {
   })
 }
 api.mails.email2Comment = payload => {
-  const limit = payload && payload.limit ? payload.limit : 100
-  const page = payload && payload.page ? payload.page : 0
-  return axios.get(`/api/v2/mails?limit=${limit}&page=${page}`).then(res => {
+  //same payload like in taskpane
+  return axios.post('/email2comment').then(res => {
     return res.data
   })
 }

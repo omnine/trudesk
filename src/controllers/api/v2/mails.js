@@ -67,7 +67,7 @@ apiMails.get = function (req, res) {
       var results = []
       for (const item of response.items) {
         var message = {}
-        message._id = item.InternetMessageId
+        message._id = item.Id.UniqueId
         message.from = item.From.Address
         message.subject = item.Subject
         //      received time and size?

@@ -40,12 +40,7 @@ const reducer = handleActions(
     },
 
     [EMAIL_COMMENT.SUCCESS]: (state, action) => {
-      const resTeam = action.response.team
-      const withInsertedTeam = state.mails.push(fromJS(resTeam))
-      return {
-        ...state,
-        mails: withInsertedTeam.sortBy(team => team.get('name'))
-      }
+      return { ...state }
     },
 
     [DELETE_MAIL.SUCCESS]: (state, action) => {

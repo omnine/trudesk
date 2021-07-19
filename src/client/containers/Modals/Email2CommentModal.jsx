@@ -35,7 +35,7 @@ class Email2CommentModal extends React.Component {
   onEmail2CommentClicked (e) {
     e.preventDefault()
 
-    this.props.email2Comment({ name: this.name })
+    this.props.email2Comment({ tid: this.name, itemId: this.props.itemId})
   }
 
   render () {
@@ -76,6 +76,7 @@ class Email2CommentModal extends React.Component {
 }
 
 Email2CommentModal.propTypes = {
+  itemId: PropTypes.object,
   email2Comment: PropTypes.func.isRequired
 }
 
