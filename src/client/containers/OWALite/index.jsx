@@ -79,6 +79,41 @@ class OWALiteContainer extends React.Component {
     )
   }
 
+  onConvertConversationClick (_id) { //InternetMessageId
+    UIKit.modal.confirm(
+      `<h2>Are you sure?</h2>
+        <p style="font-size: 15px;">
+            <span class="uk-text-danger" style="font-size: 15px;">This will convert the whole email conversation into a ticket and commnets.</span> 
+        </p>
+        `,
+      () => {
+        this.props.deleteMail({ _id })
+      },
+      {
+        labels: { Ok: 'Yes', Cancel: 'No' },
+        confirmButtonClass: 'md-btn-danger'
+      }
+    )
+  }
+
+  onConvertEmailClick (_id) { //InternetMessageId
+    UIKit.modal.confirm(
+      `<h2>Are you sure?</h2>
+        <p style="font-size: 15px;">
+            <span class="uk-text-danger" style="font-size: 15px;">This will convert this email into a ticket.</span> 
+        </p>
+        `,
+      () => {
+        this.props.deleteMail({ _id })
+      },
+      {
+        labels: { Ok: 'Yes', Cancel: 'No' },
+        confirmButtonClass: 'md-btn-danger'
+      }
+    )
+  }
+  
+
   render () {
     const tableItems = this.props.mailsState.mails.map(mail => {
       return (
@@ -89,9 +124,9 @@ class OWALiteContainer extends React.Component {
             <DropdownTrigger pos={'bottom-right'} offset={5} extraClass={'uk-float-left'}>
               <PageTitleButton fontAwesomeIcon={'fa-tasks'} />
               <Dropdown small={true} width={120}>
-                <DropdownItem text={'Convert'} onClick={() => this.props.showModal('CREATE_TICKET')} />
-                <DropdownItem text={'Conversation'} onClick={() => this.onSetStatus(1)} />
-                <DropdownItem text={'Comment'} onClick={() => this.onSetStatus(2)} />
+                <DropdownItem text={'Convert'} onClick={() => this.onConvertEmailClick(mail.get('_id'))} />
+                <DropdownItem text={'Conversation'} onClick={() => this.onConvertConversationClick(mail.get('_id'))} />
+                <DropdownItem text={'Comment'} onClick={() => this.props.showModal('CREATE_TICKET')} />
                 {helpers.canUser('tickets:delete', true) && <DropdownSeparator />}
                 {helpers.canUser('tickets:delete', true) && (
                   <DropdownItem text={'Delete'} extraClass={'text-danger'} onClick={() => this.onDeleteMailClick(mail.get('_id'))} />
