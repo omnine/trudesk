@@ -31,6 +31,11 @@ import TableRow from 'components/Table/TableRow'
 import TableCell from 'components/Table/TableCell'
 import TableHeader from 'components/Table/TableHeader'
 import ButtonGroup from 'components/ButtonGroup'
+import PageTitleButton from 'components/PageTitleButton'
+import DropdownTrigger from 'components/Dropdown/DropdownTrigger'
+import Dropdown from 'components/Dropdown'
+import DropdownItem from 'components/Dropdown/DropdownItem'
+import DropdownSeparator from 'components/Dropdown/DropdownSeperator'
 
 class OWALiteContainer extends React.Component {
   constructor (props) {
@@ -81,17 +86,20 @@ class OWALiteContainer extends React.Component {
           <TableCell style={{ fontWeight: 500, padding: '18px 15px' }}>{mail.get('from')}</TableCell>
           <TableCell style={{ padding: '13px 8px 8px 8px' }}>{mail.get('subject')}</TableCell>
           <TableCell style={{ textAlign: 'right', paddingRight: 15 }}>
-            <ButtonGroup>
-              {helpers.canUser('teams:delete', true) && (
-                <Button
-                  text={'Delete'}
-                  style={'danger'}
-                  small={true}
-                  waves={true}
-                  onClick={() => this.onDeleteMailClick(mail.get('_id'))}
-                />
-              )}
-            </ButtonGroup>
+            <DropdownTrigger pos={'bottom-right'} offset={5} extraClass={'uk-float-left'}>
+              <PageTitleButton fontAwesomeIcon={'fa-tasks'} />
+              <Dropdown small={true} width={120}>
+                <DropdownItem text={'Create'} onClick={() => this.props.showModal('CREATE_TICKET')} />
+                <DropdownSeparator />
+                <DropdownItem text={'Set Open'} onClick={() => this.onSetStatus(1)} />
+                <DropdownItem text={'Set Pending'} onClick={() => this.onSetStatus(2)} />
+                <DropdownItem text={'Set Closed'} onClick={() => this.onSetStatus(3)} />
+                {helpers.canUser('tickets:delete', true) && <DropdownSeparator />}
+                {helpers.canUser('tickets:delete', true) && (
+                  <DropdownItem text={'Delete'} extraClass={'text-danger'} onClick={() => this.onDeleteMailClick(mail.get('_id'))} />
+                )}
+              </Dropdown>
+            </DropdownTrigger>
           </TableCell>
         </TableRow>
       )
