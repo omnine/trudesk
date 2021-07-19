@@ -233,7 +233,7 @@ api.mails.getWithPage = payload => {
 }
 api.mails.email2Comment = payload => {
   //same payload like in taskpane
-  return axios.post('/email2comment').then(res => {
+  return axios.post('/email2comment', payload).then(res => {
     return res.data
   })
 }

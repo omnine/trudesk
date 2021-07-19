@@ -61,7 +61,7 @@ class Email2CommentModal extends React.Component {
           <div className='uk-modal-footer uk-text-right'>
             <Button text={'Close'} extraClass={'uk-modal-close'} flat={true} waves={true} />
             <Button
-              text={'Create'}
+              text={'Convert'}
               type={'button'}
               flat={true}
               waves={true}
