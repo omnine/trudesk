@@ -126,7 +126,7 @@ class OWALiteContainer extends React.Component {
               <Dropdown small={true} width={120}>
                 <DropdownItem text={'Convert'} onClick={() => this.onConvertEmailClick(mail.get('_id'))} />
                 <DropdownItem text={'Conversation'} onClick={() => this.onConvertConversationClick(mail.get('_id'))} />
-                <DropdownItem text={'Comment'} onClick={() => this.props.showModal('CREATE_TICKET')} />
+                <DropdownItem text={'Comment'} onClick={() => this.props.showModal('EMAIL_COMMENT')} />
                 {helpers.canUser('tickets:delete', true) && <DropdownSeparator />}
                 {helpers.canUser('tickets:delete', true) && (
                   <DropdownItem text={'Delete'} extraClass={'text-danger'} onClick={() => this.onDeleteMailClick(mail.get('_id'))} />

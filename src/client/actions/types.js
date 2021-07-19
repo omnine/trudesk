@@ -76,6 +76,8 @@ export const CREATE_MAIL = defineAction('CREATE_MAIL', [PENDING, SUCCESS, ERROR]
 export const DELETE_MAIL = defineAction('DELETE_MAIL', [PENDING, SUCCESS, ERROR])
 export const UNLOAD_MAILS = defineAction('UNLOAD_MAILS', [SUCCESS])
 
+export const EMAIL_COMMENT = defineAction('EMAIL_COMMENT', [PENDING, SUCCESS, ERROR])
+
 // Departments
 export const FETCH_DEPARTMENTS = defineAction('FETCH_DEPARTMENTS', [PENDING, SUCCESS, ERROR])
 export const CREATE_DEPARTMENT = defineAction('CREATE_DEPARTMENT', [PENDING, SUCCESS, ERROR])

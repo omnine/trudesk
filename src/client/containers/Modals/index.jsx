@@ -29,6 +29,7 @@ import AddTagsModal from './AddTagsModal'
 import CreateTicketModal from './CreateTicketModal'
 import CreateRoleModal from './CreateRoleModal'
 import DeleteRoleModal from './DeleteRoleModal'
+import Email2CommentModal from './Email2CommentModal'
 import ViewAllNotificationsModal from './ViewAllNotificationsModal'
 import CreateAccountModal from './CreateAccountModal'
 import EditAccountModal from './EditAccountModal'
@@ -52,6 +53,7 @@ const MODAL_COMPONENTS = {
   ADD_TAGS_MODAL: AddTagsModal,
   CREATE_ROLE: CreateRoleModal,
   DELETE_ROLE: DeleteRoleModal,
+  EMAIL_COMMENT: Email2CommentModal,
   VIEW_ALL_NOTIFICATIONS: ViewAllNotificationsModal,
   CREATE_ACCOUNT: CreateAccountModal,
   EDIT_ACCOUNT: EditAccountModal,

@@ -15,7 +15,7 @@
 
 import { fromJS, List } from 'immutable'
 import { handleActions } from 'redux-actions'
-import { CREATE_MAIL, DELETE_MAIL, FETCH_MAILS, UNLOAD_MAILS } from 'actions/types'
+import { CREATE_MAIL, DELETE_MAIL, FETCH_MAILS, UNLOAD_MAILS, EMAIL_COMMENT } from 'actions/types'
 
 const initialState = {
   mails: List([])
@@ -31,6 +31,15 @@ const reducer = handleActions(
     },
 
     [CREATE_MAIL.SUCCESS]: (state, action) => {
+      const resTeam = action.response.team
+      const withInsertedTeam = state.mails.push(fromJS(resTeam))
+      return {
+        ...state,
+        mails: withInsertedTeam.sortBy(team => team.get('name'))
+      }
+    },
+
+    [EMAIL_COMMENT.SUCCESS]: (state, action) => {
       const resTeam = action.response.team
       const withInsertedTeam = state.mails.push(fromJS(resTeam))
       return {
