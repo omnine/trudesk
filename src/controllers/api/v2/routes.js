@@ -54,6 +54,7 @@ module.exports = function (middleware, router, controllers) {
 
   // OWA
   router.get('/api/v2/mails', apiv2Auth, apiv2.mails.get)
+  router.post('/api/v2/mails/read', apiv2Auth, apiv2.mails.read)
 
   // Departments
   router.get('/api/v2/departments', apiv2Auth, apiv2.departments.get)

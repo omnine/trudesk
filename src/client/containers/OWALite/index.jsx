@@ -113,8 +113,8 @@ class OWALiteContainer extends React.Component {
     )
   }
   
-  onReadMailClick (_id) { //ItemId
-    this.props.readMail({ _id })
+  onReadMailClick (id) { //ItemId
+    this.props.readMail({itemId: id})
   }
 
   render () {

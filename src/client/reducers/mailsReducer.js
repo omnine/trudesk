@@ -46,7 +46,7 @@ const reducer = handleActions(
     [READ_MAIL.SUCCESS]: (state, action) => {
       return {
         ...state,
-        mailbody: fromJS(action.payload.response.body)
+        mailbody: fromJS(action.response.body)
       }
     },
 

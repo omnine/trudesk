@@ -101,5 +101,6 @@ export default function * watcher () {
   yield takeLatest(CREATE_MAIL.ACTION, createMail)
   yield takeLatest(EMAIL_COMMENT.ACTION, email2Comment)
   yield takeLatest(DELETE_MAIL.ACTION, deleteMail)
+  yield takeLatest(READ_MAIL.ACTION, readMail)
   yield takeLatest(UNLOAD_MAILS.ACTION, unloadThunk)
 }
