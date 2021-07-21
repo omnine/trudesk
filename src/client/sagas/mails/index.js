@@ -14,15 +14,7 @@
  */
 
 import { call, put, takeLatest } from 'redux-saga/effects'
-import {
-  CREATE_MAIL,
-  CONDUCT_MAIL,
-  READ_MAIL,
-  FETCH_MAILS,
-  HIDE_MODAL,
-  UNLOAD_MAILS,
-  EMAIL_COMMENT
-} from 'actions/types'
+import { CREATE_MAIL, CONDUCT_MAIL, FETCH_MAILS, HIDE_MODAL, UNLOAD_MAILS } from 'actions/types'
 
 import Log from '../../logger'
 import api from '../../api'
@@ -52,30 +44,6 @@ function * createMail ({ payload }) {
   }
 }
 
-function * email2Comment ({ payload }) {
-  try {
-    const response = yield call(api.mails.email2Comment, payload)
-    yield put({ type: EMAIL_COMMENT.SUCCESS, response })
-    yield put({ type: HIDE_MODAL.ACTION })
-  } catch (error) {
-    const errorText = error.response.data.error
-    helpers.UI.showSnackbar(`Error: ${errorText}`, true)
-    yield put({ type: EMAIL_COMMENT.ERROR, error })
-  }
-}
-
-function * readMail ({ payload }) {
-  try {
-    const response = yield call(api.mails.readMail, payload)
-    yield put({ type: READ_MAIL.SUCCESS, payload, response })
-  } catch (error) {
-    const errorText = error.response ? error.response.data.error : error
-    helpers.UI.showSnackbar(`Error: ${errorText}`, true)
-    Log.error(errorText, error)
-    yield put({ type: READ_MAIL.ERROR, error })
-  }
-}
-
 function * conductMail ({ payload }) {
   try {
     const response = yield call(api.mails.conductMail, payload)
@@ -99,8 +67,6 @@ function * unloadThunk ({ payload, meta }) {
 export default function * watcher () {
   yield takeLatest(FETCH_MAILS.ACTION, fetchMails)
   yield takeLatest(CREATE_MAIL.ACTION, createMail)
-  yield takeLatest(EMAIL_COMMENT.ACTION, email2Comment)
   yield takeLatest(CONDUCT_MAIL.ACTION, conductMail)
-  yield takeLatest(READ_MAIL.ACTION, readMail)
   yield takeLatest(UNLOAD_MAILS.ACTION, unloadThunk)
 }

@@ -17,7 +17,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 
-import { fetchMails, unloadMails, conductMail, readMail } from 'actions/mails'
+import { fetchMails, unloadMails, conductMail } from 'actions/mails'
 import { showModal } from 'actions/common'
 
 import PageTitle from 'components/PageTitle'
@@ -114,7 +114,7 @@ class OWALiteContainer extends React.Component {
   }
   
   onReadMailClick (id) { //ItemId
-    this.props.readMail({itemId: id})
+    this.props.conductMail({itemId: id, action: 'read'})
   }
 
   render () {
@@ -193,7 +193,6 @@ OWALiteContainer.propTypes = {
   fetchMails: PropTypes.func.isRequired,
   unloadMails: PropTypes.func.isRequired,
   conductMail: PropTypes.func.isRequired,
-  readMail: PropTypes.func.isRequired,
   showModal: PropTypes.func.isRequired
 }
 
@@ -203,5 +202,5 @@ const mapStateToProps = state => ({
 
 export default connect(
   mapStateToProps,
-  { fetchMails, unloadMails, conductMail, readMail, showModal }
+  { fetchMails, unloadMails, conductMail, showModal }
 )(OWALiteContainer)

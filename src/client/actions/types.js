@@ -74,10 +74,7 @@ export const UNLOAD_TEAMS = defineAction('UNLOAD_TEAMS', [SUCCESS])
 export const FETCH_MAILS = defineAction('FETCH_MAILS', [PENDING, SUCCESS, ERROR])
 export const CREATE_MAIL = defineAction('CREATE_MAIL', [PENDING, SUCCESS, ERROR])
 export const CONDUCT_MAIL = defineAction('CONDUCT_MAIL', [PENDING, SUCCESS, ERROR])
-export const READ_MAIL = defineAction('READ_MAIL', [PENDING, SUCCESS, ERROR])
 export const UNLOAD_MAILS = defineAction('UNLOAD_MAILS', [SUCCESS])
-
-export const EMAIL_COMMENT = defineAction('EMAIL_COMMENT', [PENDING, SUCCESS, ERROR])
 
 // Departments
 export const FETCH_DEPARTMENTS = defineAction('FETCH_DEPARTMENTS', [PENDING, SUCCESS, ERROR])

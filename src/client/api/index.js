@@ -237,11 +237,6 @@ api.mails.email2Comment = payload => {
     return res.data
   })
 }
-api.mails.readMail = payload => {
-  return axios.post('/api/v2/mails/read', payload).then(res => {
-    return res.data
-  })
-}
 api.mails.conductMail = payload => {
   return axios.post('/api/v2/mails/conduct', payload).then(res => {
     return res.data

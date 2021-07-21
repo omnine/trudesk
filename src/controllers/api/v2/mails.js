@@ -335,15 +335,6 @@ apiMails.get = function (req, res) {
   )
 }
 
-apiMails.read = function (req, res) {
-  var message = req.body
-  if (!message) return apiUtils.sendApiError_InvalidPostData(res)
-  var propertySet = new ews.PropertySet(ews.ItemSchema.Body)
-  ews.EmailMessage.Bind(ewsCheck.exchService, new ews.ItemId(message.itemId), propertySet).then(function (email) {
-    res.json({ error: 0, body: email.Body.Text })
-  })
-}
-
 apiMails.conduct = function (req, res) {
   var message = req.body
   if (!message) return apiUtils.sendApiError_InvalidPostData(res)
@@ -368,11 +359,20 @@ apiMails.conduct = function (req, res) {
     case 'comment':
       email2Comment(message)
       break
+    case 'read':
+      var propertySet = new ews.PropertySet(ews.ItemSchema.Body)
+      ews.EmailMessage.Bind(ewsCheck.exchService, new ews.ItemId(message.itemId), propertySet).then(function (email) {
+        res.json({ error: 0, body: email.Body.Text })
+      })
+      break
     case 'case':
-      //      email2Comment(message)
+      var propertySet = new ews.PropertySet(ews.ItemSchema.UniqueBody)
+      ews.EmailMessage.Bind(ewsCheck.exchService, new ews.ItemId(message.itemId), propertySet).then(function (email) {
+        createTicket(email, null)
+        res.json({ error: 0 })
+      })
       break
     default:
-      text = 'I have never heard of that fruit...'
   }
 }
 

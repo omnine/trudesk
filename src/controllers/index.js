@@ -30,7 +30,6 @@ var Controllers = {
   editor: require('./editor'),
   backuprestore: require('./backuprestore'),
   api: require('./api'),
-  addin: require('./addin'),
 
   debug: require('./debug')
 }

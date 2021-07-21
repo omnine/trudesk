@@ -19,7 +19,7 @@ import { observer } from 'mobx-react'
 import { observable } from 'mobx'
 import { connect } from 'react-redux'
 
-import { email2Comment } from 'actions/mails'
+import { conductMail } from 'actions/mails'
 
 import Button from 'components/Button'
 import BaseModal from './BaseModal'
@@ -35,7 +35,7 @@ class Email2CommentModal extends React.Component {
   onEmail2CommentClicked (e) {
     e.preventDefault()
 
-    this.props.email2Comment({ tid: this.name, itemId: this.props.itemId, action: 'comment'})
+    this.props.conductMail({ tid: this.name, itemId: this.props.itemId, action: 'comment'})
   }
 
   render () {
@@ -77,10 +77,10 @@ class Email2CommentModal extends React.Component {
 
 Email2CommentModal.propTypes = {
   itemId: PropTypes.object,
-  email2Comment: PropTypes.func.isRequired
+  conductMail: PropTypes.func.isRequired
 }
 
 export default connect(
   null,
-  { email2Comment }
+  { conductMail }
 )(Email2CommentModal)
