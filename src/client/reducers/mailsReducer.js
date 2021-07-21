@@ -15,7 +15,7 @@
 
 import { fromJS, List } from 'immutable'
 import { handleActions } from 'redux-actions'
-import { CREATE_MAIL, DELETE_MAIL, READ_MAIL, FETCH_MAILS, UNLOAD_MAILS, EMAIL_COMMENT } from 'actions/types'
+import { CREATE_MAIL, CONDUCT_MAIL, READ_MAIL, FETCH_MAILS, UNLOAD_MAILS, EMAIL_COMMENT } from 'actions/types'
 
 const initialState = {
   mails: List([])
@@ -50,7 +50,7 @@ const reducer = handleActions(
       }
     },
 
-    [DELETE_MAIL.SUCCESS]: (state, action) => {
+    [CONDUCT_MAIL.SUCCESS]: (state, action) => {
       const idx = state.mails.findIndex(t => {
         return t.get('_id') === action.payload._id
       })

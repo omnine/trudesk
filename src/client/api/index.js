@@ -242,8 +242,8 @@ api.mails.readMail = payload => {
     return res.data
   })
 }
-api.mails.deleteMail = payload => {
-  return axios.post('/api/v2/mails/delete', payload).then(res => {
+api.mails.conductMail = payload => {
+  return axios.post('/api/v2/mails/conduct', payload).then(res => {
     return res.data
   })
 }

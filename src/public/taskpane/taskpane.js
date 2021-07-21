@@ -93,10 +93,11 @@ export async function email2Comment () {
   var item = Office.context.mailbox.item
   let data = {
     itemId: item.itemId,
-    tid: tid
+    tid: tid,
+    action: 'comment'
   }
   $.ajax({
-    url: 'https://helpdesk.deepnetsecurity.com/email2comment',
+    url: 'https://helpdesk.deepnetsecurity.com/api/v2/mails/conduct',
     method: 'POST',
     dataType: 'json',
     crossDomain: true,
@@ -122,11 +123,12 @@ export async function conversations2Case () {
   // get MailItem.ConversationID as the paramter, https://docs.microsoft.com/en-us/javascript/api/outlook/office.messageread?view=outlook-js-1.5&preserve-view=true#conversationId
   var item = Office.context.mailbox.item
   let data = {
-    conversationId: item.conversationId
+    conversationId: item.conversationId,
+    action: 'conversation'
   }
 
   $.ajax({
-    url: 'https://helpdesk.deepnetsecurity.com/conversations2case',
+    url: 'https://helpdesk.deepnetsecurity.com/api/v2/mails/conduct',
     method: 'POST',
     dataType: 'json',
     crossDomain: true,
@@ -161,11 +163,12 @@ export async function email2Case () {
   //ticket and comment may need to create seperately.
   var item = Office.context.mailbox.item
   let data = {
-    itemId: item.itemId
+    itemId: item.itemId,
+    action: 'case'
   }
 
   $.ajax({
-    url: 'https://helpdesk.deepnetsecurity.com/email2case',
+    url: 'https://helpdesk.deepnetsecurity.com/api/v2/mails/conduct',
     method: 'POST',
     dataType: 'json',
     crossDomain: true,
@@ -187,50 +190,6 @@ export async function email2Case () {
       //remove cookies as well to avoid wrong csrf check
     }
   })
-
-  /*
-
-  //Use office.js to get mail body content
-  Office.context.mailbox.item.body.getAsync(Office.CoercionType.Html, result => {
-    if (result.status === Office.AsyncResultStatus.Failed) {
-      // show some error message?
-      return
-    }
-
-    let bodyHtml = result.value
-    //ticket and comment may need to create seperately.
-    var item = Office.context.mailbox.item
-    let data = {
-      itemId: item.itemId,
-      from: item.from.emailAddress,
-      subject: item.subject,
-      body: bodyHtml
-    }
-
-    $.ajax({
-      url: 'https://helpdesk.deepnetsecurity.com/email2case',
-      method: 'POST',
-      dataType: 'json',
-      crossDomain: true,
-      contentType: 'application/json; charset=utf-8',
-      data: JSON.stringify(data),
-      cache: false,
-      beforeSend: function (xhr) {
-        xhr.setRequestHeader('accesstoken', userAPIToken)
-      },
-      success: function (result) {
-        window.location.href = 'https://helpdesk.deepnetsecurity.com/tickets/' + result.uid
-      },
-      error: function (xhr, status, error) {
-        //show this block to allow change API Token
-        $('#group_apikey').show()
-        $('#message').html('Result: ' + xhr.status + ' ' + xhr.statusText)
-
-        //remove cookies as well to avoid wrong csrf check
-      }
-    })
-  })
-  */
 }
 
 function parseJwt (token) {

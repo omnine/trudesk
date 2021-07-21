@@ -16,7 +16,7 @@
 import { call, put, takeLatest } from 'redux-saga/effects'
 import {
   CREATE_MAIL,
-  DELETE_MAIL,
+  CONDUCT_MAIL,
   READ_MAIL,
   FETCH_MAILS,
   HIDE_MODAL,
@@ -76,15 +76,15 @@ function * readMail ({ payload }) {
   }
 }
 
-function * deleteMail ({ payload }) {
+function * conductMail ({ payload }) {
   try {
-    const response = yield call(api.mails.deleteMail, payload)
-    yield put({ type: DELETE_MAIL.SUCCESS, payload, response })
+    const response = yield call(api.mails.conductMail, payload)
+    yield put({ type: CONDUCT_MAIL.SUCCESS, payload, response })
   } catch (error) {
     const errorText = error.response ? error.response.data.error : error
     helpers.UI.showSnackbar(`Error: ${errorText}`, true)
     Log.error(errorText, error)
-    yield put({ type: DELETE_MAIL.ERROR, error })
+    yield put({ type: CONDUCT_MAIL.ERROR, error })
   }
 }
 
@@ -100,7 +100,7 @@ export default function * watcher () {
   yield takeLatest(FETCH_MAILS.ACTION, fetchMails)
   yield takeLatest(CREATE_MAIL.ACTION, createMail)
   yield takeLatest(EMAIL_COMMENT.ACTION, email2Comment)
-  yield takeLatest(DELETE_MAIL.ACTION, deleteMail)
+  yield takeLatest(CONDUCT_MAIL.ACTION, conductMail)
   yield takeLatest(READ_MAIL.ACTION, readMail)
   yield takeLatest(UNLOAD_MAILS.ACTION, unloadThunk)
 }

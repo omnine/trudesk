@@ -17,7 +17,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 
-import { fetchMails, unloadMails, deleteMail, readMail } from 'actions/mails'
+import { fetchMails, unloadMails, conductMail, readMail } from 'actions/mails'
 import { showModal } from 'actions/common'
 
 import PageTitle from 'components/PageTitle'
@@ -70,7 +70,7 @@ class OWALiteContainer extends React.Component {
         </p>
         `,
       () => {
-        this.props.deleteMail({itemId: id })
+        this.props.conductMail({itemId: id, action:'delete' })
       },
       {
         labels: { Ok: 'Yes', Cancel: 'No' },
@@ -79,7 +79,7 @@ class OWALiteContainer extends React.Component {
     )
   }
 
-  onConvertConversationClick (_id) {
+  onConvertConversationClick (id) {
     UIKit.modal.confirm(
       `<h2>Are you sure?</h2>
         <p style="font-size: 15px;">
@@ -87,7 +87,7 @@ class OWALiteContainer extends React.Component {
         </p>
         `,
       () => {
-        this.props.deleteMail({ _id })
+        this.props.conductMail({itemId: id, action: 'conversation' })
       },
       {
         labels: { Ok: 'Yes', Cancel: 'No' },
@@ -96,7 +96,7 @@ class OWALiteContainer extends React.Component {
     )
   }
 
-  onConvertEmailClick (_id) {
+  onConvertEmailClick (id) {
     UIKit.modal.confirm(
       `<h2>Are you sure?</h2>
         <p style="font-size: 15px;">
@@ -104,7 +104,7 @@ class OWALiteContainer extends React.Component {
         </p>
         `,
       () => {
-        this.props.deleteMail({ _id })
+        this.props.conductMail({itemId: id, action: 'case' })
       },
       {
         labels: { Ok: 'Yes', Cancel: 'No' },
@@ -192,7 +192,7 @@ OWALiteContainer.propTypes = {
   mailsState: PropTypes.object.isRequired,
   fetchMails: PropTypes.func.isRequired,
   unloadMails: PropTypes.func.isRequired,
-  deleteMail: PropTypes.func.isRequired,
+  conductMail: PropTypes.func.isRequired,
   readMail: PropTypes.func.isRequired,
   showModal: PropTypes.func.isRequired
 }
@@ -203,5 +203,5 @@ const mapStateToProps = state => ({
 
 export default connect(
   mapStateToProps,
-  { fetchMails, unloadMails, deleteMail, readMail, showModal }
+  { fetchMails, unloadMails, conductMail, readMail, showModal }
 )(OWALiteContainer)
