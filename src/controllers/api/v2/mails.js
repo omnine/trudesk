@@ -91,6 +91,22 @@ apiMails.read = function (req, res) {
   })
 }
 
+apiMails.delete = function (req, res) {
+  var message = req.body
+  if (!message) return apiUtils.sendApiError_InvalidPostData(res)
+  //can we use null for the last two parameters?
+  ewsCheck.exchService
+    .DeleteItem(
+      new ews.ItemId(message.itemId),
+      ews.DeleteMode.MoveToDeletedItems,
+      ews.SendCancellationsMode.SendToNone,
+      ews.AffectedTaskOccurrence.SpecifiedOccurrenceOnly
+    )
+    .then(function () {
+      res.json({ error: 0 })
+    })
+}
+
 apiMails.create = function (req, res) {
   var postData = req.body
   if (!postData) return apiUtils.sendApiError_InvalidPostData(res)

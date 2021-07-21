@@ -59,7 +59,7 @@ class OWALiteContainer extends React.Component {
     this.props.showModal('CREATE_TEAM')
   }
 
-  onDeleteMailClick (_id) { 
+  onDeleteMailClick (id) { 
     UIKit.modal.confirm(
       `<h2>Are you sure?</h2>
         <p style="font-size: 15px;">
@@ -70,7 +70,7 @@ class OWALiteContainer extends React.Component {
         </p>
         `,
       () => {
-        this.props.deleteMail({ _id })
+        this.props.deleteMail({itemId: id })
       },
       {
         labels: { Ok: 'Yes', Cancel: 'No' },

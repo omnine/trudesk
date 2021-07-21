@@ -238,8 +238,12 @@ api.mails.email2Comment = payload => {
   })
 }
 api.mails.readMail = payload => {
-  //same payload like in taskpane
   return axios.post('/api/v2/mails/read', payload).then(res => {
+    return res.data
+  })
+}
+api.mails.deleteMail = payload => {
+  return axios.post('/api/v2/mails/delete', payload).then(res => {
     return res.data
   })
 }
