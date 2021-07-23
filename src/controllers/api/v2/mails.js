@@ -28,7 +28,7 @@ var Team = require('../../../models/team')
 var apiUtils = require('../apiUtils')
 var ewsCheck = require('../../../mailer/ewsCheck')
 
-function createTicket (email, conversation, cb) {
+function createTicket (req, res, email, conversation, cb) {
   var message = {}
   message.from = email.From.Address
   message.subject = email.Subject
@@ -167,14 +167,18 @@ function createTicket (email, conversation, cb) {
         return null
       }
 
-      return cb(null, ticket.handleCreateTicket, conversation) // pay attention to it! handleCreateTicket is the true model
+      if (cb) {
+        cb(null, ticket.handleCreateTicket, conversation) // pay attention to it! handleCreateTicket is the true model
+      } else {
+        res.json({ error: 0, tid: ticket.handleCreateTicket.uid })
+      }
     }
   )
 }
 
 //Covert conversations into a ticket plus comments, todo
 //https://github.com/MicrosoftDocs/office-developer-exchange-docs/blob/master/docs/exchange-web-services/how-to-work-with-conversations-by-using-ews-in-exchange.md
-function conversations2Case (message) {
+function conversations2Case (res, message) {
   /*
   var propertySet = new ews.PropertySet(ews.BasePropertySet.IdOnly, [
     ews.ItemSchema.Subject,
@@ -211,13 +215,13 @@ function conversations2Case (message) {
 
       if (emails.length == 1) {
         var email = emails[0]
-        createTicket(email, null)
+        createTicket(req, res, email, null)
       } else {
         const firstMail = emails.shift() // get the first one and also remove it from the array
         async.waterfall(
           [
             //https://github.com/caolan/async/issues/14
-            async.apply(createTicket, firstMail, emails), // Pass arguments to the first function in waterfall
+            async.apply(createTicket, req, res, firstMail, emails), // Pass arguments to the first function in waterfall
             function (ticket, items, callback) {
               items.forEach(email => {
                 appendEmail(email, ticket)
@@ -302,7 +306,7 @@ apiMails.get = function (req, res) {
   }
 
   var startDate = ews.DateTime.Now
-  startDate = startDate.AddDays(-7) // 1 week
+  startDate = startDate.AddDays(-28) // 1 week
   //      var startDate = new ews.DateTime(2021, 6, 6)
   var greaterThanfilter = new ews.SearchFilter.IsGreaterThanOrEqualTo(
     ews.EmailMessageSchema.DateTimeReceived,
@@ -360,16 +364,19 @@ apiMails.conduct = function (req, res) {
       email2Comment(message)
       break
     case 'read':
-      var propertySet = new ews.PropertySet(ews.ItemSchema.Body)
+      var additionalProps = [] // In order to load UniqueBody
+      additionalProps.push(ews.ItemSchema.UniqueBody)
+      var propertySet = new ews.PropertySet(ews.BasePropertySet.FirstClassProperties, additionalProps)
       ews.EmailMessage.Bind(ewsCheck.exchService, new ews.ItemId(message.itemId), propertySet).then(function (email) {
         res.json({ error: 0, body: email.Body.Text })
       })
       break
     case 'case':
-      var propertySet = new ews.PropertySet(ews.ItemSchema.UniqueBody)
+      var additionalProps = [] // In order to load UniqueBody
+      additionalProps.push(ews.ItemSchema.UniqueBody)
+      var propertySet = new ews.PropertySet(ews.BasePropertySet.FirstClassProperties, additionalProps)
       ews.EmailMessage.Bind(ewsCheck.exchService, new ews.ItemId(message.itemId), propertySet).then(function (email) {
-        createTicket(email, null)
-        res.json({ error: 0 })
+        createTicket(req, res, email, null)
       })
       break
     default:

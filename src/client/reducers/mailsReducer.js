@@ -40,13 +40,22 @@ const reducer = handleActions(
     },
 
     [CONDUCT_MAIL.SUCCESS]: (state, action) => {
-      if (action.payload.action === 'read') {
-        return {
-          ...state,
-          mailbody: fromJS(action.response.body)
-        }
+      switch (action.payload.action) {
+        case 'read':
+          return {
+            ...state,
+            mailbody: fromJS(action.response.body)
+          }
+          break
+        case 'case':
+          return {
+            ...state,
+            tid: fromJS(action.response.tid)
+          }
+          break
+        default:
+          return { ...state }
       }
-      return { ...state }
     },
 
     [UNLOAD_MAILS.SUCCESS]: state => {
