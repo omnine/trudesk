@@ -378,7 +378,7 @@ function openInboxFolder (beginTime, endTime, callback) {
             message.from = item.From.Address
             message.subject = item.Subject
 
-            message.body = toMD(item.UniqueBody)
+            message.body = ewsCheck.toMD(item.UniqueBody)
             message.tid = tid
             message.messageId = item.InternetMessageId
             message.folder = 'INBOX'
@@ -504,7 +504,7 @@ function openSentFolder (beginTime, endTime, callback) {
               var recips = item.ToRecipients.Items
               message.from = recips[0].Address
               message.subject = item.Subject
-              message.body = toMD(item.UniqueBody) // only replied email body instead of whole email body = item.Body,
+              message.body = ewsCheck.toMD(item.UniqueBody) // only replied email body instead of whole email body = item.Body,
               //use this one
               message.inReplyTo = item.inReplyTo
               //                message.references = item.References
