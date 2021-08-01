@@ -1,3 +1,45 @@
+## [1.1.8](https://github.com/polonel/trudesk/compare/v1.1.7...v1.1.8) (2021-07-25)
+
+
+### Bug Fixes
+
+* **tickets:** creation has no response [#423](https://github.com/polonel/trudesk/issues/423) by alsemany ([dcfde5f](https://github.com/polonel/trudesk/commit/dcfde5f))
+
+## [1.1.7](https://github.com/polonel/trudesk/compare/v1.1.6...v1.1.7) (2021-07-15)
+
+
+### Bug Fixes
+
+* **import:** importing users with csv [#418](https://github.com/polonel/trudesk/issues/418) ([d2cab62](https://github.com/polonel/trudesk/commit/d2cab62))
+
+## [1.1.6](https://github.com/polonel/trudesk/compare/v1.1.5...v1.1.6) (2021-06-21)
+
+
+### Bug Fixes
+
+* **renderer:** view rendering incorrectly (departments) ([18f9eca](https://github.com/polonel/trudesk/commit/18f9eca))
+* **security:** security fix 1 [#413](https://github.com/polonel/trudesk/issues/413) ([c3c3b29](https://github.com/polonel/trudesk/commit/c3c3b29))
+* **security:** security fix 2 [#413](https://github.com/polonel/trudesk/issues/413) ([58c90d8](https://github.com/polonel/trudesk/commit/58c90d8))
+* **tickets:** security fix 11 [#413](https://github.com/polonel/trudesk/issues/413) ([17c2eb7](https://github.com/polonel/trudesk/commit/17c2eb7))
+* **tickets:** security fix 4 [#413](https://github.com/polonel/trudesk/issues/413) ([caaec12](https://github.com/polonel/trudesk/commit/caaec12))
+* **uploads:** security fix ([25c5ae4](https://github.com/polonel/trudesk/commit/25c5ae4))
+
+## [1.1.5](https://github.com/polonel/trudesk/compare/v1.1.4...v1.1.5) (2021-06-09)
+
+
+### Bug Fixes
+
+* **tickets:** view rending incorrectly on latest version of Chrome ([d574948](https://github.com/polonel/trudesk/commit/d574948))
+
+## [1.1.4](https://github.com/polonel/trudesk/compare/v1.1.3...v1.1.4) (2021-06-01)
+
+
+### Bug Fixes
+
+* **accounts:** check if agent is assignee before deleting agent. [#408](https://github.com/polonel/trudesk/issues/408) ([81fd6ea](https://github.com/polonel/trudesk/commit/81fd6ea))
+* **build:** stop nightly build ([fefb8de](https://github.com/polonel/trudesk/commit/fefb8de))
+* **tickets:** third party ([c954ba0](https://github.com/polonel/trudesk/commit/c954ba0))
+
 ## [1.1.3](https://github.com/polonel/trudesk/compare/v1.1.2...v1.1.3) (2020-02-05)
 
 
