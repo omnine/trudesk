@@ -180,7 +180,7 @@ export async function email2Case () {
       xhr.setRequestHeader('accesstoken', userAPIToken)
     },
     success: function (result) {
-      window.location.href = 'https://helpdesk.deepnetsecurity.com/tickets/' + result.uid
+      window.location.href = 'https://helpdesk.deepnetsecurity.com/tickets/' + result.tid
     },
     error: function (xhr, status, error) {
       //show this block to allow change API Token
