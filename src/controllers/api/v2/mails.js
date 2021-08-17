@@ -153,7 +153,7 @@ function createTicket (req, res, email, conversation, cb) {
         'handleCreateTicket',
         function (ticket, callback) {
           var subject = message.subject
-          subject = '[DISSUE#' + ticket.handleCreateTicket.uid + ']-' + subject
+          subject = '[DISSUE#' + ticket.handleCreateTicket.uid + '] - ' + subject
           //email is from the function parameter, we don't need to do ews bind
           email.SetSubject(subject)
           email.Update(ews.ConflictResolutionMode.AlwaysOverwrite) //2

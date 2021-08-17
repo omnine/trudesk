@@ -16,6 +16,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
+//import  { Redirect } from 'react-router-dom'
 
 import { fetchMails, unloadMails, conductMail } from 'actions/mails'
 import { showModal } from 'actions/common'
@@ -118,10 +119,14 @@ class OWALiteContainer extends React.Component {
   }
 
   render () {
+    //https://stackoverflow.com/questions/45089386/what-is-the-best-way-to-redirect-a-page-using-react-router
  //   https://stackoverflow.com/questions/43230194/how-to-use-redirect-in-the-new-react-router-dom-of-reactjs
+ // todo still got error: Invariant failed: You should not use <Redirect> outside a <Router>
+ /*
     if (this.props.mailsState.tid) {
       return <Redirect to={'/tickets/' + this.props.mailsState.tid}/>;
     }
+    */
     const tableItems = this.props.mailsState.mails.map(mail => {
       return (
         <TableRow key={mail.get('_id')} className={'vam nbb'}>
