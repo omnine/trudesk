@@ -24,7 +24,7 @@ module.exports = {
       'underscore'
     ],
     'trudesk.min': path.resolve(__dirname, 'src/public/js/app.js'),
-    taskpane: './src/public/taskpane/taskpane.js',
+    taskpane: './src/public/taskpane/index.jsx',
     truRequire: 'expose-loader?truRequire!' + path.resolve(__dirname, './src/public/js/truRequire')
   },
   output: {
@@ -133,6 +133,10 @@ module.exports = {
           'postcss-loader',
           'sass-loader'
         ]
+      },
+      {
+        test: /\.css$/,
+        use: ['style-loader', 'css-loader']
       },
       {
         test: /\.jsx$/,
