@@ -33,13 +33,15 @@ Office.initialize = () => {
 
 /* Initial render showing a progress bar */
 //render(App);
+
+
+
+/*
 ReactDOM.render(
   <App title={title} isOfficeInitialized={isOfficeInitialized} />,
 document.getElementById("container")
 );
 
-
-/*
 if (module.hot) {
   module.hot.accept("./components/App", () => {
     const NextApp = require("./components/App").default;

@@ -201,6 +201,9 @@ module.exports = {
       template: './src/public/taskpane/taskpane.html',
       chunks: ['polyfill', 'taskpane']
     }),
+    new webpack.ProvidePlugin({
+      Promise: ['es6-promise', 'Promise']
+    }),
     new CopyWebpackPlugin([
       {
         to: 'outlook/taskpane.css',
