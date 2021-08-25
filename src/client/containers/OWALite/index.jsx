@@ -27,7 +27,7 @@ import PageContent from 'components/PageContent'
 import helpers from 'lib/helpers'
 import Button from 'components/Button'
 import UIKit from 'uikit'
-import Table from 'components/Table'
+//import Table from 'components/Table'
 import TableRow from 'components/Table/TableRow'
 import TableCell from 'components/Table/TableCell'
 import TableHeader from 'components/Table/TableHeader'
@@ -37,6 +37,21 @@ import DropdownTrigger from 'components/Dropdown/DropdownTrigger'
 import Dropdown from 'components/Dropdown'
 import DropdownItem from 'components/Dropdown/DropdownItem'
 import DropdownSeparator from 'components/Dropdown/DropdownSeperator'
+
+import { Table, Tag, Space } from 'antd';
+
+const columns = [
+  {
+    title: 'From',
+    dataIndex: 'from',
+    key: 'from',
+  },
+  {
+    title: 'Subject',
+    dataIndex: 'subject',
+    key: 'subject',
+  }
+];
 
 class OWALiteContainer extends React.Component {
   constructor (props) {
@@ -127,6 +142,7 @@ class OWALiteContainer extends React.Component {
       return <Redirect to={'/tickets/' + this.props.mailsState.tid}/>;
     }
     */
+   const data = this.props.mailsState.mails.toJS()  //there are reasons to use or not use immutable data
     const tableItems = this.props.mailsState.mails.map(mail => {
       return (
         <TableRow key={mail.get('_id')} className={'vam nbb'}>
@@ -177,27 +193,8 @@ class OWALiteContainer extends React.Component {
             </div>
           }
         />
-        <PageContent id={'teams-page-content'} padding={0} paddingBottom={0}>
-          <Table
-            headers={[
-              <TableHeader key={0} width={'25%'} height={40} text={'From'} padding={'8px 8px 8px 15px'} />,
-              <TableHeader key={1} width={'50%'} text={'Subject'} />,
-              <TableHeader key={2} width={130} text={'Mail Actions'} />
-            ]}
-          >
-            {this.props.mailsState.mails.size < 1 && (
-              <TableRow>
-                <TableCell colSpan={3}>
-                  <h5 style={{ paddingLeft: 8 }}>No Mails</h5>
-                </TableCell>
-              </TableRow>
-            )}
-            {tableItems}
-          </Table>
-          <div>
-            {this.props.mailsState.mailbody}
-          </div>
-        </PageContent>
+        <Table columns={columns} dataSource={data} />
+
       </div>
     )
   }
